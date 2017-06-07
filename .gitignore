@@ -31,3 +31,13 @@ vignettes/*.pdf
 # Temporary files created by R markdown
 *.utf8.md
 *.knit.md
+.Rproj.user
+
+# .DS_Store
+*.DS_Store
+
+# raw GHCN data
+/data/ghcnd_all/ghcnd_all/*.dly
+
+# R project
+*.Rproj
