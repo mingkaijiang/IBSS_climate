@@ -48,42 +48,40 @@ CoefPlot<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRE
 ##Calculate coefficient of variation (stdev/mean)
 CoefVar<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECTORY)
 {
-  
-  DatFiles <- list.files(path = sourceDir, pattern = "\\.csv")
-  
-  for (thisFile in 1:length(DatFiles)) 
-  {
+    DatFiles <- list.files(path = sourceDir, pattern = "\\.csv")
     dir.create(destDir, showWarnings = FALSE)
-    inName <- file.path(sourceDir, DatFiles[thisFile], fsep = .Platform$file.sep)
-    outName <- file.path(destDir, DatFiles[thisFile], fsep = .Platform$file.sep)
     
-    dd <- read.table(inName,header=F,sep=" ",col.names=c("year","month",
-                                                         "day","prcp"))
-    dd[dd$prcp<=(-99.),"prcp"]<-NA
+    ### Create a outdf to store all data in one file
+    outDF <- matrix(ncol=7, nrow=length(DatFiles))
+    outDF <- as.data.frame(outDF)
+    colnames(outDF) <- c("GHCN_ID", "Start_yr", "End_yr", "Yr_range",
+                         "Daily_stdev", 
+                         "Daily_mean", 
+                         "Daily_coef_var")
+    outDF$GHCN_ID <- sub(".csv", "", DatFiles)
     
-    output <- matrix(ncol=6)
-    output <- as.data.frame(output, row.names = NULL, stringsAsFactors = FALSE)
-    colnames(output) <- c("climateStart","climateEnd","yrRange","STDEV",
-                          "meanprcp","coefOfVar")    
+    for (i in 1:length(DatFiles)) 
+    {
+        print(i)
+        inName <- file.path(sourceDir, DatFiles[i], fsep = .Platform$file.sep)
+
+        dd <- read.csv(inName,header=F,skip=1,sep=",",
+                       col.names=c("id","year","month","day","prcp"))
+        
+        outDF[i,"Start_yr"] <- min(as.numeric(dd$year))
+        outDF[i,"End_yr"] <- max(as.numeric(dd$year))
+        
+        outDF[i,"Daily_stdev"] <- sd(dd$prcp,na.rm=T)
+        outDF[i,"Daily_mean"] <- mean(dd$prcp,na.rm=T)
+
+    }
     
-    yrmin <- min(as.numeric(dd$year))
-    yrmax <- max(as.numeric(dd$year))
-    yrrange <- yrmax - yrmin
-    stdev <- sd(dd$prcp,na.rm=T)
-    meanpr <- mean(dd$prcp,na.rm=T)
-    coef <- round(stdev/meanpr,digits=2)
+    outDF[,"Yr_range"] <- outDF[,"End_yr"] - outDF[,"Start_yr"]
+    coef_var <- outDF$Daily_stdev/outDF$Daily_mean
+    outDF[,"Daily_coef_var"] <- round(coef_var,digits=2)
     
+    write.csv(outDF,paste0(destDir, "/daily_coef_var.csv"))
     
-    output$climateStart <- yrmin
-    output$climateEnd <- yrmax
-    output$yrRange <- yrrange
-    output$STDEV <- stdev
-    output$meanprcp <- meanpr
-    output$coefOfVar <- coef
-    
-    write.table(output,outName,append=F,quote=F,sep=",",na="-99.9",row.names=F,col.names=T)
-    
-  }
 }
 
 ##############################################################################################################
@@ -138,16 +136,17 @@ CoefVar_move<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.
 ##Need to be in the correct directory
 
 ConvertFiles <- function(sourceDir = DAILY.FILES.DIRECTORY, 
+                         stations,
                          destDir = DAILY.DATA.DIRECTORY) 
 {
-  files <- list.files(path = sourceDir, pattern = ".dly")
+  files <- paste0(stations, ".dly")
   if (!file.exists(destDir)) 
     dir.create(destDir)
   for (thisFile in 1:length(files)) 
   {
     print(thisFile)     
-    X <- ReadDailyPRCP(files[thisFile], sourceDir)
-    fname <- sub(".dly", ".raw", files[thisFile])
+    X <- ReadDailyPRCP(paste0(sourceDir, files[thisFile]))
+    fname <- sub(".dly", ".csv", files[thisFile])
     fname <- file.path(destDir, fname, fsep = .Platform$file.sep)
     write.table(X[,1:35], fname, row.names=F)
   }
@@ -2496,7 +2495,7 @@ R99PS_pred_move<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTP
 
 ##############################################################################################################
 ##Read daily prcp data, within function ConvertFiles
-ReadDailyPRCP <- function(filename, directory = DAILY.FILES.DIRECTORY)
+ReadDailyPRCP <- function(filename)
 {
   fname <- filename
   X <- readLines(fname)
@@ -2566,9 +2565,10 @@ ReOrder <- function (sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.INPUT.DIR
 ReStructureFile <- function (sourceDir = DAILY.DATA.DIRECTORY, 
                              destDir = DAILY.INPUT.DIRECTORY)
 {
-  DatFiles <- list.files(path = sourceDir, pattern = "\\.raw")
+  DatFiles <- list.files(path = sourceDir, pattern = "\\.csv")
   for (thisFile in 1:length(DatFiles)) 
   {
+    print(files[thisFile])
     dir.create(destDir, showWarnings = FALSE)
     inName <- file.path(sourceDir, DatFiles[thisFile], fsep = .Platform$file.sep)
     outName <- file.path(destDir, DatFiles[thisFile], fsep = .Platform$file.sep)
@@ -2588,8 +2588,9 @@ ReStructureFile <- function (sourceDir = DAILY.DATA.DIRECTORY,
     keeps <- c("Year","Month","Day","value")
     data_upd <- data_upd[keeps]
     data_upd <- as.data.frame(sapply(data_upd,gsub,pattern="Day",replacement=""))
-    
-    write.table(data_upd, outName, sep = " ")
+    X <- data_upd
+    X <- X[order(X$Year, X$Month, X$Day), ]
+    write.csv(X, outName)
   }
 }
 
@@ -2769,23 +2770,25 @@ RX1Day<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECT
 RX1S<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECTORY)
 {
   DatFiles <- list.files(path = sourceDir, pattern = "\\.csv")
+  dir.create(destDir, showWarnings = FALSE)
+  
+  
   for (thisFile in 1:length(DatFiles)) 
   {
-    dir.create(destDir, showWarnings = FALSE)
+      print(thisFile)
     inName <- file.path(sourceDir, DatFiles[thisFile], fsep = .Platform$file.sep)
     outName <- file.path(destDir, DatFiles[thisFile], fsep = .Platform$file.sep)
     
-    dd <- read.table(inName,header=F,col.names=c("year","month","day","prcp"),
-                     colClasses=rep("real",4))
+    dd <- read.csv(inName,header=F,skip=1,col.names=c("id", "year","month","day","prcp"))
     
+    dd <- dd[,2:5]
     nama<-substr(inName,start=1,stop=(nchar(inName)-4))
     outdirtmp <- strsplit(inName,"/")[[1]]
     
     ofilename<-substr(outdirtmp[length(outdirtmp)],
                       start=1,stop=(nchar(outdirtmp[length(outdirtmp)])-4))
     
-    dd[dd$prcp<=(-99.),"prcp"]<-NA
-    
+
     ddd<-matrix(NA,365,4)
     dddl<-matrix(NA,366,4)
     dimnames(ddd)<-list(NULL,c("year","month","day","prcp"))
@@ -2844,19 +2847,21 @@ RX1S<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECTOR
     years<-dd[1,1]
     yeare<-dd[dim(dd)[1],1]
     
-    if (leapyear(years)) 
-      dddd<-dddl 
-    else 
-      dddd<-ddd
+    if (leapyear(years)) {
+        dddd<-dddl   
+    } else {
+        dddd <- ddd
+    }
     
     dddd[,"year"]<-years
     
     for (year in years:yeare)
     {                  
-      if (leapyear(year)) 
-        dddd1 <- dddl 
-      else 
-        dddd1 <- ddd
+      if (leapyear(year)) {
+          dddd1 <- dddl
+      } else {
+          dddd1 <- ddd
+      }
       
       dddd1[,"year"]<-year
       
@@ -2914,7 +2919,7 @@ RX1S<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECTOR
       ofile[k,6]<-max(ofile[k,2:6],na.rm=F)
     }       
     
-    write.table(ofile,outName,append=F,quote=F,sep=",",na="-99.9",row.names=F)
+    write.csv(ofile,outName, row.names=F)
   }
   
 }
@@ -3422,12 +3427,14 @@ RX5S<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECTOR
 {
   dir.create(destDir, showWarnings = FALSE)
   DatFiles <- list.files(path = sourceDir, pattern = "\\.csv")
+  
   for (thisFile in 1:length(DatFiles)) 
   {
+      print(thisFile)
     inName <- file.path(sourceDir, DatFiles[thisFile], fsep = .Platform$file.sep)
     outName <- file.path(destDir, DatFiles[thisFile], fsep = .Platform$file.sep)
-    dd <- read.table(inName,header=F,col.names=c("year","month","day","prcp"),
-                     colClasses=rep("real",4))
+    dd <- read.csv(inName,header=F,skip=1,col.names=c("id","year","month","day","prcp"))
+    dd <- dd[,2:5]
     
     nama<-substr(inName,start=1,stop=(nchar(inName)-4))
     outdirtmp <- strsplit(inName,"/")[[1]]
@@ -3435,8 +3442,6 @@ RX5S<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECTOR
     ofilename<-substr(outdirtmp[length(outdirtmp)],
                       start=1,stop=(nchar(outdirtmp[length(outdirtmp)])-4))
     
-    
-    dd[dd$prcp<=(-99.),"prcp"]<-NA
     
     ddd<-matrix(NA,365,4)
     dddl<-matrix(NA,366,4)
@@ -3578,7 +3583,7 @@ RX5S<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECTOR
       ofile[k,6]<-max(ofile[k,2:6],na.rm=F)
     }
     
-    write.table(ofile,outName,append=F,quote=F,sep=",",na="-99.9",row.names=F)
+    write.csv(ofile,outName,row.names=F)
   }
 }
 
@@ -4665,13 +4670,14 @@ ThrIndS<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIREC
 {
   dir.create(destDir, showWarnings = FALSE)
   DatFiles <- list.files(path = sourceDir, pattern = "\\.csv")
+  
   for (thisFile in 1:length(DatFiles)) 
   {
     inName <- file.path(sourceDir, DatFiles[thisFile], fsep = .Platform$file.sep)
     outName <- file.path(destDir, DatFiles[thisFile], fsep = .Platform$file.sep)
     
-    dd <- read.table(inName,header=F,col.names=c("year","month","day","prcp"),
-                     colClasses=rep("real",4))
+    dd <- read.csv(inName,header=F,skip=1,col.names=c("id","year","month","day","prcp"))
+    dd <- dd[,2:5]
     
     nama<-substr(inName,start=1,stop=(nchar(inName)-4))
     outdirtmp <- strsplit(inName,"/")[[1]]
@@ -4679,8 +4685,6 @@ ThrIndS<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIREC
     ofilename<-substr(outdirtmp[length(outdirtmp)],
                       start=1,stop=(nchar(outdirtmp[length(outdirtmp)])-4))
     
-    
-    dd[dd$prcp<=(-99.),"prcp"]<-NA
     
     ddd<-matrix(NA,365,4)
     dddl<-matrix(NA,366,4)
@@ -4947,39 +4951,25 @@ ThrIndS<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIREC
 }
 
 ##############################################################################################################
-##Filter data for Year range > 60 for long-term trend analysis - modified
-YrRange10<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECTORY)
+##Filter data for Year range > 19 for long-term trend analysis - modified
+YrRange10<-function(sourceDir = DAILY.DATA.DIRECTORY)
 {
   dir.create(destDir, showWarnings = FALSE)
-  DatFiles <- list.files(path = sourceDir, pattern = "\\.raw")
+  DatFiles <- list.files(path = sourceDir, pattern = "\\.csv")
   for (thisFile in 1:length(DatFiles)) 
   {
     inName <- file.path(sourceDir, DatFiles[thisFile], fsep = .Platform$file.sep)
     outName1 <- file.path(destDir, DatFiles[thisFile], fsep = .Platform$file.sep)
     
-    unselected <- "E:/IBSS/Output/unselected10"
-    dir.create(unselected, showWarnings = FALSE)
-    
-    outName2 <- file.path(unselected,
-                          DatFiles[thisFile], fsep = .Platform$file.sep)
-    
     dd <- read.table(inName,header=T,sep=" ")
     
-    if (is.numeric(dd$Year) == T)
-    {
-      yrrange <- max(as.numeric(dd$Year)) - min(as.numeric(dd$Year))
+    yrrange <- max(as.numeric(dd$Year)) - min(as.numeric(dd$Year))
     
-      if (yrrange > 10)
+      if (yrrange < 10)
       {  
-        write.table(dd,outName1,append=F,quote=F,sep=" ",na="-99.9",row.names=F,col.names=T)
+        print(files[thisFile])
       }
-      else
-      {  
-        write.table(dd,outName2,append=F,quote=F,sep=" ",na="-99.9",row.names=F,col.names=T)
-      }
-    }
-    else
-      unlink(dd, recursive = F, force=F)
+
   }
 }
 

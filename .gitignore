@@ -38,6 +38,14 @@ vignettes/*.pdf
 
 # raw GHCN data
 /data/ghcnd_all/ghcnd_all/*.dly
+/data/ghcnd_selected/*.csv
+/data/ghcnd_coef_var/*.csv
+/data/Indices/*.csv
+/data/Indices/rx1s/*.csv
+/data/Indices/rx5s/*.csv
+/data/Indices/ThrIndS/*.csv
+/data/Indices/SDIIS/*.csv
+
 
 # R project
 *.Rproj
