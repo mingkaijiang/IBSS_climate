@@ -45,6 +45,7 @@ vignettes/*.pdf
 /data/Indices/rx5s/*.csv
 /data/Indices/ThrIndS/*.csv
 /data/Indices/SDIIS/*.csv
+/data/predictability/*.csv
 
 
 # R project
