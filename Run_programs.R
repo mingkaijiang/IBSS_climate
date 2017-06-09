@@ -11,17 +11,22 @@
 #library(reshape2)
 #library(lubridate) #needed for the leap_year function
 #library(eeptools)
-
 ##############################################################################################################
 #### Prepare all functions and coordinate files
+### clear workspace
+rm(list=ls())
+
 ### Calls script containing all necessary functions
 source("R/functionCode_V4.R")
 
 ### Get SCCS coordinates and Station ID Files
 corDF <- read.csv("data/weight_dis_ht.csv")
 
-### GHCN station ID list
-station.list <- unique(corDF$SITE.name)
+### SCCS station list
+sDF <- unique(corDF[corDF$SCCSID,])
+
+## Get GHCN station list
+gDF <- read.csv("data/ghcnd-stations.csv")
 
 ##############################################################################################################
 #### select on SCCS sites based on their information sheet
@@ -32,15 +37,18 @@ ConvertFiles(sourceDir = "data/ghcnd_all/ghcnd_all/",
              destDir = "data/ghcnd_selected")
 
 ### Step 2:
-### Check year range quality - only include data with > 10 yrs of data
-### Return GHCN sites with < 10 yr of data
-YrRange10(sourceDir = "data/ghcnd_selected")
-
-### Step 3:
 ### Restructure the files to continuous days, added leap years
 ### Replacing old with new files
 ReStructureFile(sourceDir = "data/ghcnd_selected", destDir = "data/ghcnd_selected")
 
+### Step 3:
+### Check year range quality - only include data with > 10 yrs of data
+###                          - and data with < 20% missing values
+YrRange10(sourceDir = "data/ghcnd_selected")
+
+### Step 4: 
+### Gap filling
+Gap_Fill(sourceDir = "data/ghcnd_selected", destDir = "data/ghcnd_gap_filled")
 
 ##############################################################################################################
 #### Compute indices
@@ -74,42 +82,42 @@ R10S_pred(sourceDir = "data/indices/ThrIndS", destDir = "data/predictability")
 
 
 ##Calculate R20 predictability
-R20S_pred(sourceDir = "E:/IBSS/Output/ThrIndS/selected", destDir = "E:/IBSS/Output/R20S_pred")
+R20S_pred(sourceDir = "data/indices/ThrIndS", destDir = "data/predictability")
 
 
 ##Calculate PRCPTOT predictability
-PRCPTOTS_pred(sourceDir = "E:/IBSS/Output/ThrIndS/selected", destDir = "E:/IBSS/Output/PRCPTOTS_pred")
+PRCPTOTS_pred(sourceDir = "data/indices/ThrIndS", destDir = "data/predictability")
 
 
 ##Calculate R95P predictability
 ##Need to exclude two files:
 ##SU000062650.csv in the ThrIndS folder
-R95PS_pred(sourceDir = "E:/IBSS/Output/ThrIndS/selected", destDir = "E:/IBSS/Output/R95PS_pred")
+R95PS_pred(sourceDir = "data/indices/ThrIndS", destDir = "data/predictability")
 
 
 ##Calculate R99P predictability
 ##Need to exclude two files:
 ##ASN00015628.csv & WA004150450.csv in the ThrIndS folder
-R99PS_pred(sourceDir = "E:/IBSS/Output/ThrIndS/selected", destDir = "E:/IBSS/Output/R99PS_pred")
+R99PS_pred(sourceDir = "data/indices/ThrIndS", destDir = "data/predictability")
 
 
-R05PS_pred(sourceDir = "E:/IBSS/Output/ThrIndS/selected", destDir = "E:/IBSS/Output/R05PS_pred")
+R05PS_pred(sourceDir = "data/indices/ThrIndS", destDir = "data/predictability")
 
 
 
-R01PS_pred(sourceDir = "E:/IBSS/Output/ThrIndS/selected", destDir = "E:/IBSS/Output/R01PS_pred")
+R01PS_pred(sourceDir = "data/indices/ThrIndS", destDir = "data/predictability")
 
 
 ##Calculate RX1S predictability
-RX1S_pred(sourceDir = "E:/IBSS/Output/RX1S/selected", destDir = "E:/IBSS/Output/RX1S_pred")
+RX1S_pred(sourceDir = "data/indices/rx1s", destDir = "data/predictability")
 
 
 ##Calculate RX5S predictability
-RX5S_pred(sourceDir = "E:/IBSS/Output/RX5S/selected", destDir = "E:/IBSS/Output/RX5S_pred")
+RX5S_pred(sourceDir = "data/indices/rx5s", destDir = "data/predictability")
 
 
 ##Calculate SDII predictability
-SDIIS_pred(sourceDir = "E:/IBSS/Output/SDIIS/selected", destDir = "E:/IBSS/Output/SDIIS_pred")
+SDIIS_pred(sourceDir = "data/indices/SDIIS", destDir = "data/predictability")
 
 
 

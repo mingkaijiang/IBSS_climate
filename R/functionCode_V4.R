@@ -14,7 +14,7 @@ library(reshape)
 library(reshape2)
 library(lubridate) 
 library(eeptools)
-
+library(hyfo)
 
 ##############################################################################################################
 ##Plot annual trend of coefficient of variation and the associated focal year onto the same graph
@@ -303,22 +303,31 @@ PRCPTOTS_pred<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT
   dir.create(destDir, showWarnings = FALSE)
   DatFiles <- list.files(path = sourceDir, pattern = "\\.csv")
   
-  for (thisFile in 1:length(DatFiles)) 
+  ### Create a outdf to store all data in one file
+  output <- matrix(ncol=22, nrow=length(DatFiles))
+  output <- as.data.frame(output, row.names = NULL, stringsAsFactors = FALSE)
+  colnames(output) <- c("GHCN_ID","Start_yr","End_yr","Yr_count",
+                        "HofX","HofY","HofXY","HXofY","s","t","P","C","M","CbyP","MbyP",
+                        "Mutual","GC","C_freedom","GM","M_freedom","GP","P_freedom")
+  
+  output$GHCN_ID <- sub(".csv", "", DatFiles)
+  
+  for (j in 1:length(DatFiles)) 
   {
-    inName <- file.path(sourceDir, DatFiles[thisFile], fsep = .Platform$file.sep)
-    outName <- file.path(destDir, DatFiles[thisFile], fsep = .Platform$file.sep)
-    
-    biome_prcp <- read.table("E:/IBSS/Output/biome_prcp_rng/biome_PRCPTOTS.csv",header=T,sep=",")
-    X <- read.table(inName, sep=",", header=T,quote="")
+    inName <- file.path(sourceDir, DatFiles[j], fsep = .Platform$file.sep)
+
+    X <- read.csv(inName)
     
     years <- min(X$year)
     yeare <- max(X$year)
     yearr <- yeare-years
     
-    i <- X$WWF_MHTNUM[2]
+    # site specific data range
+    v.range <- c(X$prcptot_spr, X$prcptot_sum, 
+                 X$prcptot_aut, X$prcptot_win)
     
-    max_top <- round_any(biome_prcp[biome_prcp$WWF_Num == i, "prcpmax"], 1000, f = ceiling)
-    min_bot <- round_any(biome_prcp[biome_prcp$WWF_Num == i, "prcpmin"], 1000, f = floor)
+    max_top <- round_any(max(v.range), 10, f = ceiling)
+    min_bot <- round_any(min(v.range), 10, f = floor)
     diff <- max_top - min_bot
     interval <- 10
     
@@ -334,18 +343,10 @@ PRCPTOTS_pred<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT
                min_bot+0.5*diff,min_bot+0.6*diff,min_bot+0.7*diff,min_bot+0.8*diff,
                min_bot+0.9*diff,max_top)
     
-    
-    output <- matrix(ncol=32)
-    output <- as.data.frame(output, row.names = NULL, stringsAsFactors = FALSE)
-    colnames(output) <- c("Site_ID","Target_ID","Lat","Long","Elev","Name","SCCS_ID","Focal_year",
-                          "WWF_Num","WWF_Name","startyear","endyear","year_count","seasons",
-                          "HofX","HofY","HofXY","HXofY","s","t","P","C","M","CbyP","MbyP",
-                          "Mutual","GC","C_freedom","GM","M_freedom","GP","P_freedom")
-    
-    spr_cut = cut(X[X$WWF_MHTNUM == i, "prcptot_spr"], breaks, include.lowest=TRUE,right=TRUE)
-    sum_cut = cut(X[X$WWF_MHTNUM == i, "prcptot_sum"], breaks, include.lowest=TRUE,right=TRUE)
-    aut_cut = cut(X[X$WWF_MHTNUM == i, "prcptot_aut"], breaks, include.lowest=TRUE,right=TRUE)
-    win_cut = cut(X[X$WWF_MHTNUM == i, "prcptot_win"], breaks, include.lowest=TRUE,right=TRUE)
+    spr_cut = cut(X[, "prcptot_spr"], breaks, include.lowest=TRUE,right=TRUE)
+    sum_cut = cut(X[, "prcptot_sum"], breaks, include.lowest=TRUE,right=TRUE)
+    aut_cut = cut(X[, "prcptot_aut"], breaks, include.lowest=TRUE,right=TRUE)
+    win_cut = cut(X[, "prcptot_win"], breaks, include.lowest=TRUE,right=TRUE)
     
     spr_freq = table(spr_cut)
     sum_freq = table(sum_cut)
@@ -359,9 +360,8 @@ PRCPTOTS_pred<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT
     
     bin[,"whole"] = (bin[,"spr"]+bin[,"sum"]+bin[,"aut"]+bin[,"win"])
     
-    col_sum <- sum(table(X[X$WWF_MHTNUM == i, "prcptot_spr"]))
+    col_sum <- sum(table(X[, "prcptot_spr"]))
     whole_sum <- col_sum*4
-    
     
     #uncertainty with respect to time H(X)
     HofX <- -((col_sum/whole_sum)*log10(col_sum/whole_sum))*4
@@ -415,41 +415,33 @@ PRCPTOTS_pred<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT
     GP <- GM + GC
     P_free <- (s-1)*t
     
-    output$Site_ID <- X$Site_ID[2]
-    output$Target_FID <- X$TARGET_FID[2]
-    output$Lat <- X$Lat[2]
-    output$Long <- X$Long[2]
-    output$Elev <- X$Elev[2]
-    output$Name <- X$Name[2]
-    output$SCCS_ID <- X$SCCS_ID[2]
-    output$Focal_year <- X$Focal_year[2]
-    output$WWF_Num <- X$WWF_MHTNUM[2]
-    output$WWF_Name <- X$WWF_MHTNAM[2]
-    output$startyear <- years
-    output$endyear <- yeare
-    output$year_count <- col_sum 
-    output$seasons <- whole_sum
-    output$HofX <- HofX
-    output$HofY <- HofY
-    output$HofXY <- HofXY
-    output$HXofY <- HXofY
-    output$s <- s
-    output$t <- t
-    output$P <- P
-    output$C <- C
-    output$M <- M
-    output$CbyP <- CoverP
-    output$MbyP <- MoverP
-    output$Mutual <- IofXY
-    output$GC <- GC
-    output$C_freedom <- C_free
-    output$GM <- GM
-    output$M_freedom <- M_free
-    output$GP <- GP
-    output$P_freedom <- P_free
+    output[j,"Start_yr"] <- years
+    output[j,"End_yr"] <- yeare
+    output[j,"Yr_count"] <- col_sum 
     
-    write.table(output,outName,append=F,sep=",",row.names=F)
+    
+    output[j,"HofX"] <- HofX
+    output[j,"HofY"] <- HofY
+    output[j,"HofXY"] <- HofXY
+    output[j,"HXofY"] <- HXofY
+    output[j,"s"] <- s
+    output[j,"t"] <- t
+    output[j,"P"] <- P
+    output[j,"C"] <- C
+    output[j,"M"] <- M
+    output[j,"CbyP"] <- CoverP
+    output[j,"MbyP"] <- MoverP
+    output[j,"Mutual"] <- IofXY
+    output[j,"GC"] <- GC
+    output[j,"C_freedom"] <- C_free
+    output[j,"GM"] <- GM
+    output[j,"M_freedom"] <- M_free
+    output[j,"GP"] <- GP
+    output[j,"P_freedom"] <- P_free
   }
+  
+  write.csv(output,paste0(destDir, "/PRCPTOT_PCM.csv"),row.names=F)
+  
 }
 
 
@@ -1252,9 +1244,9 @@ R10S_pred<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIR
     
     output$GHCN_ID <- sub(".csv", "", DatFiles)
     
-    for (i in 1:length(DatFiles)) 
+    for (j in 1:length(DatFiles)) 
     {
-        inName <- file.path(sourceDir, DatFiles[i], fsep = .Platform$file.sep)
+        inName <- file.path(sourceDir, DatFiles[j], fsep = .Platform$file.sep)
         
         X <- read.csv(inName)
         
@@ -1357,29 +1349,29 @@ R10S_pred<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIR
         GP <- GM + GC
         P_free <- (s-1)*t
         
-        output[i,"Start_yr"] <- years
-        output[i,"End_yr"] <- yeare
-        output[i,"Yr_count"] <- col_sum 
+        output[j,"Start_yr"] <- years
+        output[j,"End_yr"] <- yeare
+        output[j,"Yr_count"] <- col_sum 
         
 
-        output[i,"HofX"] <- HofX
-        output[i,"HofY"] <- HofY
-        output[i,"HofXY"] <- HofXY
-        output[i,"HXofY"] <- HXofY
-        output[i,"s"] <- s
-        output[i,"t"] <- t
-        output[i,"P"] <- P
-        output[i,"C"] <- C
-        output[i,"M"] <- M
-        output[i,"CbyP"] <- CoverP
-        output[i,"MbyP"] <- MoverP
-        output[i,"Mutual"] <- IofXY
-        output[i,"GC"] <- GC
-        output[i,"C_freedom"] <- C_free
-        output[i,"GM"] <- GM
-        output[i,"M_freedom"] <- M_free
-        output[i,"GP"] <- GP
-        output[i,"P_freedom"] <- P_free
+        output[j,"HofX"] <- HofX
+        output[j,"HofY"] <- HofY
+        output[j,"HofXY"] <- HofXY
+        output[j,"HXofY"] <- HXofY
+        output[j,"s"] <- s
+        output[j,"t"] <- t
+        output[j,"P"] <- P
+        output[j,"C"] <- C
+        output[j,"M"] <- M
+        output[j,"CbyP"] <- CoverP
+        output[j,"MbyP"] <- MoverP
+        output[j,"Mutual"] <- IofXY
+        output[j,"GC"] <- GC
+        output[j,"C_freedom"] <- C_free
+        output[j,"GM"] <- GM
+        output[j,"M_freedom"] <- M_free
+        output[j,"GP"] <- GP
+        output[j,"P_freedom"] <- P_free
     }
     
     write.csv(output,paste0(destDir, "/R10S_PCM.csv"),row.names=F)
@@ -1549,22 +1541,31 @@ R20S_pred<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIR
   dir.create(destDir, showWarnings = FALSE)
   DatFiles <- list.files(path = sourceDir, pattern = "\\.csv")
   
-  for (thisFile in 1:length(DatFiles)) 
+  ### Create a outdf to store all data in one file
+  output <- matrix(ncol=22, nrow=length(DatFiles))
+  output <- as.data.frame(output, row.names = NULL, stringsAsFactors = FALSE)
+  colnames(output) <- c("GHCN_ID","Start_yr","End_yr","Yr_count",
+                        "HofX","HofY","HofXY","HXofY","s","t","P","C","M","CbyP","MbyP",
+                        "Mutual","GC","C_freedom","GM","M_freedom","GP","P_freedom")
+  
+  output$GHCN_ID <- sub(".csv", "", DatFiles)
+  
+  for (j in 1:length(DatFiles)) 
   {
-    inName <- file.path(sourceDir, DatFiles[thisFile], fsep = .Platform$file.sep)
-    outName <- file.path(destDir, DatFiles[thisFile], fsep = .Platform$file.sep)
-    
-    biome_prcp <- read.table("E:/IBSS/Output/biome_prcp_rng/biome_R20S.csv",header=T,sep=",")
-    X <- read.table(inName, sep=",", header=T, quote="")
+    inName <- file.path(sourceDir, DatFiles[j], fsep = .Platform$file.sep)
+
+    X <- read.csv(inName)
     
     years <- min(X$year)
     yeare <- max(X$year)
     yearr <- yeare-years
     
-    i <- X$WWF_MHTNUM[2]
+    # site specific data range
+    v.range <- c(X$R20_spr, X$R20_sum, 
+                 X$R20_aut, X$R20_win)
     
-    max_top <- round_any(biome_prcp[biome_prcp$WWF_Num == i, "prcpmax"], 10, f = ceiling)
-    min_bot <- round_any(biome_prcp[biome_prcp$WWF_Num == i, "prcpmin"], 10, f = floor)
+    max_top <- round_any(max(v.range), 10, f = ceiling)
+    min_bot <- round_any(min(v.range), 10, f = floor)
     diff <- max_top - min_bot
     interval <- 10
     
@@ -1580,18 +1581,10 @@ R20S_pred<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIR
                min_bot+0.5*diff,min_bot+0.6*diff,min_bot+0.7*diff,min_bot+0.8*diff,
                min_bot+0.9*diff,max_top)
     
-    
-    output <- matrix(ncol=32)
-    output <- as.data.frame(output, row.names = NULL, stringsAsFactors = FALSE)
-    colnames(output) <- c("Site_ID","Target_ID","Lat","Long","Elev","Name","SCCS_ID","Focal_year",
-                          "WWF_Num","WWF_Name","startyear","endyear","year_count","seasons",
-                          "HofX","HofY","HofXY","HXofY","s","t","P","C","M","CbyP","MbyP",
-                          "Mutual","GC","C_freedom","GM","M_freedom","GP","P_freedom")
-    
-    spr_cut = cut(X[X$WWF_MHTNUM == i, "R20_spr"], breaks, include.lowest=TRUE,right=TRUE)
-    sum_cut = cut(X[X$WWF_MHTNUM == i, "R20_sum"], breaks, include.lowest=TRUE,right=TRUE)
-    aut_cut = cut(X[X$WWF_MHTNUM == i, "R20_aut"], breaks, include.lowest=TRUE,right=TRUE)
-    win_cut = cut(X[X$WWF_MHTNUM == i, "R20_win"], breaks, include.lowest=TRUE,right=TRUE)
+    spr_cut = cut(X[, "R20_spr"], breaks, include.lowest=TRUE,right=TRUE)
+    sum_cut = cut(X[, "R20_sum"], breaks, include.lowest=TRUE,right=TRUE)
+    aut_cut = cut(X[, "R20_aut"], breaks, include.lowest=TRUE,right=TRUE)
+    win_cut = cut(X[, "R20_win"], breaks, include.lowest=TRUE,right=TRUE)
     
     spr_freq = table(spr_cut)
     sum_freq = table(sum_cut)
@@ -1605,7 +1598,7 @@ R20S_pred<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIR
     
     bin[,"whole"] = (bin[,"spr"]+bin[,"sum"]+bin[,"aut"]+bin[,"win"])
     
-    col_sum <- sum(table(X[X$WWF_MHTNUM == i, "R20_spr"]))
+    col_sum <- sum(table(X[, "R20_spr"]))
     whole_sum <- col_sum*4
     
     
@@ -1661,41 +1654,32 @@ R20S_pred<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIR
     GP <- GM + GC
     P_free <- (s-1)*t
     
-    output$Site_ID <- X$Site_ID[2]
-    output$Target_FID <- X$TARGET_FID[2]
-    output$Lat <- X$Lat[2]
-    output$Long <- X$Long[2]
-    output$Elev <- X$Elev[2]
-    output$Name <- X$Name[2]
-    output$SCCS_ID <- X$SCCS_ID[2]
-    output$Focal_year <- X$Focal_year[2]
-    output$WWF_Num <- X$WWF_MHTNUM[2]
-    output$WWF_Name <- X$WWF_MHTNAM[2]
-    output$startyear <- years
-    output$endyear <- yeare
-    output$year_count <- col_sum 
-    output$seasons <- whole_sum
-    output$HofX <- HofX
-    output$HofY <- HofY
-    output$HofXY <- HofXY
-    output$HXofY <- HXofY
-    output$s <- s
-    output$t <- t
-    output$P <- P
-    output$C <- C
-    output$M <- M
-    output$CbyP <- CoverP
-    output$MbyP <- MoverP
-    output$Mutual <- IofXY
-    output$GC <- GC
-    output$C_freedom <- C_free
-    output$GM <- GM
-    output$M_freedom <- M_free
-    output$GP <- GP
-    output$P_freedom <- P_free
+    output[j,"Start_yr"] <- years
+    output[j,"End_yr"] <- yeare
+    output[j,"Yr_count"] <- col_sum 
     
-    write.table(output,outName,append=F,sep=",",row.names=F)
+    
+    output[j,"HofX"] <- HofX
+    output[j,"HofY"] <- HofY
+    output[j,"HofXY"] <- HofXY
+    output[j,"HXofY"] <- HXofY
+    output[j,"s"] <- s
+    output[j,"t"] <- t
+    output[j,"P"] <- P
+    output[j,"C"] <- C
+    output[j,"M"] <- M
+    output[j,"CbyP"] <- CoverP
+    output[j,"MbyP"] <- MoverP
+    output[j,"Mutual"] <- IofXY
+    output[j,"GC"] <- GC
+    output[j,"C_freedom"] <- C_free
+    output[j,"GM"] <- GM
+    output[j,"M_freedom"] <- M_free
+    output[j,"GP"] <- GP
+    output[j,"P_freedom"] <- P_free
   }
+  write.csv(output,paste0(destDir, "/R20S_PCM.csv"),row.names=F)
+  
 }
 
 
@@ -1865,25 +1849,33 @@ R95PS_pred<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DI
   dir.create(destDir, showWarnings = FALSE)
   DatFiles <- list.files(path = sourceDir, pattern = "\\.csv")
   
-  for (thisFile in 1:length(DatFiles)) 
+  ### Create a outdf to store all data in one file
+  output <- matrix(ncol=22, nrow=length(DatFiles))
+  output <- as.data.frame(output, row.names = NULL, stringsAsFactors = FALSE)
+  colnames(output) <- c("GHCN_ID","Start_yr","End_yr","Yr_count",
+                        "HofX","HofY","HofXY","HXofY","s","t","P","C","M","CbyP","MbyP",
+                        "Mutual","GC","C_freedom","GM","M_freedom","GP","P_freedom")
+  
+  output$GHCN_ID <- sub(".csv", "", DatFiles)
+  
+  for (j in 1:length(DatFiles)) 
   {
-    inName <- file.path(sourceDir, DatFiles[thisFile], fsep = .Platform$file.sep)
-    outName <- file.path(destDir, DatFiles[thisFile], fsep = .Platform$file.sep)
-    
-    biome_prcp <- read.table("E:/IBSS/Output/biome_prcp_rng/biome_R95PS.csv",header=T,sep=",")
-    X <- read.table(inName, sep=",", header=T,quote="")
+    inName <- file.path(sourceDir, DatFiles[j], fsep = .Platform$file.sep)
+
+    X <- read.csv(inName)
     
     years <- min(X$year)
     yeare <- max(X$year)
     yearr <- yeare-years
     
-    i <- X$WWF_MHTNUM[2]
+    # site specific data range
+    v.range <- c(X$r95p_spr, X$r95p_sum, 
+                 X$r95p_aut, X$r95p_win)
     
-    max_top <- round_any(biome_prcp[biome_prcp$WWF_Num == i, "prcpmax"], 1000, f = ceiling)
-    min_bot <- round_any(biome_prcp[biome_prcp$WWF_Num == i, "prcpmin"], 1000, f = floor)
+    max_top <- round_any(max(v.range), 10, f = ceiling)
+    min_bot <- round_any(min(v.range), 10, f = floor)
     diff <- max_top - min_bot
     interval <- 10
-    
     
     bin <- matrix(0, ncol=6, nrow=interval)
     dimnames(bin) <- list(NULL,c("bin_size","spr","sum","aut","win","whole"))
@@ -1896,18 +1888,11 @@ R95PS_pred<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DI
                min_bot+0.5*diff,min_bot+0.6*diff,min_bot+0.7*diff,min_bot+0.8*diff,
                min_bot+0.9*diff,max_top)
     
+    spr_cut = cut(X[, "r95p_spr"], breaks, include.lowest=TRUE,right=TRUE)
+    sum_cut = cut(X[, "r95p_sum"], breaks, include.lowest=TRUE,right=TRUE)
+    aut_cut = cut(X[, "r95p_aut"], breaks, include.lowest=TRUE,right=TRUE)
+    win_cut = cut(X[, "r95p_win"], breaks, include.lowest=TRUE,right=TRUE)
     
-    output <- matrix(ncol=32)
-    output <- as.data.frame(output, row.names = NULL, stringsAsFactors = FALSE)
-    colnames(output) <- c("Site_ID","Target_ID","Lat","Long","Elev","Name","SCCS_ID","Focal_year",
-                          "WWF_Num","WWF_Name","startyear","endyear","year_count","seasons",
-                          "HofX","HofY","HofXY","HXofY","s","t","P","C","M","CbyP","MbyP",
-                          "Mutual","GC","C_freedom","GM","M_freedom","GP","P_freedom")
-    
-    spr_cut = cut(X[X$WWF_MHTNUM == i, "r95p_spr"], breaks, include.lowest=TRUE,right=TRUE)
-    sum_cut = cut(X[X$WWF_MHTNUM == i, "r95p_sum"], breaks, include.lowest=TRUE,right=TRUE)
-    aut_cut = cut(X[X$WWF_MHTNUM == i, "r95p_aut"], breaks, include.lowest=TRUE,right=TRUE)
-    win_cut = cut(X[X$WWF_MHTNUM == i, "r95p_win"], breaks, include.lowest=TRUE,right=TRUE)
     
     spr_freq = table(spr_cut)
     sum_freq = table(sum_cut)
@@ -1921,7 +1906,7 @@ R95PS_pred<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DI
     
     bin[,"whole"] = (bin[,"spr"]+bin[,"sum"]+bin[,"aut"]+bin[,"win"])
     
-    col_sum <- sum(table(X[X$WWF_MHTNUM == i, "r95p_spr"]))
+    col_sum <- sum(table(X[, "R10_spr"]))
     whole_sum <- col_sum*4
     
     
@@ -1977,41 +1962,32 @@ R95PS_pred<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DI
     GP <- GM + GC
     P_free <- (s-1)*t
     
-    output$Site_ID <- X$Site_ID[2]
-    output$Target_FID <- X$TARGET_FID[2]
-    output$Lat <- X$Lat[2]
-    output$Long <- X$Long[2]
-    output$Elev <- X$Elev[2]
-    output$Name <- X$Name[2]
-    output$SCCS_ID <- X$SCCS_ID[2]
-    output$Focal_year <- X$Focal_year[2]
-    output$WWF_Num <- X$WWF_MHTNUM[2]
-    output$WWF_Name <- X$WWF_MHTNAM[2]
-    output$startyear <- years
-    output$endyear <- yeare
-    output$year_count <- col_sum 
-    output$seasons <- whole_sum
-    output$HofX <- HofX
-    output$HofY <- HofY
-    output$HofXY <- HofXY
-    output$HXofY <- HXofY
-    output$s <- s
-    output$t <- t
-    output$P <- P
-    output$C <- C
-    output$M <- M
-    output$CbyP <- CoverP
-    output$MbyP <- MoverP
-    output$Mutual <- IofXY
-    output$GC <- GC
-    output$C_freedom <- C_free
-    output$GM <- GM
-    output$M_freedom <- M_free
-    output$GP <- GP
-    output$P_freedom <- P_free
+    output[j,"Start_yr"] <- years
+    output[j,"End_yr"] <- yeare
+    output[j,"Yr_count"] <- col_sum 
     
-    write.table(output,outName,append=F,sep=",",row.names=F)
+    
+    output[j,"HofX"] <- HofX
+    output[j,"HofY"] <- HofY
+    output[j,"HofXY"] <- HofXY
+    output[j,"HXofY"] <- HXofY
+    output[j,"s"] <- s
+    output[j,"t"] <- t
+    output[j,"P"] <- P
+    output[j,"C"] <- C
+    output[j,"M"] <- M
+    output[j,"CbyP"] <- CoverP
+    output[j,"MbyP"] <- MoverP
+    output[j,"Mutual"] <- IofXY
+    output[j,"GC"] <- GC
+    output[j,"C_freedom"] <- C_free
+    output[j,"GM"] <- GM
+    output[j,"M_freedom"] <- M_free
+    output[j,"GP"] <- GP
+    output[j,"P_freedom"] <- P_free
   }
+  
+  write.csv(output,paste0(destDir, "/R95P_PCM.csv"),row.names=F)
 }
 
 ##############################################################################################################
@@ -2178,22 +2154,31 @@ R99PS_pred<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DI
   dir.create(destDir, showWarnings = FALSE)
   DatFiles <- list.files(path = sourceDir, pattern = "\\.csv")
   
-  for (thisFile in 1:length(DatFiles)) 
+  ### Create a outdf to store all data in one file
+  output <- matrix(ncol=22, nrow=length(DatFiles))
+  output <- as.data.frame(output, row.names = NULL, stringsAsFactors = FALSE)
+  colnames(output) <- c("GHCN_ID","Start_yr","End_yr","Yr_count",
+                        "HofX","HofY","HofXY","HXofY","s","t","P","C","M","CbyP","MbyP",
+                        "Mutual","GC","C_freedom","GM","M_freedom","GP","P_freedom")
+  
+  output$GHCN_ID <- sub(".csv", "", DatFiles)
+  
+  for (j in 1:length(DatFiles)) 
   {
-    inName <- file.path(sourceDir, DatFiles[thisFile], fsep = .Platform$file.sep)
-    outName <- file.path(destDir, DatFiles[thisFile], fsep = .Platform$file.sep)
-    
-    biome_prcp <- read.table("E:/IBSS/Output/biome_prcp_rng/biome_R99PS.csv",header=T,sep=",")
-    X <- read.table(inName, sep=",", header=T,quote="")
+    inName <- file.path(sourceDir, DatFiles[j], fsep = .Platform$file.sep)
+
+    X <- read.csv(inName)
     
     years <- min(X$year)
     yeare <- max(X$year)
     yearr <- yeare-years
     
-    i <- X$WWF_MHTNUM[2]
+    # site specific data range
+    v.range <- c(X$r99p_spr, X$r99p_sum, 
+                 X$r99p_aut, X$r99p_win)
     
-    max_top <- round_any(biome_prcp[biome_prcp$WWF_Num == i, "prcpmax"], 1000, f = ceiling)
-    min_bot <- round_any(biome_prcp[biome_prcp$WWF_Num == i, "prcpmin"], 1000, f = floor)
+    max_top <- round_any(max(v.range), 10, f = ceiling)
+    min_bot <- round_any(min(v.range), 10, f = floor)
     diff <- max_top - min_bot
     interval <- 10
     
@@ -2560,11 +2545,11 @@ ReStructureFile <- function (sourceDir = DAILY.DATA.DIRECTORY,
   DatFiles <- list.files(path = sourceDir, pattern = "\\.csv")
   for (thisFile in 1:length(DatFiles)) 
   {
-    print(files[thisFile])
-    dir.create(destDir, showWarnings = FALSE)
+    print(DatFiles[thisFile])
+
     inName <- file.path(sourceDir, DatFiles[thisFile], fsep = .Platform$file.sep)
     outName <- file.path(destDir, DatFiles[thisFile], fsep = .Platform$file.sep)
-    #        outName <- sub(".raw", ".txt", DatFiles[thisFile])
+
     X <- read.table(inName, stringsAsFactors = FALSE,sep=" ", header=T)
     melted <- melt(X, id.var = c("Id", "Elements", "Year", "Month"), 
                    variable_name = "Day")
@@ -2581,6 +2566,12 @@ ReStructureFile <- function (sourceDir = DAILY.DATA.DIRECTORY,
     data_upd <- data_upd[keeps]
     data_upd <- as.data.frame(sapply(data_upd,gsub,pattern="Day",replacement=""))
     X <- data_upd
+    X$Year <- as.numeric(as.character(X$Year))
+    X$Month <- as.numeric(as.character(X$Month))
+    X$Day <- as.numeric(as.character(X$Day))
+    X$value <- as.numeric(as.character(X$value))
+    X[is.na(X)] <- -99.9
+    
     X <- X[order(X$Year, X$Month, X$Day), ]
     write.csv(X, outName)
   }
@@ -4942,23 +4933,31 @@ ThrIndS<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIREC
 }
 
 ##############################################################################################################
-##Filter data for Year range > 19 for long-term trend analysis - modified
+## Filter data for Year range > 10 for long-term trend analysis 
+## Also check for missing data issue, missing data should not be > 80%
 YrRange10<-function(sourceDir = DAILY.DATA.DIRECTORY)
 {
-  dir.create(destDir, showWarnings = FALSE)
   DatFiles <- list.files(path = sourceDir, pattern = "\\.csv")
+  
   for (thisFile in 1:length(DatFiles)) 
   {
     inName <- file.path(sourceDir, DatFiles[thisFile], fsep = .Platform$file.sep)
-    outName1 <- file.path(destDir, DatFiles[thisFile], fsep = .Platform$file.sep)
     
-    dd <- read.table(inName,header=T,sep=" ")
+    dd <- read.csv(inName,header=F,skip = 1, sep=",")
+    colnames(dd) <- c("id", "Year", "Month", "Day", "value")
     
     yrrange <- max(as.numeric(dd$Year)) - min(as.numeric(dd$Year))
     
-      if (yrrange < 10)
+    # check for missing data issue
+    target <- yrrange * 365
+    d2 <- dd[complete.cases(dd),]
+    reality <- nrow(d2)
+    miss_percent <- (target - reality) / target
+    
+      if (yrrange < 10 || miss_percent > 0.2)
       {  
-        print(files[thisFile])
+        print(DatFiles[thisFile])
+        file.remove(paste0(sourceDir, "/", DatFiles[thisFile]))
       }
 
   }
@@ -4998,6 +4997,37 @@ YrRange60<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIR
 
 
 ##############################################################################################################
+### Gap filling using the hyfo package as an easy solution
+Gap_Fill <- function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECTORY) {
+    
+    dir.create(destDir, showWarnings = FALSE)
+    DatFiles <- list.files(path = sourceDir, pattern = "\\.csv")
+    
+    for (thisFile in 1:length(DatFiles)) 
+    {
+        inName <- file.path(sourceDir, DatFiles[thisFile], fsep = .Platform$file.sep)
+        outName <- file.path(destDir, DatFiles[thisFile], fsep = .Platform$file.sep)
+        
+        X <- read.csv(inName)
+        
+        X$date <- as.Date(paste(X$Year, X$Month, X$Day, sep="-"),
+                          format = "%Y-%m-%d")
+        
+        modDF <- data.frame(X$date, X$value)
+        colnames(modDF) <- c("date", "value")
+        
+        modDF[modDF$value == -99.9, "value"] <- NA
+        
+        test <- modDF[1:3, ]
+        test$value[2] <- NA
+        
+        test2 <- fillGap(test, corPeriod="daily")
+        
+        write.csv(dd,outName)
+        
+    }
+    
+}
 ##############################################################################################################
 ##############################################################################################################
 
