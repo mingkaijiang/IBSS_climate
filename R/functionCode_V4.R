@@ -5027,8 +5027,7 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME,
                      sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECTORY) {
     
     dir.create(destDir, showWarnings = FALSE)
-    DatFiles <- list.files(path = sourceDir, pattern = "\\.csv")
-    
+
     targList <- paste0(stationDF$ghcn1,".csv")
     supList2 <- paste0(stationDF$ghcn2,".csv")
     supList3 <- paste0(stationDF$ghcn3,".csv")
@@ -5232,10 +5231,64 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME,
         # delete row entries where the entire row are full with NAs
         test2 <- testDF[rowSums(is.na(testDF[,2:10]))!=9, ]
         
-        # gap fill the rest missing values
-        test3 <- fillGap(test2, corPeriod="daily")
+        test3 <- subset(test2, date <= max(modDF$date))
+        test4 <- subset(test3, date >= min(modDF$date))
         
-        write.csv(test3,outName)
+        # check column sums to ensure there's still data left for each ghcn station
+        csum <- colSums(!is.na(test4[,2:10]))
+
+        if(csum[[2]] <= 10) {
+            test4$s2 <- test4$s1
+        }
+        
+        if(csum[[3]] <= 10) {
+            test4$s3 <- test4$s1
+        }
+        
+        if(csum[[4]] <= 10) {
+            test4$s4 <- test4$s1
+        }
+        
+        if(csum[[5]] <= 10) {
+            test4$s5 <- test4$s1
+        }
+        
+        if(csum[[6]] <= 10) {
+            test4$s6 <- test4$s1
+        }
+        
+        if(csum[[7]] <= 10) {
+            test4$s7 <- test4$s1
+        }
+        
+        if(csum[[8]] <= 10) {
+            test4$s8 <- test4$s1
+        }
+        
+        if(csum[[9]] <= 10) {
+            test4$s9 <- test4$s1
+        }
+        
+        # gap fill the rest missing values
+        test5 <- fillGap(test4, corPeriod="daily")
+        
+        # re-create the dataframe over the entire period with no missing values
+        t.series <- seq.Date(from = min(modDF$date), to = max(modDF$date),
+                             by = "day")
+        outDF <- data.frame(t.series, NA)
+        colnames(outDF) <- c("date", "s1")
+        
+        for (j in test5$Date) {
+            outDF[outDF$date == j, "s1"] <- test5[test5$Date == j, "s1"]
+        }
+        
+        outDF$Year <- as.numeric(format(outDF$date, "%Y"))
+        outDF$Month <- as.numeric(format(outDF$date, "%m"))
+        outDF$Day <- as.numeric(format(outDF$date, "%d"))
+        
+        outDF2 <- outDF[,c("date", "Year", "Month", "Day", "s1")]
+        
+        write.csv(outDF2,outName)
         
     }
     
