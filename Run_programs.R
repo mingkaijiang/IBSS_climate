@@ -22,11 +22,17 @@ source("R/functionCode_V4.R")
 ### Get SCCS coordinates and Station ID Files
 corDF <- read.csv("data/weight_dis_ht.csv")
 
-### SCCS station list
-sDF <- unique(corDF[corDF$SCCSID,])
-
-## Get GHCN station list
+### Get GHCN station list
 gDF <- read.csv("data/ghcnd-stations.csv")
+
+#### Obtain SCCS based GHCN stations that are closest to the SCCS point
+stationDF <- select_9_ghcn_stations(corDF, gDF)
+
+#### Obtain GHCN station list to process
+station.list <- c(stationDF$ghcn1, stationDF$ghcn2, stationDF$ghcn3,
+                  stationDF$ghcn4, stationDF$ghcn5, stationDF$ghcn6,
+                  stationDF$ghcn7, stationDF$ghcn8, stationDF$ghcn9)
+station.list <- unique(station.list)
 
 ##############################################################################################################
 #### select on SCCS sites based on their information sheet
@@ -36,6 +42,10 @@ ConvertFiles(sourceDir = "data/ghcnd_all/ghcnd_all/",
              stations = station.list,
              destDir = "data/ghcnd_selected")
 
+### Step 3:
+### Check year range quality - only include data with > 10 yrs of data
+YrRange10(sourceDir = "data/ghcnd_selected")
+
 ### Step 2:
 ### Restructure the files to continuous days, added leap years
 ### Replacing old with new files
@@ -44,11 +54,11 @@ ReStructureFile(sourceDir = "data/ghcnd_selected", destDir = "data/ghcnd_selecte
 ### Step 3:
 ### Check year range quality - only include data with > 10 yrs of data
 ###                          - and data with < 20% missing values
-YrRange10(sourceDir = "data/ghcnd_selected")
+Missing_check(sourceDir = "data/ghcnd_selected")
 
 ### Step 4: 
 ### Gap filling
-Gap_Fill(sourceDir = "data/ghcnd_selected", destDir = "data/ghcnd_gap_filled")
+Gap_Fill(stationDF, sourceDir = "data/ghcnd_selected", destDir = "data/ghcnd_gap_filled")
 
 ##############################################################################################################
 #### Compute indices

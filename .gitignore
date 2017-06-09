@@ -46,6 +46,7 @@ vignettes/*.pdf
 /data/Indices/ThrIndS/*.csv
 /data/Indices/SDIIS/*.csv
 /data/predictability/*.csv
+/data/ghcnd_gap_filled/*.csv
 
 
 # R project

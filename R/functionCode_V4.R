@@ -4943,24 +4943,49 @@ YrRange10<-function(sourceDir = DAILY.DATA.DIRECTORY)
   {
     inName <- file.path(sourceDir, DatFiles[thisFile], fsep = .Platform$file.sep)
     
-    dd <- read.csv(inName,header=F,skip = 1, sep=",")
-    colnames(dd) <- c("id", "Year", "Month", "Day", "value")
-    
+    dd <- read.table(inName, sep=" ", header=T)
+
     yrrange <- max(as.numeric(dd$Year)) - min(as.numeric(dd$Year))
     
-    # check for missing data issue
-    target <- yrrange * 365
-    d2 <- dd[complete.cases(dd),]
-    reality <- nrow(d2)
-    miss_percent <- (target - reality) / target
     
-      if (yrrange < 10 || miss_percent > 0.2)
+      if (yrrange < 2)
       {  
         print(DatFiles[thisFile])
         file.remove(paste0(sourceDir, "/", DatFiles[thisFile]))
       }
 
   }
+}
+
+##############################################################################################################
+## Filter data for Year range > 10 for long-term trend analysis 
+## Also check for missing data issue, missing data should not be > 80%
+Missing_check<-function(sourceDir = DAILY.DATA.DIRECTORY)
+{
+    DatFiles <- list.files(path = sourceDir, pattern = "\\.csv")
+    
+    for (thisFile in 1:length(DatFiles)) 
+    {
+        inName <- file.path(sourceDir, DatFiles[thisFile], fsep = .Platform$file.sep)
+        
+        dd <- read.csv(inName,header=F,skip = 1, sep=",")
+        colnames(dd) <- c("id", "Year", "Month", "Day", "value")
+        
+        yrrange <- max(as.numeric(dd$Year)) - min(as.numeric(dd$Year))
+        
+        # check for missing data issue
+        target <- yrrange * 365
+        d2 <- dd[complete.cases(dd),]
+        reality <- nrow(d2)
+        miss_percent <- (target - reality) / target
+        
+        if (yrrange < 10 || miss_percent > 0.2)
+        {  
+            print(DatFiles[thisFile])
+            file.remove(paste0(sourceDir, "/", DatFiles[thisFile]))
+        }
+        
+    }
 }
 
 ##############################################################################################################
@@ -4998,37 +5023,319 @@ YrRange60<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIR
 
 ##############################################################################################################
 ### Gap filling using the hyfo package as an easy solution
-Gap_Fill <- function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECTORY) {
+Gap_Fill <- function(stationDF = STATION.DATAFRAME, 
+                     sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECTORY) {
     
     dir.create(destDir, showWarnings = FALSE)
     DatFiles <- list.files(path = sourceDir, pattern = "\\.csv")
     
-    for (thisFile in 1:length(DatFiles)) 
+    targList <- paste0(stationDF$ghcn1,".csv")
+    supList2 <- paste0(stationDF$ghcn2,".csv")
+    supList3 <- paste0(stationDF$ghcn3,".csv")
+    supList4 <- paste0(stationDF$ghcn4,".csv")
+    supList5 <- paste0(stationDF$ghcn5,".csv")
+    supList6 <- paste0(stationDF$ghcn6,".csv")
+    supList7 <- paste0(stationDF$ghcn7,".csv")
+    supList8 <- paste0(stationDF$ghcn8,".csv")
+    supList9 <- paste0(stationDF$ghcn9,".csv")
+    
+    
+    
+    for (i in 1:length(targList)) 
     {
-        inName <- file.path(sourceDir, DatFiles[thisFile], fsep = .Platform$file.sep)
-        outName <- file.path(destDir, DatFiles[thisFile], fsep = .Platform$file.sep)
+        inName <- file.path(sourceDir, targList[i], fsep = .Platform$file.sep)
+        outName <- file.path(destDir, targList[i], fsep = .Platform$file.sep)
         
-        X <- read.csv(inName)
+        inName2 <- file.path(sourceDir, supList2[i], fsep = .Platform$file.sep)
+        inName3 <- file.path(sourceDir, supList3[i], fsep = .Platform$file.sep)
+        inName4 <- file.path(sourceDir, supList4[i], fsep = .Platform$file.sep)
+        inName5 <- file.path(sourceDir, supList5[i], fsep = .Platform$file.sep)
+        inName6 <- file.path(sourceDir, supList6[i], fsep = .Platform$file.sep)
+        inName7 <- file.path(sourceDir, supList7[i], fsep = .Platform$file.sep)
+        inName8 <- file.path(sourceDir, supList8[i], fsep = .Platform$file.sep)
+        inName9 <- file.path(sourceDir, supList9[i], fsep = .Platform$file.sep)
         
-        X$date <- as.Date(paste(X$Year, X$Month, X$Day, sep="-"),
-                          format = "%Y-%m-%d")
+
+        # read in 1st file
+        if(file.exists(inName)) {
+            X <- read.csv(inName)
+            X$date <- as.Date(paste(X$Year, X$Month, X$Day, sep="-"),
+                              format = "%Y-%m-%d")
+            
+            modDF <- data.frame(X$date, X$value)
+            colnames(modDF) <- c("date", "value")
+            
+            modDF[modDF$value == -99.9, "value"] <- NA
+        } else {
+            modDF <- NA
+        }
         
-        modDF <- data.frame(X$date, X$value)
-        colnames(modDF) <- c("date", "value")
+        # read 2nd file
+        if(file.exists(inName2)) {
+            X2 <- read.csv(inName2)
+            X2$date <- as.Date(paste(X2$Year, X2$Month, X2$Day, sep="-"),
+                               format = "%Y-%m-%d")
+            
+            modDF2 <- data.frame(X2$date, X2$value)
+            colnames(modDF2) <- c("date", "value")
+            
+            modDF2[modDF2$value == -99.9, "value"] <- NA
+        } else { 
+            modDF2 <- modDF
+        }
         
-        modDF[modDF$value == -99.9, "value"] <- NA
+        # read 3rd file
+        if(file.exists(inName3)) {
+            X3 <- read.csv(inName3)
+            X3$date <- as.Date(paste(X3$Year, X3$Month, X3$Day, sep="-"),
+                               format = "%Y-%m-%d")
+            
+            modDF3 <- data.frame(X3$date, X3$value)
+            colnames(modDF3) <- c("date", "value")
+            
+            modDF3[modDF3$value == -99.9, "value"] <- NA
+        } else { 
+            modDF3 <- modDF 
+        }
         
-        test <- modDF[1:3, ]
-        test$value[2] <- NA
+        # read 4th file
+        if(file.exists(inName4)) {
+            X4 <- read.csv(inName4)
+            X4$date <- as.Date(paste(X4$Year, X4$Month, X4$Day, sep="-"),
+                               format = "%Y-%m-%d")
+            
+            modDF4 <- data.frame(X4$date, X4$value)
+            colnames(modDF4) <- c("date", "value")
+            
+            modDF4[modDF4$value == -99.9, "value"] <- NA
+        } else { modDF4 <- modDF }
         
-        test2 <- fillGap(test, corPeriod="daily")
+
+        # read 5th file
+        if(file.exists(inName5)) {
+            X5 <- read.csv(inName5)
+            X5$date <- as.Date(paste(X5$Year, X5$Month, X5$Day, sep="-"),
+                               format = "%Y-%m-%d")
+            
+            modDF5 <- data.frame(X5$date, X5$value)
+            colnames(modDF5) <- c("date", "value")
+            
+            modDF5[modDF5$value == -99.9, "value"] <- NA
+        } else { modDF5 <- modDF }
         
-        write.csv(dd,outName)
+        # read 6th file
+        if(file.exists(inName6)) {
+            X6 <- read.csv(inName6)
+            X6$date <- as.Date(paste(X6$Year, X6$Month, X6$Day, sep="-"),
+                               format = "%Y-%m-%d")
+            
+            modDF6 <- data.frame(X6$date, X6$value)
+            colnames(modDF6) <- c("date", "value")
+            
+            modDF6[modDF6$value == -99.9, "value"] <- NA
+        } else { modDF6 <- modDF }
+        
+        # read 7th file
+        if(file.exists(inName7)) {
+            X7 <- read.csv(inName7)
+            X7$date <- as.Date(paste(X7$Year, X7$Month, X7$Day, sep="-"),
+                               format = "%Y-%m-%d")
+            
+            modDF7 <- data.frame(X7$date, X7$value)
+            colnames(modDF7) <- c("date", "value")
+            
+            modDF7[modDF7$value == -99.9, "value"] <- NA
+        } else { modDF7 <- modDF }
+        
+        # read 8th file
+        if(file.exists(inName8)) {
+            X8 <- read.csv(inName8)
+            X8$date <- as.Date(paste(X8$Year, X8$Month, X8$Day, sep="-"),
+                               format = "%Y-%m-%d")
+            
+            modDF8 <- data.frame(X8$date, X8$value)
+            colnames(modDF8) <- c("date", "value")
+            
+            modDF8[modDF8$value == -99.9, "value"] <- NA
+        } else { 
+            modDF8$date <- modDF 
+        }
+        
+        # read 9th file
+        if(file.exists(inName9)) {
+            X9 <- read.csv(inName9)
+            X9$date <- as.Date(paste(X9$Year, X9$Month, X9$Day, sep="-"),
+                               format = "%Y-%m-%d")
+            
+            modDF9 <- data.frame(X9$date, X9$value)
+            colnames(modDF9) <- c("date", "value")
+            
+            modDF9[modDF9$value == -99.9, "value"] <- NA
+        } else { 
+            modDF9$date <- modDF 
+        }
+        
+        # Find minimum start date
+        startDate <- min(modDF$date, modDF2$date, modDF3$date, 
+                         modDF4$date, modDF5$date, modDF6$date, 
+                         modDF7$date, modDF8$date, modDF9$date)
+        
+        # find maximum end date
+        endDate <- max(modDF$date, modDF2$date, modDF3$date, 
+                         modDF4$date, modDF5$date, modDF6$date, 
+                       modDF7$date, modDF8$date, modDF9$date)
+
+        # create new datamframe 
+        t.series <- seq.Date(from = startDate, to = endDate,
+                           by = "day")
+        testDF <- data.frame(t.series, NA, NA, NA, NA, NA, NA, NA, NA, NA)
+        colnames(testDF) <- c("date", "s1", "s2", "s3", "s4", "s5",
+                              "s6", "s7", "s8", "s9")
+        
+        # assign station values onto the dataframe
+        for (j in modDF$date) {
+            testDF[testDF$date == j, "s1"] <- modDF[modDF$date == j, "value"]
+        }
+        
+        for (j in modDF2$date) {
+            testDF[testDF$date == j, "s2"] <- modDF2[modDF2$date == j, "value"]
+        }
+
+        for (j in modDF3$date) {
+            testDF[testDF$date == j, "s3"] <- modDF3[modDF3$date == j, "value"]
+        }
+        
+        for (j in modDF4$date) {
+            testDF[testDF$date == j, "s4"] <- modDF4[modDF4$date == j, "value"]
+        }
+        
+        for (j in modDF5$date) {
+            testDF[testDF$date == j, "s5"] <- modDF5[modDF5$date == j, "value"]
+        }
+        
+        for (j in modDF6$date) {
+            testDF[testDF$date == j, "s6"] <- modDF6[modDF6$date == j, "value"]
+        }
+        
+        for (j in modDF7$date) {
+            testDF[testDF$date == j, "s7"] <- modDF7[modDF7$date == j, "value"]
+        }
+        
+        for (j in modDF8$date) {
+            testDF[testDF$date == j, "s8"] <- modDF8[modDF8$date == j, "value"]
+        }
+        
+        for (j in modDF9$date) {
+            testDF[testDF$date == j, "s9"] <- modDF9[modDF9$date == j, "value"]
+        }
+        
+        # delete row entries where the entire row are full with NAs
+        test2 <- testDF[rowSums(is.na(testDF[,2:10]))!=9, ]
+        
+        # gap fill the rest missing values
+        test3 <- fillGap(test2, corPeriod="daily")
+        
+        write.csv(test3,outName)
         
     }
     
 }
 ##############################################################################################################
+select_9_ghcn_stations <- function(corDF, gDF) {
+    
+    ### libraries
+    library(sp)
+    library(rgeos)
+    library(Imap)
+    
+    
+    ### SCCS station list
+    corDF$SCCSID <- as.character(corDF$SCCSID)
+    sDF <- corDF[!duplicated(corDF$SCCSID), ] 
+    
+    newDF <- data.frame(sDF$SCCSID, sDF$slat, sDF$slon,
+                        0,0,0,0,0,0,0,0,0,0,0,0,
+                        0,0,0,0,0,0,0,0,0,0,0,0,
+                        0,0,0,0,0,0,0,0,0,0,0,0)
+    
+    colnames(newDF) <- c("sccs_id", "slat", "slon",
+                         "ghcn1", "lat1", "lon1", "elev1",
+                         "ghcn2", "lat2", "lon2", "elev2",
+                         "ghcn3", "lat3", "lon3", "elev3",
+                         "ghcn4", "lat4", "lon4", "elev4",
+                         "ghcn5", "lat5", "lon5", "elev5",
+                         "ghcn6", "lat6", "lon6", "elev6",
+                         "ghcn7", "lat7", "lon7", "elev7",
+                         "ghcn8", "lat8", "lon8", "elev8",
+                         "ghcn9", "lat9", "lon9", "elev9")
+    
+
+    gDF$GHCN_ID <- as.character(gDF$GHCN_ID)
+    
+    
+    ### Find nearest 9 stations 
+    for (i in 1:nrow(newDF)) {
+        gDF$dist <- gdist(lat.1=gDF$Lat,
+                          lon.1=gDF$Lon,
+                          lat.2=newDF$slat[i],
+                          lon.2=newDF$slon[i])
+        
+        newg <- gDF[order(gDF$dist),]
+        
+        newDF[i,"ghcn1"] <- newg[1,"GHCN_ID"]
+        newDF[i,"lat1"] <- newg[1,"Lat"]
+        newDF[i,"lon1"] <- newg[1,"Lon"]
+        newDF[i,"elev1"] <- newg[1,"Elev"]
+        
+        newDF[i,"ghcn2"] <- newg[2,"GHCN_ID"]
+        newDF[i,"lat2"] <- newg[2,"Lat"]
+        newDF[i,"lon2"] <- newg[2,"Lon"]
+        newDF[i,"elev2"] <- newg[2,"Elev"]
+        
+        newDF[i,"ghcn3"] <- newg[3,"GHCN_ID"]
+        newDF[i,"lat3"] <- newg[3,"Lat"]
+        newDF[i,"lon3"] <- newg[3,"Lon"]
+        newDF[i,"elev3"] <- newg[3,"Elev"]
+        
+        newDF[i,"ghcn4"] <- newg[4,"GHCN_ID"]
+        newDF[i,"lat4"] <- newg[4,"Lat"]
+        newDF[i,"lon4"] <- newg[4,"Lon"]
+        newDF[i,"elev4"] <- newg[4,"Elev"]
+        
+        newDF[i,"ghcn5"] <- newg[5,"GHCN_ID"]
+        newDF[i,"lat5"] <- newg[5,"Lat"]
+        newDF[i,"lon5"] <- newg[5,"Lon"]
+        newDF[i,"elev5"] <- newg[5,"Elev"]
+        
+        newDF[i,"ghcn6"] <- newg[6,"GHCN_ID"]
+        newDF[i,"lat6"] <- newg[6,"Lat"]
+        newDF[i,"lon6"] <- newg[6,"Lon"]
+        newDF[i,"elev6"] <- newg[6,"Elev"]
+        
+        newDF[i,"ghcn7"] <- newg[7,"GHCN_ID"]
+        newDF[i,"lat7"] <- newg[7,"Lat"]
+        newDF[i,"lon7"] <- newg[7,"Lon"]
+        newDF[i,"elev7"] <- newg[7,"Elev"]
+        
+        newDF[i,"ghcn8"] <- newg[8,"GHCN_ID"]
+        newDF[i,"lat8"] <- newg[8,"Lat"]
+        newDF[i,"lon8"] <- newg[8,"Lon"]
+        newDF[i,"elev8"] <- newg[8,"Elev"]
+        
+        newDF[i,"ghcn9"] <- newg[9,"GHCN_ID"]
+        newDF[i,"lat9"] <- newg[9,"Lat"]
+        newDF[i,"lon9"] <- newg[9,"Lon"]
+        newDF[i,"elev9"] <- newg[9,"Elev"]
+        
+    }
+    
+
+    write.csv(newDF, "data/sccs_ghcn_station_list.csv", row.names=F)
+    
+    return(newDF)
+}
+
+
 ##############################################################################################################
 
 
