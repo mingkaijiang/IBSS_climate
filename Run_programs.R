@@ -57,8 +57,13 @@ ReStructureFile(sourceDir = "data/ghcnd_selected", destDir = "data/ghcnd_selecte
 Missing_check(sourceDir = "data/ghcnd_selected")
 
 ### Step 4: 
-### Gap filling
+### Gap filling 1. - use statistical correlation among 9 stations to gap fill one station
+###                - excluding big chunk of missing data
 Gap_Fill(stationDF, sourceDir = "data/ghcnd_selected", destDir = "data/ghcnd_gap_filled")
+
+### Step 5:
+### Gap filling 2. - use same period in other years to fill big chunk of missing data
+Gap_Fill_2(stationDF, sourceDir = "data/ghcnd_gap_filled", destDir = "data/ghcnd_gap_filled_2")
 
 ##############################################################################################################
 #### Compute indices
