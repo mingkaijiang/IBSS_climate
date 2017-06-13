@@ -59,7 +59,10 @@ Missing_check(sourceDir = "data/ghcnd_selected")
 ### Step 4: 
 ### Gap filling 1. - use statistical correlation among 9 stations to gap fill one station
 ###                - excluding big chunk of missing data
-Gap_Fill(stationDF, sourceDir = "data/ghcnd_selected", destDir = "data/ghcnd_gap_filled")
+
+station.list1 <- station.list[-12]
+stationDF1 <- stationDF[-12,]
+Gap_Fill(stationDF1, sourceDir = "data/ghcnd_selected", destDir = "data/ghcnd_gap_filled")
 
 ### Step 5:
 ### Gap filling 2. - use same period in other years to fill big chunk of missing data
