@@ -5229,7 +5229,7 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME,
         }
         
         # delete row entries where the entire row are full with NAs
-        test2 <- testDF[rowSums(is.na(testDF[,2:10]))!=9, ]
+        test2 <- testDF[rowSums(is.na(testDF[,2:10]))<=7, ]  # != 9 was the original setting
         
         test3 <- subset(test2, date <= max(modDF$date))
         test4 <- subset(test3, date >= min(modDF$date))
@@ -5289,6 +5289,8 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME,
         outDF2 <- outDF[,c("date", "Year", "Month", "Day", "s1")]
         
         write.csv(outDF2,outName)
+        
+        print(targList[i])
         
     }
     
