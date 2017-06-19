@@ -67,7 +67,12 @@ stationDF1 <- stationDF[-c(1:12),]
 
 stationDF1 <- stationDF[-c(1:78),]
 
-Gap_Fill(stationDF1, sourceDir = "data/ghcnd_selected", destDir = "data/ghcnd_gap_filled")
+stationDF2 <- stationDF[c(12, 14, 15, 16, 17, 18, 25, 26, 29, 30, 
+                          34, 35, 36, 37, 40, 41, 42, 46, 47, 48, 
+                          50, 51, 52, 53, 62, 63, 64, 66, 67, 68, 
+                          69, 70, 74, 77, 78),]
+
+Gap_Fill(stationDF2, sourceDir = "data/ghcnd_selected", destDir = "data/ghcnd_gap_filled")
 
 ### Step 5:
 ### Gap filling 2. - use same period in other years to fill big chunk of missing data
