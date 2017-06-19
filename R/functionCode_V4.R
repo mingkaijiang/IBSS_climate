@@ -5229,7 +5229,7 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME,
         }
         
         # delete row entries where the entire row are full with NAs
-        test2 <- testDF[rowSums(is.na(testDF[,2:10]))<=7, ]  # != 9 was the original setting
+        test2 <- testDF[rowSums(is.na(testDF[,2:10]))<=1, ]  # != 9 was the original setting
         
         test3 <- subset(test2, date <= max(modDF$date))
         test4 <- subset(test3, date >= min(modDF$date))
@@ -5237,35 +5237,36 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME,
         # check column sums to ensure there's still data left for each ghcn station
         csum <- colSums(!is.na(test4[,2:10]))
 
-        if(csum[[2]] <= 10) {
+        # if >90% are NAs, simply repeat column 1 values 
+        if(csum[[2]]/csum[[1]] <= 0.1) {
             test4$s2 <- test4$s1
         }
         
-        if(csum[[3]] <= 10) {
+        if(csum[[3]]/csum[[1]] <= 0.1) {
             test4$s3 <- test4$s1
         }
         
-        if(csum[[4]] <= 10) {
+        if(csum[[4]]/csum[[1]] <= 0.1) {
             test4$s4 <- test4$s1
         }
         
-        if(csum[[5]] <= 10) {
+        if(csum[[5]]/csum[[1]] <= 0.1) {
             test4$s5 <- test4$s1
         }
         
-        if(csum[[6]] <= 10) {
+        if(csum[[6]]/csum[[1]] <= 0.1) {
             test4$s6 <- test4$s1
         }
         
-        if(csum[[7]] <= 10) {
+        if(csum[[7]]/csum[[1]] <= 0.1) {
             test4$s7 <- test4$s1
         }
         
-        if(csum[[8]] <= 10) {
+        if(csum[[8]]/csum[[1]] <= 0.1) {
             test4$s8 <- test4$s1
         }
         
-        if(csum[[9]] <= 10) {
+        if(csum[[9]]/csum[[1]] <= 0.1) {
             test4$s9 <- test4$s1
         }
         
