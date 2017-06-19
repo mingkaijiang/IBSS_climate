@@ -5144,7 +5144,9 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME,
             colnames(modDF7) <- c("date", "value")
             
             modDF7[modDF7$value == -99.9, "value"] <- NA
-        } else { modDF7 <- modDF }
+        } else { 
+            modDF7 <- modDF
+        }
         
         # read 8th file
         if(file.exists(inName8)) {
@@ -5157,7 +5159,7 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME,
             
             modDF8[modDF8$value == -99.9, "value"] <- NA
         } else { 
-            modDF8$date <- modDF 
+            modDF8 <- modDF 
         }
         
         # read 9th file
@@ -5171,7 +5173,7 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME,
             
             modDF9[modDF9$value == -99.9, "value"] <- NA
         } else { 
-            modDF9$date <- modDF 
+            modDF9 <- modDF 
         }
         
         # Find minimum start date
@@ -5229,7 +5231,8 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME,
         }
         
         # delete row entries where the entire row are full with NAs
-        test2 <- testDF[rowSums(is.na(testDF[,2:10]))<=1, ]  # != 9 was the original setting
+        test2 <- testDF[rowSums(is.na(testDF[,2:10]))<=4, ]  # != 9 was the original setting, this new number seems strict!!!
+        
         
         test3 <- subset(test2, date <= max(modDF$date))
         test4 <- subset(test3, date >= min(modDF$date))
