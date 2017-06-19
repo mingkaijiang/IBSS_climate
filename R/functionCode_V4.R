@@ -5231,7 +5231,7 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME,
         }
         
         # delete row entries where the entire row are full with NAs
-        test2 <- testDF[rowSums(is.na(testDF[,2:10]))<=4, ]  # != 9 was the original setting, this new number seems strict!!!
+        test2 <- testDF[rowSums(is.na(testDF[,2:10]))<=2, ]  # != 9 was the original setting, this new number seems strict!!!
         
         
         test3 <- subset(test2, date <= max(modDF$date))
