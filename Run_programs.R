@@ -57,8 +57,8 @@ ReStructureFile(sourceDir = "data/ghcnd_selected", destDir = "data/ghcnd_selecte
 Missing_check(sourceDir = "data/ghcnd_selected")
 
 ### Step 4: 
-### Gap filling 1. - use statistical correlation among 9 stations to gap fill one station
-###                - excluding big chunk of missing data
+### Gap filling 1. - use statistical correlation among 9 stations to gap fill all 9 stations
+###                - excluding big chunk of missing data which will be filled later use a different function
 
 ## the following sites are problematic, so exclude in the first run
 stationDF2 <- stationDF[-c(15, 20, 21, 36, 41:51, 53, 57:69, 71),]
