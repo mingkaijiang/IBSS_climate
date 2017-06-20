@@ -63,8 +63,9 @@ Missing_check(sourceDir = "data/ghcnd_selected")
 ## the following sites are problematic, so exclude in the first run
 stationDF2 <- stationDF[-c(15, 20, 21, 36, 41:51, 53, 57:69, 71),]
 
-Gap_Fill(stationDF2, threshold=2,
-         sourceDir = "data/ghcnd_selected", 
+# original set threshold = 2
+Gap_Fill(stationDF2, threshold=8,
+         sourceDir = "data/ghcnd_gap_filled", 
          destDir = "data/ghcnd_gap_filled")
 
 ## the following sites need larger threshold
@@ -85,7 +86,8 @@ Gap_Fill(stationDF4, threshold=3,
 
 stationDF5 <- stationDF[c(15, 44, 46, 53, 60, 61, 65, 69, 71),]
 
-
+replace_with_value_column(sourceDir = "data/ghcnd_gap_filled",
+                          destDir = "data/ghcnd_gap_filled")
 ### Step 5:
 ### Gap filling 2. - use same period in other years to fill big chunk of missing data
 Gap_Fill_within_station(stationDF, threshold=8, 

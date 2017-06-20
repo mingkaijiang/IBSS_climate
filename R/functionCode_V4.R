@@ -5038,21 +5038,34 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME, threshold,
     supList8 <- paste0(stationDF$ghcn8,".csv")
     supList9 <- paste0(stationDF$ghcn9,".csv")
     
-    
-    
     for (i in 1:length(targList)) 
     {
         inName <- file.path(sourceDir, targList[i], fsep = .Platform$file.sep)
         outName <- file.path(destDir, targList[i], fsep = .Platform$file.sep)
         
         inName2 <- file.path(sourceDir, supList2[i], fsep = .Platform$file.sep)
+        outName2 <- file.path(destDir, supList2[i], fsep = .Platform$file.sep)
+        
         inName3 <- file.path(sourceDir, supList3[i], fsep = .Platform$file.sep)
+        outName3 <- file.path(destDir, supList3[i], fsep = .Platform$file.sep)
+        
         inName4 <- file.path(sourceDir, supList4[i], fsep = .Platform$file.sep)
+        outName4 <- file.path(destDir, supList4[i], fsep = .Platform$file.sep)
+        
         inName5 <- file.path(sourceDir, supList5[i], fsep = .Platform$file.sep)
+        outName5 <- file.path(destDir, supList5[i], fsep = .Platform$file.sep)
+        
         inName6 <- file.path(sourceDir, supList6[i], fsep = .Platform$file.sep)
+        outName6 <- file.path(destDir, supList6[i], fsep = .Platform$file.sep)
+        
         inName7 <- file.path(sourceDir, supList7[i], fsep = .Platform$file.sep)
+        outName7 <- file.path(destDir, supList7[i], fsep = .Platform$file.sep)
+        
         inName8 <- file.path(sourceDir, supList8[i], fsep = .Platform$file.sep)
+        outName8 <- file.path(destDir, supList8[i], fsep = .Platform$file.sep)
+        
         inName9 <- file.path(sourceDir, supList9[i], fsep = .Platform$file.sep)
+        outName9 <- file.path(destDir, supList9[i], fsep = .Platform$file.sep)
         
 
         # read in 1st file
@@ -5183,7 +5196,7 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME, threshold,
         
         # find maximum end date
         endDate <- max(modDF$date, modDF2$date, modDF3$date, 
-                         modDF4$date, modDF5$date, modDF6$date, 
+                       modDF4$date, modDF5$date, modDF6$date, 
                        modDF7$date, modDF8$date, modDF9$date)
 
         # create new datamframe 
@@ -5280,19 +5293,145 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME, threshold,
         t.series <- seq.Date(from = min(modDF$date), to = max(modDF$date),
                              by = "day")
         outDF <- data.frame(t.series, NA)
-        colnames(outDF) <- c("date", "s1")
+        colnames(outDF) <- c("date", "value")
         
+        t.series <- seq.Date(from = min(modDF2$date), to = max(modDF2$date),
+                             by = "day")
+        outDF2 <- data.frame(t.series, NA)
+        colnames(outDF2) <- c("date", "value")
+        
+        t.series <- seq.Date(from = min(modDF3$date), to = max(modDF3$date),
+                             by = "day")
+        outDF3 <- data.frame(t.series, NA)
+        colnames(outDF3) <- c("date", "value")
+        
+        t.series <- seq.Date(from = min(modDF4$date), to = max(modDF4$date),
+                             by = "day")
+        outDF4 <- data.frame(t.series, NA)
+        colnames(outDF4) <- c("date", "value")
+        
+        t.series <- seq.Date(from = min(modDF5$date), to = max(modDF5$date),
+                             by = "day")
+        outDF5 <- data.frame(t.series, NA)
+        colnames(outDF5) <- c("date", "value")
+        
+        t.series <- seq.Date(from = min(modDF6$date), to = max(modDF6$date),
+                             by = "day")
+        outDF6 <- data.frame(t.series, NA)
+        colnames(outDF6) <- c("date", "value")
+        
+        t.series <- seq.Date(from = min(modDF7$date), to = max(modDF7$date),
+                             by = "day")
+        outDF7 <- data.frame(t.series, NA)
+        colnames(outDF7) <- c("date", "value")
+        
+        t.series <- seq.Date(from = min(modDF8$date), to = max(modDF8$date),
+                             by = "day")
+        outDF8 <- data.frame(t.series, NA)
+        colnames(outDF8) <- c("date", "value")
+        
+        t.series <- seq.Date(from = min(modDF9$date), to = max(modDF9$date),
+                             by = "day")
+        outDF9 <- data.frame(t.series, NA)
+        colnames(outDF9) <- c("date", "value")
+        
+        # assign values from output filled df
         for (j in test5$Date) {
-            outDF[outDF$date == j, "s1"] <- test5[test5$Date == j, "s1"]
+            outDF[outDF$date == j, "value"] <- test5[test5$Date == j, "s1"]
+            outDF2[outDF2$date == j, "value"] <- test5[test5$Date == j, "s2"]
+            outDF3[outDF3$date == j, "value"] <- test5[test5$Date == j, "s3"]
+            outDF4[outDF4$date == j, "value"] <- test5[test5$Date == j, "s4"]
+            outDF5[outDF5$date == j, "value"] <- test5[test5$Date == j, "s5"]
+            outDF6[outDF6$date == j, "value"] <- test5[test5$Date == j, "s6"]
+            outDF7[outDF7$date == j, "value"] <- test5[test5$Date == j, "s7"]
+            outDF8[outDF8$date == j, "value"] <- test5[test5$Date == j, "s8"]
+            outDF9[outDF9$date == j, "value"] <- test5[test5$Date == j, "s9"]
+            
         }
         
         outDF$Year <- as.numeric(format(outDF$date, "%Y"))
         outDF$Month <- as.numeric(format(outDF$date, "%m"))
         outDF$Day <- as.numeric(format(outDF$date, "%d"))
         
-        outDF2 <- outDF[,c("date", "Year", "Month", "Day", "s1")]
+        outDF2$Year <- as.numeric(format(outDF2$date, "%Y"))
+        outDF2$Month <- as.numeric(format(outDF2$date, "%m"))
+        outDF2$Day <- as.numeric(format(outDF2$date, "%d"))
+        
+        outDF3$Year <- as.numeric(format(outDF3$date, "%Y"))
+        outDF3$Month <- as.numeric(format(outDF3$date, "%m"))
+        outDF3$Day <- as.numeric(format(outDF3$date, "%d"))
+        
+        outDF4$Year <- as.numeric(format(outDF4$date, "%Y"))
+        outDF4$Month <- as.numeric(format(outDF4$date, "%m"))
+        outDF4$Day <- as.numeric(format(outDF4$date, "%d"))
+        
+        outDF5$Year <- as.numeric(format(outDF5$date, "%Y"))
+        outDF5$Month <- as.numeric(format(outDF5$date, "%m"))
+        outDF5$Day <- as.numeric(format(outDF5$date, "%d"))
+        
+        outDF6$Year <- as.numeric(format(outDF6$date, "%Y"))
+        outDF6$Month <- as.numeric(format(outDF6$date, "%m"))
+        outDF6$Day <- as.numeric(format(outDF6$date, "%d"))
+        
+        outDF7$Year <- as.numeric(format(outDF7$date, "%Y"))
+        outDF7$Month <- as.numeric(format(outDF7$date, "%m"))
+        outDF7$Day <- as.numeric(format(outDF7$date, "%d"))
+        
+        outDF8$Year <- as.numeric(format(outDF8$date, "%Y"))
+        outDF8$Month <- as.numeric(format(outDF8$date, "%m"))
+        outDF8$Day <- as.numeric(format(outDF8$date, "%d"))
+        
+        outDF9$Year <- as.numeric(format(outDF9$date, "%Y"))
+        outDF9$Month <- as.numeric(format(outDF9$date, "%m"))
+        outDF9$Day <- as.numeric(format(outDF9$date, "%d"))
+        
+        outDF$value[is.na(outDF$value)] <- -99.9
+        outDF2$value[is.na(outDF2$value)] <- -99.9
+        outDF3$value[is.na(outDF3$value)] <- -99.9
+        outDF4$value[is.na(outDF4$value)] <- -99.9
+        outDF5$value[is.na(outDF5$value)] <- -99.9
+        outDF6$value[is.na(outDF6$value)] <- -99.9
+        outDF7$value[is.na(outDF7$value)] <- -99.9
+        outDF8$value[is.na(outDF8$value)] <- -99.9
+        outDF9$value[is.na(outDF9$value)] <- -99.9
+        
+        
+        outDF <- outDF[,c("date", "Year", "Month", "Day", "value")]
+        colnames(outDF) <- c("date", "Year", "Month", "Day", "value")
+        write.csv(outDF,outName, row.names=F)
+        
+        outDF2 <- outDF2[,c("date", "Year", "Month", "Day", "value")]
         colnames(outDF2) <- c("date", "Year", "Month", "Day", "value")
-        write.csv(outDF2,outName)
+        write.csv(outDF2,outName2, row.names=F)
+        
+        outDF3 <- outDF3[,c("date", "Year", "Month", "Day", "value")]
+        colnames(outDF3) <- c("date", "Year", "Month", "Day", "value")
+        write.csv(outDF3,outName3, row.names=F)
+        
+        outDF4 <- outDF4[,c("date", "Year", "Month", "Day", "value")]
+        colnames(outDF4) <- c("date", "Year", "Month", "Day", "value")
+        write.csv(outDF4,outName4, row.names=F)
+        
+        outDF5 <- outDF5[,c("date", "Year", "Month", "Day", "value")]
+        colnames(outDF5) <- c("date", "Year", "Month", "Day", "value")
+        write.csv(outDF5,outName5, row.names=F)
+        
+        outDF6 <- outDF6[,c("date", "Year", "Month", "Day", "value")]
+        colnames(outDF6) <- c("date", "Year", "Month", "Day", "value")
+        write.csv(outDF6,outName6, row.names=F)
+        
+        outDF7 <- outDF7[,c("date", "Year", "Month", "Day", "value")]
+        colnames(outDF7) <- c("date", "Year", "Month", "Day", "value")
+        write.csv(outDF7,outName7, row.names=F)
+        
+        outDF8 <- outDF8[,c("date", "Year", "Month", "Day", "value")]
+        colnames(outDF8) <- c("date", "Year", "Month", "Day", "value")
+        write.csv(outDF8,outName8, row.names=F)
+        
+        outDF9 <- outDF9[,c("date", "Year", "Month", "Day", "value")]
+        colnames(outDF9) <- c("date", "Year", "Month", "Day", "value")
+        write.csv(outDF9,outName9, row.names=F)
+        
         
         print(targList[i])
         
@@ -5549,6 +5688,24 @@ select_9_ghcn_stations <- function(corDF, gDF) {
 
 
 ##############################################################################################################
-
+replace_with_value_column <- function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECTORY) {
+    
+    dir.create(destDir, showWarnings = FALSE)
+    
+    targList <- list.files(path = sourceDir, pattern = "\\.csv")
+    
+    
+    for (i in 1:length(targList)) 
+    {
+        inName <- file.path(sourceDir, targList[i], fsep = .Platform$file.sep)
+        outName <- file.path(destDir, targList[i], fsep = .Platform$file.sep)
+        
+        X <- read.csv(inName)
+        colnames(X) <- c("id","date", "Year", "Month", "Day", "value")
+        write.csv(X[,2:6],outName, row.names=F)
+        
+        print(targList[i])
+    }
+}
 
 ##############################################################################################################
