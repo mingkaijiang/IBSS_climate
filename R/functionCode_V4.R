@@ -5291,7 +5291,160 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME, threshold,
         outDF$Day <- as.numeric(format(outDF$date, "%d"))
         
         outDF2 <- outDF[,c("date", "Year", "Month", "Day", "s1")]
+        colnames(outDF2) <- c("date", "Year", "Month", "Day", "value")
+        write.csv(outDF2,outName)
         
+        print(targList[i])
+        
+    }
+    
+}
+
+##############################################################################################################
+### Gap filling using the hyfo package as an easy solution
+Gap_Fill_within_station <- function(stationDF = STATION.DATAFRAME, threshold, 
+                                    sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECTORY) {
+    
+    dir.create(destDir, showWarnings = FALSE)
+    
+    targList <- paste0(stationDF$ghcn1,".csv")
+    
+    for (i in 1:length(targList)) 
+    {
+        inName <- file.path(sourceDir, targList[i], fsep = .Platform$file.sep)
+        outName <- file.path(destDir, targList[i], fsep = .Platform$file.sep)
+        
+        # read in 1st file
+        if(file.exists(inName)) {
+            X <- read.csv(inName)
+            X$date <- as.Date(paste(X$Year, X$Month, X$Day, sep="-"),
+                              format = "%Y-%m-%d")
+            
+            modDF <- data.frame(X$date, X$value)
+            colnames(modDF) <- c("date", "value")
+            
+            modDF[modDF$value == -99.9, "value"] <- NA
+        } else {
+            modDF <- NA
+        }
+
+        
+        # Find minimum start date
+        startDate <- min(modDF$date, modDF2$date, modDF3$date, 
+                         modDF4$date, modDF5$date, modDF6$date, 
+                         modDF7$date, modDF8$date, modDF9$date)
+        
+        # find maximum end date
+        endDate <- max(modDF$date, modDF2$date, modDF3$date, 
+                       modDF4$date, modDF5$date, modDF6$date, 
+                       modDF7$date, modDF8$date, modDF9$date)
+        
+        # create new datamframe 
+        t.series <- seq.Date(from = startDate, to = endDate,
+                             by = "day")
+        testDF <- data.frame(t.series, NA, NA, NA, NA, NA, NA, NA, NA, NA)
+        colnames(testDF) <- c("date", "s1", "s2", "s3", "s4", "s5",
+                              "s6", "s7", "s8", "s9")
+        
+        # assign station values onto the dataframe
+        for (j in modDF$date) {
+            testDF[testDF$date == j, "s1"] <- modDF[modDF$date == j, "value"]
+        }
+        
+        for (j in modDF2$date) {
+            testDF[testDF$date == j, "s2"] <- modDF2[modDF2$date == j, "value"]
+        }
+        
+        for (j in modDF3$date) {
+            testDF[testDF$date == j, "s3"] <- modDF3[modDF3$date == j, "value"]
+        }
+        
+        for (j in modDF4$date) {
+            testDF[testDF$date == j, "s4"] <- modDF4[modDF4$date == j, "value"]
+        }
+        
+        for (j in modDF5$date) {
+            testDF[testDF$date == j, "s5"] <- modDF5[modDF5$date == j, "value"]
+        }
+        
+        for (j in modDF6$date) {
+            testDF[testDF$date == j, "s6"] <- modDF6[modDF6$date == j, "value"]
+        }
+        
+        for (j in modDF7$date) {
+            testDF[testDF$date == j, "s7"] <- modDF7[modDF7$date == j, "value"]
+        }
+        
+        for (j in modDF8$date) {
+            testDF[testDF$date == j, "s8"] <- modDF8[modDF8$date == j, "value"]
+        }
+        
+        for (j in modDF9$date) {
+            testDF[testDF$date == j, "s9"] <- modDF9[modDF9$date == j, "value"]
+        }
+        
+        # delete row entries where the entire row are full with NAs
+        test2 <- testDF[rowSums(is.na(testDF[,2:10]))<=threshold, ]  # != 9 was the original setting, this new number seems strict!!!
+        
+        
+        test3 <- subset(test2, date <= max(modDF$date))
+        test4 <- subset(test3, date >= min(modDF$date))
+        
+        # check column sums to ensure there's still data left for each ghcn station
+        csum <- colSums(!is.na(test4[,2:10]))
+        
+        # if >90% are NAs, simply repeat column 1 values 
+        if(csum[[2]]/csum[[1]] <= 0.1) {
+            test4$s2 <- test4$s1
+        }
+        
+        if(csum[[3]]/csum[[1]] <= 0.1) {
+            test4$s3 <- test4$s1
+        }
+        
+        if(csum[[4]]/csum[[1]] <= 0.1) {
+            test4$s4 <- test4$s1
+        }
+        
+        if(csum[[5]]/csum[[1]] <= 0.1) {
+            test4$s5 <- test4$s1
+        }
+        
+        if(csum[[6]]/csum[[1]] <= 0.1) {
+            test4$s6 <- test4$s1
+        }
+        
+        if(csum[[7]]/csum[[1]] <= 0.1) {
+            test4$s7 <- test4$s1
+        }
+        
+        if(csum[[8]]/csum[[1]] <= 0.1) {
+            test4$s8 <- test4$s1
+        }
+        
+        if(csum[[9]]/csum[[1]] <= 0.1) {
+            test4$s9 <- test4$s1
+        }
+        
+        # gap fill the rest missing values
+        test5 <- fillGap(test4, corPeriod="daily")
+        
+        # re-create the dataframe over the entire period with no missing values
+        t.series <- seq.Date(from = min(modDF$date), to = max(modDF$date),
+                             by = "day")
+        outDF <- data.frame(t.series, NA)
+        colnames(outDF) <- c("date", "s1")
+        
+        for (j in test5$Date) {
+            outDF[outDF$date == j, "s1"] <- test5[test5$Date == j, "s1"]
+        }
+        
+        outDF$Year <- as.numeric(format(outDF$date, "%Y"))
+        outDF$Month <- as.numeric(format(outDF$date, "%m"))
+        outDF$Day <- as.numeric(format(outDF$date, "%d"))
+        
+        outDF2 <- outDF[,c("date", "Year", "Month", "Day", "s1")]
+        colnames(outDF2) <- c("date", "Year", "Month", "Day", "value")
         write.csv(outDF2,outName)
         
         print(targList[i])
