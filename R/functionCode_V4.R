@@ -5023,7 +5023,7 @@ YrRange60<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIR
 
 ##############################################################################################################
 ### Gap filling using the hyfo package as an easy solution
-Gap_Fill <- function(stationDF = STATION.DATAFRAME, 
+Gap_Fill <- function(stationDF = STATION.DATAFRAME, threshold, 
                      sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECTORY) {
     
     dir.create(destDir, showWarnings = FALSE)
@@ -5231,7 +5231,7 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME,
         }
         
         # delete row entries where the entire row are full with NAs
-        test2 <- testDF[rowSums(is.na(testDF[,2:10]))<=2, ]  # != 9 was the original setting, this new number seems strict!!!
+        test2 <- testDF[rowSums(is.na(testDF[,2:10]))<=threshold, ]  # != 9 was the original setting, this new number seems strict!!!
         
         
         test3 <- subset(test2, date <= max(modDF$date))

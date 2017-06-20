@@ -59,13 +59,32 @@ Missing_check(sourceDir = "data/ghcnd_selected")
 ### Step 4: 
 ### Gap filling 1. - use statistical correlation among 9 stations to gap fill one station
 ###                - excluding big chunk of missing data
-###                - Problematic sites: row 12, 14, 15, 16, 17, 18, 25,26,29,30,34,35,36,37, 40,41
-###                - 42, 46, 47, 48, 50,51,52,53,62,63,64,66,67,68,69,70,
-###                - 74, 77, 78, 
 
-# exclude 36, 42 (needs <= 4 threshold), 46, 53 (failed quality check earlier, no data here)
-Gap_Fill(stationDF, sourceDir = "data/ghcnd_selected", destDir = "data/ghcnd_gap_filled")
+## the following sites are problematic, so exclude in the first run
+stationDF2 <- stationDF[-c(15, 20, 21, 36, 41:51, 53, 57:69, 71),]
 
+Gap_Fill(stationDF2, threshold=2,
+         sourceDir = "data/ghcnd_selected", 
+         destDir = "data/ghcnd_gap_filled")
+
+## the following sites need larger threshold
+stationDF3 <- stationDF[c(20, 21, 36, 41, 43, 45, 47:50,
+                          57:59, 63, 64, 66, 67, 68),]
+
+Gap_Fill(stationDF3, threshold=6,
+         sourceDir = "data/ghcnd_selected", 
+         destDir = "data/ghcnd_gap_filled")
+
+## the following sites have invalid atomic vector problem
+## i.e. the closest station has no values
+stationDF4 <- stationDF[c(42, 44, 46, 51, 53, 60, 61, 62, 65, 69, 71),]
+
+Gap_Fill(stationDF4, threshold=2,
+         sourceDir = "data/ghcnd_selected", 
+         destDir = "data/ghcnd_gap_filled")
+
+
+stationDF5 <- stationDF[c(15, )]
 ### Step 5:
 ### Gap filling 2. - use same period in other years to fill big chunk of missing data
 Gap_Fill_2(stationDF, sourceDir = "data/ghcnd_gap_filled", destDir = "data/ghcnd_gap_filled_2")
