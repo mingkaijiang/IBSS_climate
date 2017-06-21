@@ -4963,6 +4963,7 @@ YrRange10<-function(sourceDir = DAILY.DATA.DIRECTORY)
 Missing_check<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECTORY)
 {
     DatFiles <- list.files(path = sourceDir, pattern = "\\.csv")
+    dir.create(destDir, showWarnings = FALSE)
     
     for (thisFile in 1:length(DatFiles)) 
     {
@@ -4987,8 +4988,7 @@ Missing_check<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT
         
     }
     
-    file.copy(from=sourceDir, to=destDir, 
-              overwrite = recursive, recursive = FALSE, 
+    file.copy(from=sourceDir, to=destDir, recursive = T, 
               copy.mode = TRUE)
 }
 
@@ -5266,7 +5266,7 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME, threshold,
         nr1 <- nrow(testDF[complete.cases(testDF),])
         nr2 <- nrow(testDF)
         
-        decision.time <- n1/n2
+        decision.time <- nr1/nr2
             
         if (threshold >=8) {
             # Find minimum start date

@@ -42,31 +42,37 @@ ConvertFiles(sourceDir = "data/ghcnd_all/ghcnd_all/",
              stations = station.list,
              destDir = "data/ghcnd_selected")
 
-### Step 3:
+### Step 2:
 ### Check year range quality - only include data with > 10 yrs of data
 YrRange10(sourceDir = "data/ghcnd_selected")
 
-### Step 2:
+### Step 3:
 ### Restructure the files to continuous days, added leap years
 ### Replacing old with new files
 ReStructureFile(sourceDir = "data/ghcnd_selected", destDir = "data/ghcnd_selected")
 
-### Step 3:
+### Step 4:
 ### Check year range quality - only include data with > 10 yrs of data
 ###                          - and data with < 20% missing values
-Missing_check(sourceDir = "data/ghcnd_selected")
+#Missing_check(sourceDir = "data/ghcnd_selected", destDir = "data/ghcnd_gap_filled")
 
-### Step 4: 
+  ### Step 5: 
 ### Gap filling 1. - use statistical correlation among 9 stations to gap fill all 9 stations
 ###                - excluding big chunk of missing data which will be filled later use a different function
 
 ## the following sites are problematic, so exclude in the first run
-stationDF2 <- stationDF[-c(15, 20, 21, 36, 41:51, 53, 57:69, 71),]
+## problem sites: 0 (non-NA) cases: 10, 18, 22, 30, 34, 40, 42, 
+##                lmCoef[j, i]: subscript out of bounds, 12, 17, 41, 
+##                error in modDF$date: 14, 15, 
+stationDF2 <- stationDF[-c(1:42),]
 
 # original set threshold = 2
 Gap_Fill(stationDF2, threshold=8,
          sourceDir = "data/ghcnd_gap_filled", 
          destDir = "data/ghcnd_gap_filled")
+
+
+stationDF2 <- stationDF[-c(15, 20, 21, 36, 41:51, 53, 57:69, 71),]
 
 ## the following sites need larger threshold
 stationDF3 <- stationDF[c(20, 21, 36, 41, 43, 45, 47:50,
@@ -88,7 +94,7 @@ stationDF5 <- stationDF[c(15, 44, 46, 53, 60, 61, 65, 69, 71),]
 
 replace_with_value_column(sourceDir = "data/ghcnd_gap_filled",
                           destDir = "data/ghcnd_gap_filled")
-### Step 5:
+### Step 6:
 ### Gap filling 2. - use same period in other years to fill big chunk of missing data
 Gap_Fill_within_station(stationDF, threshold=8, 
                         sourceDir = "data/ghcnd_gap_filled",
