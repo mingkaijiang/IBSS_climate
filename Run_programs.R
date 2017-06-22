@@ -166,8 +166,11 @@ PRCPTOTS_pred(sourceDir = "data/indices/ThrIndS", destDir = "data/predictability
 R95PS_pred(sourceDir = "data/indices/ThrIndS", destDir = "data/predictability")
 
 
+
+### To do next
+
 ##Calculate R99P predictability
-##Need to exclude two files:
+##Need to exclude two files:  
 ##ASN00015628.csv & WA004150450.csv in the ThrIndS folder
 R99PS_pred(sourceDir = "data/indices/ThrIndS", destDir = "data/predictability")
 
