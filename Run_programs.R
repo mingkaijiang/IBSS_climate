@@ -61,39 +61,50 @@ ReStructureFile(sourceDir = "data/ghcnd_selected", destDir = "data/ghcnd_selecte
 ###                - excluding big chunk of missing data which will be filled later use a different function
 
 ## the following sites are problematic, so exclude in the first run
-## problem sites: 0 (non-NA) cases: 10, 18, 22, 30, 34, 40, 42, 
-##                lmCoef[j, i]: subscript out of bounds, 12, 17, 41, 
-##                error in modDF$date: 14, 15, 
-stationDF2 <- stationDF[-c(1:42),]
-
-# original set threshold = 2
+## problem sites: 0 (non-NA) cases: 10, 18, 22, 30, 34, 40, 42, 44, 46, 48, 62, 65, 69, 
+##                lmCoef[j, i]: subscript out of bounds, 12, 17, 41, 54, 63, 
+##                error in modDF$date: 14, 15, 53, 61, 71, 
+stationDF2 <- stationDF[-c(10, 18, 22, 30, 34, 42, 44, 46, 48, 62, 65, 69,
+                           12, 17, 41, 54, 63, 
+                           14, 15, 53, 61, 71),]
 Gap_Fill(stationDF2, threshold=8,
          sourceDir = "data/ghcnd_gap_filled", 
          destDir = "data/ghcnd_gap_filled")
 
+# solve all problematic sites by lowering threshold
+staionDF3 <- stationDF[c(18, 30, 34, 42, 46, 48, 65,
+                         12, 17, 41, 54,
+                         14), ]
 
-stationDF2 <- stationDF[-c(15, 20, 21, 36, 41:51, 53, 57:69, 71),]
-
-## the following sites need larger threshold
-stationDF3 <- stationDF[c(20, 21, 36, 41, 43, 45, 47:50,
-                          57:59, 63, 64, 66, 67, 68),]
-
-Gap_Fill(stationDF3, threshold=6,
-         sourceDir = "data/ghcnd_selected", 
+Gap_Fill(stationDF3, threshold=2,
+         sourceDir = "data/ghcnd_gap_filled", 
          destDir = "data/ghcnd_gap_filled")
 
-## the following sites have invalid atomic vector problem
-## i.e. the closest station has no values
-stationDF4 <- stationDF[c(42, 51, 62)]
+# solve remaining sites by finding the 2nd closest station 
+stationDF4 <- statonDf[c(22, 44, 62, 69, 
+                         15, 53, 71)]
+Gap_Fill_2(stationDF4, threshold=2,
+           sourceDir = "data/ghcnd_gap_filled", 
+           destDir = "data/ghcnd_gap_filled")
 
-Gap_Fill(stationDF4, threshold=3,
-         sourceDir = "data/ghcnd_selected", 
-         destDir = "data/ghcnd_gap_filled")
+# solve remaining sites by finding the 3rd closest station
+stationDF5 <- stationDF[10, ]
 
-stationDF5 <- stationDF[c(15, 44, 46, 53, 60, 61, 65, 69, 71),]
+Gap_Fill_3(stationDF5, threshold=2,
+           sourceDir = "data/ghcnd_gap_filled", 
+           destDir = "data/ghcnd_gap_filled")
 
-replace_with_value_column(sourceDir = "data/ghcnd_gap_filled",
-                          destDir = "data/ghcnd_gap_filled")
+# to do next
+stationDF6 <- stationDF[c(63,
+                          61), ]
+Gap_Fill_4(stationDF6, threshold=2,
+           sourceDir = "data/ghcnd_gap_filled", 
+           destDir = "data/ghcnd_gap_filled")
+
+### Update original stationDF list
+
+
+
 ### Step 6:
 ### Gap filling 2. - use same period in other years to fill big chunk of missing data
 Gap_Fill_within_station(stationDF, threshold=8, 
