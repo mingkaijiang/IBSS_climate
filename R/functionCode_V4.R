@@ -65,14 +65,13 @@ CoefVar<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIREC
         print(i)
         inName <- file.path(sourceDir, DatFiles[i], fsep = .Platform$file.sep)
 
-        dd <- read.csv(inName,header=F,skip=1,sep=",",
-                       col.names=c("id","year","month","day","prcp"))
+        dd <- read.csv(inName)
         
-        outDF[i,"Start_yr"] <- min(as.numeric(dd$year))
-        outDF[i,"End_yr"] <- max(as.numeric(dd$year))
+        outDF[i,"Start_yr"] <- min(as.numeric(dd$Year))
+        outDF[i,"End_yr"] <- max(as.numeric(dd$Year))
         
-        outDF[i,"Daily_stdev"] <- sd(dd$prcp,na.rm=T)
-        outDF[i,"Daily_mean"] <- mean(dd$prcp,na.rm=T)
+        outDF[i,"Daily_stdev"] <- sd(dd$value,na.rm=T)
+        outDF[i,"Daily_mean"] <- mean(dd$value,na.rm=T)
 
     }
     
@@ -2762,7 +2761,8 @@ RX1S<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECTOR
     inName <- file.path(sourceDir, DatFiles[thisFile], fsep = .Platform$file.sep)
     outName <- file.path(destDir, DatFiles[thisFile], fsep = .Platform$file.sep)
     
-    dd <- read.csv(inName,header=F,skip=1,col.names=c("id", "year","month","day","prcp"))
+    dd <- read.csv(inName)
+    colnames(dd)=c("id", "year","month","day","prcp")
     
     dd <- dd[,2:5]
     nama<-substr(inName,start=1,stop=(nchar(inName)-4))
@@ -3416,7 +3416,8 @@ RX5S<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECTOR
       print(thisFile)
     inName <- file.path(sourceDir, DatFiles[thisFile], fsep = .Platform$file.sep)
     outName <- file.path(destDir, DatFiles[thisFile], fsep = .Platform$file.sep)
-    dd <- read.csv(inName,header=F,skip=1,col.names=c("id","year","month","day","prcp"))
+    dd <- read.csv(inName)
+    colnames(dd)<-c("id","year","month","day","prcp")
     dd <- dd[,2:5]
     
     nama<-substr(inName,start=1,stop=(nchar(inName)-4))
@@ -4030,7 +4031,8 @@ SDIIS<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECTO
   {
     inName <- file.path(sourceDir, DatFiles[thisFile], fsep = .Platform$file.sep)
     outName <- file.path(destDir, DatFiles[thisFile], fsep = .Platform$file.sep)
-    dd <- read.csv(inName,header=F,skip=1,col.names=c("id","year","month","day","prcp"))
+    dd <- read.csv(inName)
+    colnames(dd)<-c("id","year","month","day","prcp")
     dd <- dd[,2:5]
     
     nama<-substr(inName,start=1,stop=(nchar(inName)-4))
@@ -4658,7 +4660,8 @@ ThrIndS<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIREC
     inName <- file.path(sourceDir, DatFiles[thisFile], fsep = .Platform$file.sep)
     outName <- file.path(destDir, DatFiles[thisFile], fsep = .Platform$file.sep)
     
-    dd <- read.csv(inName,header=F,skip=1,col.names=c("id","year","month","day","prcp"))
+    dd <- read.csv(inName)
+    colnames(dd)<-c("id","year","month","day","prcp")
     dd <- dd[,2:5]
     
     nama<-substr(inName,start=1,stop=(nchar(inName)-4))
@@ -7598,12 +7601,12 @@ Gap_Fill_3 <- function(stationDF = STATION.DATAFRAME, threshold,
 
 ##############################################################################################################
 ### Gap filling using the hyfo package as an easy solution
-Gap_Fill_within_station <- function(stationDF = STATION.DATAFRAME, threshold, 
+Gap_Fill_within_station <- function(stationDF, 
                                     sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECTORY) {
     
     dir.create(destDir, showWarnings = FALSE)
     
-    targList <- paste0(stationDF$ghcn1,".csv")
+     targList <- paste0(stationDF$ghcn1,".csv")
     
     for (i in 1:length(targList)) 
     {
@@ -7611,139 +7614,157 @@ Gap_Fill_within_station <- function(stationDF = STATION.DATAFRAME, threshold,
         outName <- file.path(destDir, targList[i], fsep = .Platform$file.sep)
         
         # read in 1st file
-        if(file.exists(inName)) {
-            X <- read.csv(inName)
-            X$date <- as.Date(paste(X$Year, X$Month, X$Day, sep="-"),
-                              format = "%Y-%m-%d")
+        X <- read.csv(inName)
+        X$date <- as.Date(paste(X$Year, X$Month, X$Day, sep="-"),
+                          format = "%Y-%m-%d")
+        
+        X[X$value == -99.9, "value"] <- NA
+        
+        
+        for (j in c(2:12, 1)) {
             
-            modDF <- data.frame(X$date, X$value)
-            colnames(modDF) <- c("date", "value")
+            # select the month
+            mt <- subset(X, Month == j)
+            check.na <- sum(is.na(mt$value))
             
-            modDF[modDF$value == -99.9, "value"] <- NA
-        } else {
-            modDF <- NA
+            if (check.na/nrow(mt) == 0) {
+                print(paste0("Data ", i, " Month ", j, "has no missing values"))
+                
+            } else if (check.na/nrow(mt) == 1) {
+                # fill current month with previous month values
+                if (j >= 2) {
+                    prev.mt <- subset(X, Month = j-1)
+                    
+                    v.list <- mt[!is.na(prev.mt$value), "value"]
+                    
+                    # computing frequency
+                    rg <- range(v.list)
+                    
+                    # insert a conditional check to make sure breaks have values
+                    if(rg[2]-rg[1] <= 1) {
+                        by.value <- 0.01
+                    } else if (rg[2] - rg[1] <= 100) {
+                        by.value <- 0.1
+                    } else if (rg[2] - rg[1] <= 10000) {
+                        by.value <- 10
+                    }
+                    
+                    s.value <- rg[1] - 0.0001
+                    e.value <- rg[2] + by.value - 0.0001
+                    
+                    breaks <- seq(s.value, e.value, by = by.value)
+                    fill.list <- seq(rg[1], rg[2]+by.value, by = by.value)
+                    precip.cut <- cut(v.list, breaks)
+                    precip.freq <- table(precip.cut)
+                    
+                    # computing probability
+                    myprob <- data.frame(precip.freq, NA)
+                    colnames(myprob) <- c("range", "freq", "prob")
+                    csum <- sum(myprob$freq)
+                    myprob$prob <- myprob$freq/csum
+                    
+                    # computing selection number list
+                    mynumbers <- fill.list[1:length(fill.list)-1]
+                    
+                    # count number of missing values
+                    mis <- sum(is.na(mt$value))
+                    
+                    # sampling from the number list following distribution probability
+                    d <- sample(mynumbers, size=mis, replace=T, prob=myprob$prob)
+                    
+                    X[X$Month == j & is.na(X$value), "value"] <- d
+                    
+                } else {  # for month 1, use Dec values
+                    prev.mt <- subset(X, Month = 12)
+                    
+                    v.list <- mt[!is.na(prev.mt$value), "value"]
+                    
+                    # computing frequency
+                    rg <- range(v.list)
+                    
+                    # insert a conditional check to make sure breaks have values
+                    if(rg[2]-rg[1] <= 1) {
+                        by.value <- 0.01
+                    } else if (rg[2] - rg[1] <= 100) {
+                        by.value <- 0.1
+                    } else if (rg[2] - rg[1] <= 10000) {
+                        by.value <- 10
+                    }
+                    
+                    s.value <- rg[1] - 0.0001
+                    e.value <- rg[2] + by.value - 0.0001
+                    
+                    breaks <- seq(s.value, e.value, by = by.value)
+                    fill.list <- seq(rg[1], rg[2]+by.value, by = by.value)
+                    precip.cut <- cut(v.list, breaks)
+                    precip.freq <- table(precip.cut)
+                    
+                    # computing probability
+                    myprob <- data.frame(precip.freq, NA)
+                    colnames(myprob) <- c("range", "freq", "prob")
+                    csum <- sum(myprob$freq)
+                    myprob$prob <- myprob$freq/csum
+                    
+                    # computing selection number list
+                    mynumbers <- fill.list[1:length(fill.list)-1]
+                    
+                    # count number of missing values
+                    mis <- sum(is.na(mt$value))
+                    
+                    # sampling from the number list following distribution probability
+                    d <- sample(mynumbers, size=mis, replace=T, prob=myprob$prob)
+                    
+                    X[X$Month == j & is.na(X$value), "value"] <- d
+                }
+                
+            } else {
+                v.list <- mt[!is.na(mt$value), "value"]
+                
+                
+                # computing frequency
+                rg <- range(v.list)
+                
+                
+                # insert a conditional check to make sure breaks have values
+                if(rg[2]-rg[1] <= 1) {
+                    by.value <- 0.01
+                } else if (rg[2] - rg[1] <= 100) {
+                    by.value <- 0.1
+                } else if (rg[2] - rg[1] <= 10000) {
+                    by.value <- 10
+                }
+                
+                s.value <- rg[1] - 0.0001
+                e.value <- rg[2] + by.value - 0.0001
+                
+                breaks <- seq(s.value, e.value, by = by.value)
+                fill.list <- seq(rg[1], rg[2]+by.value, by = by.value)
+                precip.cut <- cut(v.list, breaks)
+                precip.freq <- table(precip.cut)
+                
+                # computing probability
+                myprob <- data.frame(precip.freq, NA)
+                colnames(myprob) <- c("range", "freq", "prob")
+                csum <- sum(myprob$freq)
+                myprob$prob <- myprob$freq/csum
+                
+                # computing selection number list
+                mynumbers <- fill.list[1:length(fill.list)-1]
+                
+                # count number of missing values
+                mis <- sum(is.na(mt$value))
+                
+                # sampling from the number list following distribution probability
+                d <- sample(mynumbers, size=mis, replace=T, prob=myprob$prob)
+                
+                X[X$Month == j & is.na(X$value), "value"] <- d
+            }
+            
         }
-
         
-        # Find minimum start date
-        startDate <- min(modDF$date, modDF2$date, modDF3$date, 
-                         modDF4$date, modDF5$date, modDF6$date, 
-                         modDF7$date, modDF8$date, modDF9$date)
+        write.csv(X,outName, row.names=F)
         
-        # find maximum end date
-        endDate <- max(modDF$date, modDF2$date, modDF3$date, 
-                       modDF4$date, modDF5$date, modDF6$date, 
-                       modDF7$date, modDF8$date, modDF9$date)
-        
-        # create new datamframe 
-        t.series <- seq.Date(from = startDate, to = endDate,
-                             by = "day")
-        testDF <- data.frame(t.series, NA, NA, NA, NA, NA, NA, NA, NA, NA)
-        colnames(testDF) <- c("date", "s1", "s2", "s3", "s4", "s5",
-                              "s6", "s7", "s8", "s9")
-        
-        # assign station values onto the dataframe
-        for (j in modDF$date) {
-            testDF[testDF$date == j, "s1"] <- modDF[modDF$date == j, "value"]
-        }
-        
-        for (j in modDF2$date) {
-            testDF[testDF$date == j, "s2"] <- modDF2[modDF2$date == j, "value"]
-        }
-        
-        for (j in modDF3$date) {
-            testDF[testDF$date == j, "s3"] <- modDF3[modDF3$date == j, "value"]
-        }
-        
-        for (j in modDF4$date) {
-            testDF[testDF$date == j, "s4"] <- modDF4[modDF4$date == j, "value"]
-        }
-        
-        for (j in modDF5$date) {
-            testDF[testDF$date == j, "s5"] <- modDF5[modDF5$date == j, "value"]
-        }
-        
-        for (j in modDF6$date) {
-            testDF[testDF$date == j, "s6"] <- modDF6[modDF6$date == j, "value"]
-        }
-        
-        for (j in modDF7$date) {
-            testDF[testDF$date == j, "s7"] <- modDF7[modDF7$date == j, "value"]
-        }
-        
-        for (j in modDF8$date) {
-            testDF[testDF$date == j, "s8"] <- modDF8[modDF8$date == j, "value"]
-        }
-        
-        for (j in modDF9$date) {
-            testDF[testDF$date == j, "s9"] <- modDF9[modDF9$date == j, "value"]
-        }
-        
-        # delete row entries where the entire row are full with NAs
-        test2 <- testDF[rowSums(is.na(testDF[,2:10]))<=threshold, ]  # != 9 was the original setting, this new number seems strict!!!
-        
-        
-        test3 <- subset(test2, date <= max(modDF$date))
-        test4 <- subset(test3, date >= min(modDF$date))
-        
-        # check column sums to ensure there's still data left for each ghcn station
-        csum <- colSums(!is.na(test4[,2:10]))
-        
-        # if >90% are NAs, simply repeat column 1 values 
-        if(csum[[2]]/csum[[1]] <= 0.1) {
-            test4$s2 <- test4$s1
-        }
-        
-        if(csum[[3]]/csum[[1]] <= 0.1) {
-            test4$s3 <- test4$s1
-        }
-        
-        if(csum[[4]]/csum[[1]] <= 0.1) {
-            test4$s4 <- test4$s1
-        }
-        
-        if(csum[[5]]/csum[[1]] <= 0.1) {
-            test4$s5 <- test4$s1
-        }
-        
-        if(csum[[6]]/csum[[1]] <= 0.1) {
-            test4$s6 <- test4$s1
-        }
-        
-        if(csum[[7]]/csum[[1]] <= 0.1) {
-            test4$s7 <- test4$s1
-        }
-        
-        if(csum[[8]]/csum[[1]] <= 0.1) {
-            test4$s8 <- test4$s1
-        }
-        
-        if(csum[[9]]/csum[[1]] <= 0.1) {
-            test4$s9 <- test4$s1
-        }
-        
-        # gap fill the rest missing values
-        test5 <- fillGap(test4, corPeriod="daily")
-        
-        # re-create the dataframe over the entire period with no missing values
-        t.series <- seq.Date(from = min(modDF$date), to = max(modDF$date),
-                             by = "day")
-        outDF <- data.frame(t.series, NA)
-        colnames(outDF) <- c("date", "s1")
-        
-        for (j in test5$Date) {
-            outDF[outDF$date == j, "s1"] <- test5[test5$Date == j, "s1"]
-        }
-        
-        outDF$Year <- as.numeric(format(outDF$date, "%Y"))
-        outDF$Month <- as.numeric(format(outDF$date, "%m"))
-        outDF$Day <- as.numeric(format(outDF$date, "%d"))
-        
-        outDF2 <- outDF[,c("date", "Year", "Month", "Day", "s1")]
-        colnames(outDF2) <- c("date", "Year", "Month", "Day", "value")
-        write.csv(outDF2,outName)
-        
-        print(targList[i])
+        print(i)
         
     }  # i loop
     

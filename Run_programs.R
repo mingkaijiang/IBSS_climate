@@ -94,20 +94,30 @@ Gap_Fill_3(stationDF5, threshold=2,
            sourceDir = "data/ghcnd_gap_filled", 
            destDir = "data/ghcnd_gap_filled")
 
-# to do next
-stationDF6 <- stationDF[c(63,
-                          61), ]
-Gap_Fill_4(stationDF6, threshold=2,
-           sourceDir = "data/ghcnd_gap_filled", 
-           destDir = "data/ghcnd_gap_filled")
+# update stationDF
+stationDF_updated <- stationDF
+s.list <- c(22, 44, 62, 69, 15, 53, 71)
+for (m in s.list) {
+    stationDF_updated[m, "ghcn1"] <- stationDF_updated[m, "ghcn2"]
+    stationDF_updated[m, "lat1"] <- stationDF_updated[m, "lat2"]
+    stationDF_updated[m, "lon1"] <- stationDF_updated[m, "lon2"]
+    stationDF_updated[m, "elev1"] <- stationDF_updated[m, "elev2"]
+}
 
-### Update original stationDF list
+s.list <- c(10)
+for (m in s.list) {
+    stationDF_updated[m, "ghcn1"] <- stationDF_updated[m, "ghcn3"]
+    stationDF_updated[m, "lat1"] <- stationDF_updated[m, "lat3"]
+    stationDF_updated[m, "lon1"] <- stationDF_updated[m, "lon3"]
+    stationDF_updated[m, "elev1"] <- stationDF_updated[m, "elev3"]
+}
 
-
-
+stationDF_updated <- stationDF_updated[-c(16,61,63),]
+    
 ### Step 6:
 ### Gap filling 2. - use same period in other years to fill big chunk of missing data
-Gap_Fill_within_station(stationDF, threshold=8, 
+###                - and the remaining unfilled sites
+Gap_Fill_within_station(stationDF_updated, 
                         sourceDir = "data/ghcnd_gap_filled",
                         destDir = "data/ghcnd_gap_filled_2")
 
@@ -116,23 +126,23 @@ Gap_Fill_within_station(stationDF, threshold=8,
 
 ### Step 1:
 ### Compute coefficient of variation for all GHCN stations
-CoefVar(sourceDir = "data/ghcnd_selected", destDir = "data/indices")
+CoefVar(sourceDir = "data/ghcnd_gap_filled_2", destDir = "data/indices")
 
 ### Step 2: 
 ### Calculate seasonal 1D prcp and save into corresponding directory
-RX1S(sourceDir = "data/ghcnd_selected", destDir = "data/indices/rx1s")
+RX1S(sourceDir = "data/ghcnd_gap_filled_2", destDir = "data/indices/rx1s")
 
 ### Step 3:
 ##Calculate seasonal 5D prcp and save into corresponding directory
-RX5S(sourceDir = "data/ghcnd_selected", destDir = "data/indices/rx5s")
+RX5S(sourceDir = "data/ghcnd_gap_filled_2", destDir = "data/indices/rx5s")
 
 ### Step 4: 
 ### Calculate threshold based indices, R10, R20, R95P, R99P,PRCPTOT at seasonal timestep
-ThrIndS(sourceDir = "data/ghcnd_selected", destDir = "data/indices/ThrIndS")
+ThrIndS(sourceDir = "data/ghcnd_gap_filled_2", destDir = "data/indices/ThrIndS")
 
 ### Step 5:
 ### Calculate prcp/# of wet days over each season and save into corresponding directory
-SDIIS(sourceDir = "data/ghcnd_selected", destDir = "data/indices/SDIIS")
+SDIIS(sourceDir = "data/ghcnd_gap_filled_2", destDir = "data/indices/SDIIS")
 
 
 ##############################################################################################################
