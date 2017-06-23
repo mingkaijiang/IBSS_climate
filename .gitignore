@@ -49,6 +49,7 @@ vignettes/*.pdf
 /data/ghcnd_gap_filled/*.csv
 /data/ghcnd_selected_copy/*.csv
 /data/ghcnd_gap_filled_2/*.csv
+/data/restructured/*.csv
 
 # R project
 *.Rproj

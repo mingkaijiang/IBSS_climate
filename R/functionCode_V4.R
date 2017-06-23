@@ -2542,37 +2542,43 @@ ReStructureFile <- function (sourceDir = DAILY.DATA.DIRECTORY,
                              destDir = DAILY.INPUT.DIRECTORY)
 {
   DatFiles <- list.files(path = sourceDir, pattern = "\\.csv")
+  dir.create(destDir, showWarnings = FALSE)
+  
   for (thisFile in 1:length(DatFiles)) 
   {
-    print(DatFiles[thisFile])
+    print(thisFile)
 
     inName <- file.path(sourceDir, DatFiles[thisFile], fsep = .Platform$file.sep)
     outName <- file.path(destDir, DatFiles[thisFile], fsep = .Platform$file.sep)
 
     X <- read.table(inName, stringsAsFactors = FALSE,sep=" ", header=T)
-    melted <- melt(X, id.var = c("Id", "Elements", "Year", "Month"), 
-                   variable_name = "Day")
-    data_upd <- melted[!(melted$Month=="2" & melted$Day== "Day30"),]
-    data_upd <- data_upd[!(data_upd$Month=="2" & data_upd$Day== "Day31"),]
-    data_upd <- data_upd[!(data_upd$Month=="4" & data_upd$Day== "Day31"),]
-    data_upd <- data_upd[!(data_upd$Month=="6" & data_upd$Day== "Day31"),]
-    data_upd <- data_upd[!(data_upd$Month=="9" & data_upd$Day== "Day31"),]
-    data_upd <- data_upd[!(data_upd$Month=="11" & data_upd$Day== "Day31"),]    
-    data_upd <- data_upd[!(leap_year(data_upd$Year)==FALSE & data_upd$Month=="2" 
-                           & data_upd$Day== "Day29"),]
     
-    keeps <- c("Year","Month","Day","value")
-    data_upd <- data_upd[keeps]
-    data_upd <- as.data.frame(sapply(data_upd,gsub,pattern="Day",replacement=""))
-    X <- data_upd
-    X$Year <- as.numeric(as.character(X$Year))
-    X$Month <- as.numeric(as.character(X$Month))
-    X$Day <- as.numeric(as.character(X$Day))
-    X$value <- as.numeric(as.character(X$value))
-    X[is.na(X)] <- -99.9
+    if (nrow(X) > 0) {
+        melted <- melt(X, id.var = c("Id", "Elements", "Year", "Month"), 
+                       variable_name = "Day")
+        data_upd <- melted[!(melted$Month=="2" & melted$Day== "Day30"),]
+        data_upd <- data_upd[!(data_upd$Month=="2" & data_upd$Day== "Day31"),]
+        data_upd <- data_upd[!(data_upd$Month=="4" & data_upd$Day== "Day31"),]
+        data_upd <- data_upd[!(data_upd$Month=="6" & data_upd$Day== "Day31"),]
+        data_upd <- data_upd[!(data_upd$Month=="9" & data_upd$Day== "Day31"),]
+        data_upd <- data_upd[!(data_upd$Month=="11" & data_upd$Day== "Day31"),]    
+        data_upd <- data_upd[!(leap_year(data_upd$Year)==FALSE & data_upd$Month=="2" 
+                               & data_upd$Day== "Day29"),]
+        
+        keeps <- c("Year","Month","Day","value")
+        data_upd <- data_upd[keeps]
+        data_upd <- as.data.frame(sapply(data_upd,gsub,pattern="Day",replacement=""))
+        X <- data_upd
+        X$Year <- as.numeric(as.character(X$Year))
+        X$Month <- as.numeric(as.character(X$Month))
+        X$Day <- as.numeric(as.character(X$Day))
+        X$value <- as.numeric(as.character(X$value))
+        X[is.na(X)] <- -99.9
+        
+        X <- X[order(X$Year, X$Month, X$Day), ]
+        write.csv(X, outName)
+    }
     
-    X <- X[order(X$Year, X$Month, X$Day), ]
-    write.csv(X, outName)
   }
 }
 
@@ -4951,7 +4957,7 @@ YrRange10<-function(sourceDir = DAILY.DATA.DIRECTORY)
     yrrange <- max(as.numeric(dd$Year)) - min(as.numeric(dd$Year))
     
     
-      if (yrrange < 2)
+      if (yrrange < 10)
       {  
         print(DatFiles[thisFile])
         file.remove(paste0(sourceDir, "/", DatFiles[thisFile]))
@@ -4963,36 +4969,56 @@ YrRange10<-function(sourceDir = DAILY.DATA.DIRECTORY)
 ##############################################################################################################
 ## Filter data for Year range > 10 for long-term trend analysis 
 ## Also check for missing data issue, missing data should not be > 80%
-Missing_check<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECTORY)
+Missing_check<-function(station.list.input, sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECTORY)
 {
-    DatFiles <- list.files(path = sourceDir, pattern = "\\.csv")
+    DatFiles <- paste0(station.list.input,".csv")
     dir.create(destDir, showWarnings = FALSE)
+    
+    id.list <- c(1:length(station.list.input))
+    station.list.output <- data.frame(id.list, NA)
+    colnames(station.list.output) <- c("id", "station")
     
     for (thisFile in 1:length(DatFiles)) 
     {
         inName <- file.path(sourceDir, DatFiles[thisFile], fsep = .Platform$file.sep)
+        outName <- file.path(destDir, DatFiles[thisFile], fsep = .Platform$file.sep)
         
         dd <- read.csv(inName,header=F,skip = 1, sep=",")
         colnames(dd) <- c("id", "Year", "Month", "Day", "value")
+        dd$date <- as.Date(paste(dd$Year, dd$Month, dd$Day, sep="-"),
+                           format = "%Y-%m-%d")
         
-        yrrange <- max(as.numeric(dd$Year)) - min(as.numeric(dd$Year))
+        t.series <- seq.Date(from = min(dd$date), to = max(dd$date),
+                             by = "day")
+        
+        dd[dd$value == -99.9, "value"] <- NA
+        
+        # create outout df
+        out <- data.frame(t.series, NA, NA, NA, NA)
+        
+        colnames(out) <- c("date", "Year", "Month", "Day", "value")
+        out$value <- dd$value[match(out$date, dd$date)]
+        out$Year <- dd$Year[match(out$date, dd$date)]
+        out$Month <- dd$Month[match(out$date, dd$date)]
+        out$Day <- dd$Day[match(out$date, dd$date)]
+        out[is.na(out$value), "value"] <- -99.9
         
         # check for missing data issue
-        target <- yrrange * 365
+        target <- length(t.series)
+        
         d2 <- dd[complete.cases(dd),]
         reality <- nrow(d2)
         miss_percent <- (target - reality) / target
         
-        if (yrrange < 10 || miss_percent > 0.2)
+        if (miss_percent <= 0.2)
         {  
-            print(DatFiles[thisFile])
-            file.remove(paste0(sourceDir, "/", DatFiles[thisFile]))
+            print(station.list.input[thisFile])
+            write.csv(out, outName, row.names=F)
+            station.list.output[thisFile, "station"] <- station.list.input[thisFile]
         }
         
     }
-    
-    file.copy(from=sourceDir, to=destDir, recursive = T, 
-              copy.mode = TRUE)
+
 }
 
 ##############################################################################################################
@@ -5057,9 +5083,9 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME, threshold,
                               format = "%Y-%m-%d")
             
             modDF <- data.frame(X$date, X$value)
-            colnames(modDF) <- c("date", "value")
+            colnames(modDF) <- c("date", "s1")
             
-            modDF[modDF$value == -99.9, "value"] <- NA
+            modDF[modDF$s1 == -99.9, "s1"] <- NA
         } else {
             modDF <- NA
         }
@@ -5075,9 +5101,9 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME, threshold,
                                format = "%Y-%m-%d")
             
             modDF2 <- data.frame(X2$date, X2$value)
-            colnames(modDF2) <- c("date", "value")
+            colnames(modDF2) <- c("date", "s2")
             
-            modDF2[modDF2$value == -99.9, "value"] <- NA
+            modDF2[modDF2$s2 == -99.9, "s2"] <- NA
         } else { 
             modDF2 <- modDF
         }
@@ -5094,9 +5120,9 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME, threshold,
                                    format = "%Y-%m-%d")
                 
                 modDF3 <- data.frame(X3$date, X3$value)
-                colnames(modDF3) <- c("date", "value")
+                colnames(modDF3) <- c("date", "s3")
                 
-                modDF3[modDF3$value == -99.9, "value"] <- NA
+                modDF3[modDF3$s3 == -99.9, "s3"] <- NA
             } else { 
                 modDF3 <- modDF 
             }
@@ -5115,9 +5141,9 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME, threshold,
                                    format = "%Y-%m-%d")
                 
                 modDF4 <- data.frame(X4$date, X4$value)
-                colnames(modDF4) <- c("date", "value")
+                colnames(modDF4) <- c("date", "s4")
                 
-                modDF4[modDF4$value == -99.9, "value"] <- NA
+                modDF4[modDF4$s4 == -99.9, "s4"] <- NA
             } else { modDF4 <- modDF }
         } else {
             modDF4 <- modDF
@@ -5135,9 +5161,9 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME, threshold,
                                    format = "%Y-%m-%d")
                 
                 modDF5 <- data.frame(X5$date, X5$value)
-                colnames(modDF5) <- c("date", "value")
+                colnames(modDF5) <- c("date", "s5")
                 
-                modDF5[modDF5$value == -99.9, "value"] <- NA
+                modDF5[modDF5$s5 == -99.9, "s5"] <- NA
             } else { modDF5 <- modDF }
         } else {
             modDF5 <- modDF
@@ -5154,9 +5180,9 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME, threshold,
                                    format = "%Y-%m-%d")
                 
                 modDF6 <- data.frame(X6$date, X6$value)
-                colnames(modDF6) <- c("date", "value")
+                colnames(modDF6) <- c("date", "s6")
                 
-                modDF6[modDF6$value == -99.9, "value"] <- NA
+                modDF6[modDF6$s6 == -99.9, "s6"] <- NA
             } else { modDF6 <- modDF }
         } else {
             modDF6 <- modDF
@@ -5173,9 +5199,9 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME, threshold,
                                    format = "%Y-%m-%d")
                 
                 modDF7 <- data.frame(X7$date, X7$value)
-                colnames(modDF7) <- c("date", "value")
+                colnames(modDF7) <- c("date", "s7")
                 
-                modDF7[modDF7$value == -99.9, "value"] <- NA
+                modDF7[modDF7$s7 == -99.9, "s7"] <- NA
             } else { modDF7 <- modDF }
         } else {
             modDF7 <- modDF
@@ -5191,9 +5217,9 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME, threshold,
                                    format = "%Y-%m-%d")
                 
                 modDF8 <- data.frame(X8$date, X8$value)
-                colnames(modDF8) <- c("date", "value")
+                colnames(modDF8) <- c("date", "s8")
                 
-                modDF8[modDF8$value == -99.9, "value"] <- NA
+                modDF8[modDF8$s8 == -99.9, "s8"] <- NA
             } else { 
                 modDF8 <- modDF 
             }
@@ -5212,9 +5238,9 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME, threshold,
                                        format = "%Y-%m-%d")
                     
                     modDF9 <- data.frame(X9$date, X9$value)
-                    colnames(modDF9) <- c("date", "value")
+                    colnames(modDF9) <- c("date", "s9")
                     
-                    modDF9[modDF9$value == -99.9, "value"] <- NA
+                    modDF9[modDF9$s9 == -99.9, "s9"] <- NA
                 } else { 
                     modDF9 <- modDF 
                 }
@@ -5236,47 +5262,23 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME, threshold,
         # create new datamframe 
         t.series <- seq.Date(from = startDate, to = endDate,
                              by = "day")
-        testDF <- data.frame(t.series, NA, NA, NA, NA, NA, NA, NA, NA, NA)
+        testDF <- data.frame(t.series, NA)
+        colnames(testDF) <- c("date", "value")
+        
+        out1 <- merge(testDF, modDF, by="date", all.x=T, sort=T)
+        out2 <- merge(out1, modDF2, by="date", all.x=T, sort=T)
+        out3 <- merge(out2, modDF3, by="date", all.x=T, sort=T)
+        out4 <- merge(out3, modDF4, by="date", all.x=T, sort=T)
+        out5 <- merge(out4, modDF5, by="date", all.x=T, sort=T)
+        out6 <- merge(out5, modDF6, by="date", all.x=T, sort=T)
+        out7 <- merge(out6, modDF7, by="date", all.x=T, sort=T)
+        out8 <- merge(out7, modDF8, by="date", all.x=T, sort=T)
+        out9 <- merge(out8, modDF9, by="date", all.x=T, sort=T)
+        
+        testDF <- out9[,-2]
+        
         colnames(testDF) <- c("date", "s1", "s2", "s3", "s4", "s5",
                               "s6", "s7", "s8", "s9")
-        
-        # assign station values onto the dataframe
-        for (j in modDF$date) {
-            testDF[testDF$date == j, "s1"] <- modDF[modDF$date == j, "value"]
-        }
-        
-        for (j in modDF2$date) {
-            testDF[testDF$date == j, "s2"] <- modDF2[modDF2$date == j, "value"]
-        }
-        
-        for (j in modDF3$date) {
-            testDF[testDF$date == j, "s3"] <- modDF3[modDF3$date == j, "value"]
-        }
-        
-        for (j in modDF4$date) {
-            testDF[testDF$date == j, "s4"] <- modDF4[modDF4$date == j, "value"]
-        }
-        
-        for (j in modDF5$date) {
-            testDF[testDF$date == j, "s5"] <- modDF5[modDF5$date == j, "value"]
-        }
-        
-        for (j in modDF6$date) {
-            testDF[testDF$date == j, "s6"] <- modDF6[modDF6$date == j, "value"]
-        }
-        
-        for (j in modDF7$date) {
-            testDF[testDF$date == j, "s7"] <- modDF7[modDF7$date == j, "value"]
-        }
-        
-        for (j in modDF8$date) {
-            testDF[testDF$date == j, "s8"] <- modDF8[modDF8$date == j, "value"]
-        }
-        
-        for (j in modDF9$date) {
-            testDF[testDF$date == j, "s9"] <- modDF9[modDF9$date == j, "value"]
-        }
-        
         
         # delete row entries where the entire row are full with NAs
         nr1 <- nrow(testDF[complete.cases(testDF),])
@@ -5298,47 +5300,23 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME, threshold,
             # create new datamframe 
             t.series <- seq.Date(from = startDate, to = endDate,
                                  by = "day")
-            testDF <- data.frame(t.series, NA, NA, NA, NA, NA, NA, NA, NA, NA)
+            testDF <- data.frame(t.series, NA)
+            colnames(testDF) <- c("date", "value")
+            
+            out1 <- merge(testDF, modDF, by="date", all.x=T, sort=T)
+            out2 <- merge(out1, modDF2, by="date", all.x=T, sort=T)
+            out3 <- merge(out2, modDF3, by="date", all.x=T, sort=T)
+            out4 <- merge(out3, modDF4, by="date", all.x=T, sort=T)
+            out5 <- merge(out4, modDF5, by="date", all.x=T, sort=T)
+            out6 <- merge(out5, modDF6, by="date", all.x=T, sort=T)
+            out7 <- merge(out6, modDF7, by="date", all.x=T, sort=T)
+            out8 <- merge(out7, modDF8, by="date", all.x=T, sort=T)
+            out9 <- merge(out8, modDF9, by="date", all.x=T, sort=T)
+            
+            testDF <- out9[,-2]
+            
             colnames(testDF) <- c("date", "s1", "s2", "s3", "s4", "s5",
                                   "s6", "s7", "s8", "s9")
-            
-            # assign station values onto the dataframe
-            for (j in modDF$date) {
-                testDF[testDF$date == j, "s1"] <- modDF[modDF$date == j, "value"]
-            }
-            
-            for (j in modDF2$date) {
-                testDF[testDF$date == j, "s2"] <- modDF2[modDF2$date == j, "value"]
-            }
-            
-            for (j in modDF3$date) {
-                testDF[testDF$date == j, "s3"] <- modDF3[modDF3$date == j, "value"]
-            }
-            
-            for (j in modDF4$date) {
-                testDF[testDF$date == j, "s4"] <- modDF4[modDF4$date == j, "value"]
-            }
-            
-            for (j in modDF5$date) {
-                testDF[testDF$date == j, "s5"] <- modDF5[modDF5$date == j, "value"]
-            }
-            
-            for (j in modDF6$date) {
-                testDF[testDF$date == j, "s6"] <- modDF6[modDF6$date == j, "value"]
-            }
-            
-            for (j in modDF7$date) {
-                testDF[testDF$date == j, "s7"] <- modDF7[modDF7$date == j, "value"]
-            }
-            
-            for (j in modDF8$date) {
-                testDF[testDF$date == j, "s8"] <- modDF8[modDF8$date == j, "value"]
-            }
-            
-            for (j in modDF9$date) {
-                testDF[testDF$date == j, "s9"] <- modDF9[modDF9$date == j, "value"]
-            }
-            
             
             # delete row entries where the entire row are full with NAs
             test2 <- testDF[rowSums(is.na(testDF[,2:10]))<=threshold, ]  # != 9 was the original setting, this new number seems strict!!!
@@ -5396,42 +5374,22 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME, threshold,
             # create new datamframe 
             t.series <- seq.Date(from = startDate, to = endDate,
                                  by = "day")
-            testDF <- data.frame(t.series, NA, NA, NA, NA, NA, NA, NA, NA)
+            testDF <- data.frame(t.series, NA)
+            colnames(testDF) <- c("date", "value")
+            
+            out1 <- merge(testDF, modDF, by="date", all.x=T, sort=T)
+            out2 <- merge(out1, modDF2, by="date", all.x=T, sort=T)
+            out3 <- merge(out2, modDF3, by="date", all.x=T, sort=T)
+            out4 <- merge(out3, modDF4, by="date", all.x=T, sort=T)
+            out5 <- merge(out4, modDF5, by="date", all.x=T, sort=T)
+            out6 <- merge(out5, modDF6, by="date", all.x=T, sort=T)
+            out7 <- merge(out6, modDF7, by="date", all.x=T, sort=T)
+            out8 <- merge(out7, modDF8, by="date", all.x=T, sort=T)
+
+            testDF <- out8[,-2]
+            
             colnames(testDF) <- c("date", "s1", "s2", "s3", "s4", "s5",
                                   "s6", "s7", "s8")
-            
-            # assign station values onto the dataframe
-            for (j in modDF$date) {
-                testDF[testDF$date == j, "s1"] <- modDF[modDF$date == j, "value"]
-            }
-            
-            for (j in modDF2$date) {
-                testDF[testDF$date == j, "s2"] <- modDF2[modDF2$date == j, "value"]
-            }
-            
-            for (j in modDF3$date) {
-                testDF[testDF$date == j, "s3"] <- modDF3[modDF3$date == j, "value"]
-            }
-            
-            for (j in modDF4$date) {
-                testDF[testDF$date == j, "s4"] <- modDF4[modDF4$date == j, "value"]
-            }
-            
-            for (j in modDF5$date) {
-                testDF[testDF$date == j, "s5"] <- modDF5[modDF5$date == j, "value"]
-            }
-            
-            for (j in modDF6$date) {
-                testDF[testDF$date == j, "s6"] <- modDF6[modDF6$date == j, "value"]
-            }
-            
-            for (j in modDF7$date) {
-                testDF[testDF$date == j, "s7"] <- modDF7[modDF7$date == j, "value"]
-            }
-            
-            for (j in modDF8$date) {
-                testDF[testDF$date == j, "s8"] <- modDF8[modDF8$date == j, "value"]
-            }
             
             
             # delete row entries where the entire row are full with NAs
@@ -5486,39 +5444,22 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME, threshold,
             # create new datamframe 
             t.series <- seq.Date(from = startDate, to = endDate,
                                  by = "day")
-            testDF <- data.frame(t.series, NA, NA, NA, NA, NA, NA, NA)
+            testDF <- data.frame(t.series, NA)
+            colnames(testDF) <- c("date", "value")
+            
+            out1 <- merge(testDF, modDF, by="date", all.x=T, sort=T)
+            out2 <- merge(out1, modDF2, by="date", all.x=T, sort=T)
+            out3 <- merge(out2, modDF3, by="date", all.x=T, sort=T)
+            out4 <- merge(out3, modDF4, by="date", all.x=T, sort=T)
+            out5 <- merge(out4, modDF5, by="date", all.x=T, sort=T)
+            out6 <- merge(out5, modDF6, by="date", all.x=T, sort=T)
+            out7 <- merge(out6, modDF7, by="date", all.x=T, sort=T)
+            
+            testDF <- out7[,-2]
+            
             colnames(testDF) <- c("date", "s1", "s2", "s3", "s4", "s5",
                                   "s6", "s7")
             
-            
-            # assign station values onto the dataframe
-            for (j in modDF$date) {
-                testDF[testDF$date == j, "s1"] <- modDF[modDF$date == j, "value"]
-            }
-            
-            for (j in modDF2$date) {
-                testDF[testDF$date == j, "s2"] <- modDF2[modDF2$date == j, "value"]
-            }
-            
-            for (j in modDF3$date) {
-                testDF[testDF$date == j, "s3"] <- modDF3[modDF3$date == j, "value"]
-            }
-            
-            for (j in modDF4$date) {
-                testDF[testDF$date == j, "s4"] <- modDF4[modDF4$date == j, "value"]
-            }
-            
-            for (j in modDF5$date) {
-                testDF[testDF$date == j, "s5"] <- modDF5[modDF5$date == j, "value"]
-            }
-            
-            for (j in modDF6$date) {
-                testDF[testDF$date == j, "s6"] <- modDF6[modDF6$date == j, "value"]
-            }
-            
-            for (j in modDF7$date) {
-                testDF[testDF$date == j, "s7"] <- modDF7[modDF7$date == j, "value"]
-            }
             
             # delete row entries where the entire row are full with NAs
             test2 <- testDF[rowSums(is.na(testDF[,2:8]))<=threshold, ]  
@@ -5567,34 +5508,21 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME, threshold,
             # create new datamframe 
             t.series <- seq.Date(from = startDate, to = endDate,
                                  by = "day")
-            testDF <- data.frame(t.series, NA, NA, NA, NA, NA, NA)
+            testDF <- data.frame(t.series, NA)
+            colnames(testDF) <- c("date", "value")
+            
+            out1 <- merge(testDF, modDF, by="date", all.x=T, sort=T)
+            out2 <- merge(out1, modDF2, by="date", all.x=T, sort=T)
+            out3 <- merge(out2, modDF3, by="date", all.x=T, sort=T)
+            out4 <- merge(out3, modDF4, by="date", all.x=T, sort=T)
+            out5 <- merge(out4, modDF5, by="date", all.x=T, sort=T)
+            out6 <- merge(out5, modDF6, by="date", all.x=T, sort=T)
+            
+            testDF <- out6[,-2]
+            
             colnames(testDF) <- c("date", "s1", "s2", "s3", "s4", "s5",
                                   "s6")
             
-            # assign station values onto the dataframe
-            for (j in modDF$date) {
-                testDF[testDF$date == j, "s1"] <- modDF[modDF$date == j, "value"]
-            }
-            
-            for (j in modDF2$date) {
-                testDF[testDF$date == j, "s2"] <- modDF2[modDF2$date == j, "value"]
-            }
-            
-            for (j in modDF3$date) {
-                testDF[testDF$date == j, "s3"] <- modDF3[modDF3$date == j, "value"]
-            }
-            
-            for (j in modDF4$date) {
-                testDF[testDF$date == j, "s4"] <- modDF4[modDF4$date == j, "value"]
-            }
-            
-            for (j in modDF5$date) {
-                testDF[testDF$date == j, "s5"] <- modDF5[modDF5$date == j, "value"]
-            }
-            
-            for (j in modDF6$date) {
-                testDF[testDF$date == j, "s6"] <- modDF6[modDF6$date == j, "value"]
-            }
             
             # delete row entries where the entire row are full with NAs
             test2 <- testDF[rowSums(is.na(testDF[,2:7]))<=threshold, ]  
@@ -5640,29 +5568,19 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME, threshold,
             # create new datamframe 
             t.series <- seq.Date(from = startDate, to = endDate,
                                  by = "day")
-            testDF <- data.frame(t.series, NA, NA, NA, NA, NA)
+            testDF <- data.frame(t.series, NA)
+            colnames(testDF) <- c("date", "value")
+            
+            out1 <- merge(testDF, modDF, by="date", all.x=T, sort=T)
+            out2 <- merge(out1, modDF2, by="date", all.x=T, sort=T)
+            out3 <- merge(out2, modDF3, by="date", all.x=T, sort=T)
+            out4 <- merge(out3, modDF4, by="date", all.x=T, sort=T)
+            out5 <- merge(out4, modDF5, by="date", all.x=T, sort=T)
+            
+            testDF <- out5[,-2]
+            
             colnames(testDF) <- c("date", "s1", "s2", "s3", "s4", "s5")
             
-            # assign station values onto the dataframe
-            for (j in modDF$date) {
-                testDF[testDF$date == j, "s1"] <- modDF[modDF$date == j, "value"]
-            }
-            
-            for (j in modDF2$date) {
-                testDF[testDF$date == j, "s2"] <- modDF2[modDF2$date == j, "value"]
-            }
-            
-            for (j in modDF3$date) {
-                testDF[testDF$date == j, "s3"] <- modDF3[modDF3$date == j, "value"]
-            }
-            
-            for (j in modDF4$date) {
-                testDF[testDF$date == j, "s4"] <- modDF4[modDF4$date == j, "value"]
-            }
-            
-            for (j in modDF5$date) {
-                testDF[testDF$date == j, "s5"] <- modDF5[modDF5$date == j, "value"]
-            }
             
             # delete row entries where the entire row are full with NAs
             test2 <- testDF[rowSums(is.na(testDF[,2:6]))<=threshold, ]  
@@ -5703,25 +5621,17 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME, threshold,
             # create new datamframe 
             t.series <- seq.Date(from = startDate, to = endDate,
                                  by = "day")
-            testDF <- data.frame(t.series, NA, NA, NA, NA)
+            testDF <- data.frame(t.series, NA)
+            colnames(testDF) <- c("date", "value")
+            
+            out1 <- merge(testDF, modDF, by="date", all.x=T, sort=T)
+            out2 <- merge(out1, modDF2, by="date", all.x=T, sort=T)
+            out3 <- merge(out2, modDF3, by="date", all.x=T, sort=T)
+            out4 <- merge(out3, modDF4, by="date", all.x=T, sort=T)
+
+            testDF <- out4[,-2]
+            
             colnames(testDF) <- c("date", "s1", "s2", "s3", "s4")
-            
-            # assign station values onto the dataframe
-            for (j in modDF$date) {
-                testDF[testDF$date == j, "s1"] <- modDF[modDF$date == j, "value"]
-            }
-            
-            for (j in modDF2$date) {
-                testDF[testDF$date == j, "s2"] <- modDF2[modDF2$date == j, "value"]
-            }
-            
-            for (j in modDF3$date) {
-                testDF[testDF$date == j, "s3"] <- modDF3[modDF3$date == j, "value"]
-            }
-            
-            for (j in modDF4$date) {
-                testDF[testDF$date == j, "s4"] <- modDF4[modDF4$date == j, "value"]
-            }
             
             # delete row entries where the entire row are full with NAs
             test2 <- testDF[rowSums(is.na(testDF[,2:5]))<=threshold, ]  
@@ -5756,21 +5666,16 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME, threshold,
             # create new datamframe 
             t.series <- seq.Date(from = startDate, to = endDate,
                                  by = "day")
-            testDF <- data.frame(t.series, NA, NA, NA)
+            testDF <- data.frame(t.series, NA)
+            colnames(testDF) <- c("date", "value")
+            
+            out1 <- merge(testDF, modDF, by="date", all.x=T, sort=T)
+            out2 <- merge(out1, modDF2, by="date", all.x=T, sort=T)
+            out3 <- merge(out2, modDF3, by="date", all.x=T, sort=T)
+            
+            testDF <- out3[,-2]
+            
             colnames(testDF) <- c("date", "s1", "s2", "s3")
-            
-            # assign station values onto the dataframe
-            for (j in modDF$date) {
-                testDF[testDF$date == j, "s1"] <- modDF[modDF$date == j, "value"]
-            }
-            
-            for (j in modDF2$date) {
-                testDF[testDF$date == j, "s2"] <- modDF2[modDF2$date == j, "value"]
-            }
-            
-            for (j in modDF3$date) {
-                testDF[testDF$date == j, "s3"] <- modDF3[modDF3$date == j, "value"]
-            }
             
             # delete row entries where the entire row are full with NAs
             test2 <- testDF[rowSums(is.na(testDF[,2:4]))<=threshold, ]  
@@ -5801,17 +5706,15 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME, threshold,
             # create new datamframe 
             t.series <- seq.Date(from = startDate, to = endDate,
                                  by = "day")
-            testDF <- data.frame(t.series, NA, NA)
+            testDF <- data.frame(t.series, NA)
+            colnames(testDF) <- c("date", "value")
+            
+            out1 <- merge(testDF, modDF, by="date", all.x=T, sort=T)
+            out2 <- merge(out1, modDF2, by="date", all.x=T, sort=T)
+            
+            testDF <- out2[,-2]
+            
             colnames(testDF) <- c("date", "s1", "s2")
-            
-            # assign station values onto the dataframe
-            for (j in modDF$date) {
-                testDF[testDF$date == j, "s1"] <- modDF[modDF$date == j, "value"]
-            }
-            
-            for (j in modDF2$date) {
-                testDF[testDF$date == j, "s2"] <- modDF2[modDF2$date == j, "value"]
-            }
             
             # delete row entries where the entire row are full with NAs
             test2 <- testDF[rowSums(is.na(testDF[,2:3]))<=threshold, ]  
@@ -5829,7 +5732,6 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME, threshold,
             
         }
 
-        
         # gap fill the rest missing values
         test5 <- fillGap(test4, corPeriod="daily")
         
@@ -5838,18 +5740,19 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME, threshold,
                              by = "day")
         outDF <- data.frame(t.series, NA)
         colnames(outDF) <- c("date", "value")
+        outDF$value <- modDF$s1[match(outDF$date, modDF$date)]
+        outDF$value <- test5$s1[match(outDF$date, test5$date)]
+        
         
         t.series <- seq.Date(from = min(modDF2$date), to = max(modDF2$date),
                              by = "day")
         outDF2 <- data.frame(t.series, NA)
         colnames(outDF2) <- c("date", "value")
+        outDF2$value <- modDF2$s2[match(outDF2$date, modDF2$date)]
+        outDF2$value <- test5$s2[match(outDF2$date, test5$date)]
         
         # assign values from output filled df
-        for (j in test5$Date) {
-            outDF[outDF$date == j, "value"] <- test5[test5$Date == j, "s1"]
-            outDF2[outDF2$date == j, "value"] <- test5[test5$Date == j, "s2"]
-        }
-        
+
         outDF$Year <- as.numeric(format(outDF$date, "%Y"))
         outDF$Month <- as.numeric(format(outDF$date, "%m"))
         outDF$Day <- as.numeric(format(outDF$date, "%d"))
@@ -5875,11 +5778,8 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME, threshold,
                                  by = "day")
             outDF3 <- data.frame(t.series, NA)
             colnames(outDF3) <- c("date", "value")
-            
-            # assign values from output filled df
-            for (j in test5$Date) {
-                outDF3[outDF3$date == j, "value"] <- test5[test5$Date == j, "s3"]
-            }
+            outDF3$value <- modDF3$s3[match(outDF3$date, modDF3$date)]
+            outDF3$value <- test5$s3[match(outDF3$date, test5$date)]
             
             outDF3$Year <- as.numeric(format(outDF3$date, "%Y"))
             outDF3$Month <- as.numeric(format(outDF3$date, "%m"))
@@ -5892,16 +5792,12 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME, threshold,
             write.csv(outDF3,outName3, row.names=F)
             
             if (threshold >= 3) {
-                
                 t.series <- seq.Date(from = min(modDF4$date), to = max(modDF4$date),
                                      by = "day")
                 outDF4 <- data.frame(t.series, NA)
                 colnames(outDF4) <- c("date", "value")
-                
-                # assign values from output filled df
-                for (j in test5$Date) {
-                    outDF4[outDF4$date == j, "value"] <- test5[test5$Date == j, "s4"]
-                }
+                outDF4$value <- modDF4$s4[match(outDF4$date, modDF4$date)]
+                outDF4$value <- test5$s4[match(outDF4$date, test5$date)]
                 
                 outDF4$Year <- as.numeric(format(outDF4$date, "%Y"))
                 outDF4$Month <- as.numeric(format(outDF4$date, "%m"))
@@ -5918,11 +5814,8 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME, threshold,
                                          by = "day")
                     outDF5 <- data.frame(t.series, NA)
                     colnames(outDF5) <- c("date", "value")
-                    
-                    # assign values from output filled df
-                    for (j in test5$Date) {
-                        outDF5[outDF5$date == j, "value"] <- test5[test5$Date == j, "s5"]
-                    }
+                    outDF5$value <- modDF5$s5[match(outDF5$date, modDF5$date)]
+                    outDF5$value <- test5$s5[match(outDF5$date, test5$date)]
                     
                     outDF5$Year <- as.numeric(format(outDF5$date, "%Y"))
                     outDF5$Month <- as.numeric(format(outDF5$date, "%m"))
@@ -5939,11 +5832,8 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME, threshold,
                                              by = "day")
                         outDF6 <- data.frame(t.series, NA)
                         colnames(outDF6) <- c("date", "value")
-                        
-                        # assign values from output filled df
-                        for (j in test5$Date) {
-                            outDF6[outDF6$date == j, "value"] <- test5[test5$Date == j, "s6"]
-                        }
+                        outDF6$value <- modDF6$s6[match(outDF6$date, modDF6$date)]
+                        outDF6$value <- test5$s6[match(outDF6$date, test5$date)]
                         
                         outDF6$Year <- as.numeric(format(outDF6$date, "%Y"))
                         outDF6$Month <- as.numeric(format(outDF6$date, "%m"))
@@ -5960,11 +5850,8 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME, threshold,
                                                  by = "day")
                             outDF7 <- data.frame(t.series, NA)
                             colnames(outDF7) <- c("date", "value")
-                            
-                            # assign values from output filled df
-                            for (j in test5$Date) {
-                                outDF7[outDF7$date == j, "value"] <- test5[test5$Date == j, "s7"]
-                            }
+                            outDF7$value <- modDF7$s7[match(outDF7$date, modDF7$date)]
+                            outDF7$value <- test5$s7[match(outDF7$date, test5$date)]
                             
                             outDF7$Year <- as.numeric(format(outDF7$date, "%Y"))
                             outDF7$Month <- as.numeric(format(outDF7$date, "%m"))
@@ -5981,11 +5868,8 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME, threshold,
                                                      by = "day")
                                 outDF8 <- data.frame(t.series, NA)
                                 colnames(outDF8) <- c("date", "value")
-                                
-                                # assign values from output filled df
-                                for (j in test5$Date) {
-                                    outDF8[outDF8$date == j, "value"] <- test5[test5$Date == j, "s8"]
-                                }
+                                outDF8$value <- modDF8$s8[match(outDF8$date, modDF8$date)]
+                                outDF8$value <- test5$s8[match(outDF8$date, test5$date)]
                                 
                                 outDF8$Year <- as.numeric(format(outDF8$date, "%Y"))
                                 outDF8$Month <- as.numeric(format(outDF8$date, "%m"))
@@ -6002,11 +5886,8 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME, threshold,
                                                          by = "day")
                                     outDF9 <- data.frame(t.series, NA)
                                     colnames(outDF9) <- c("date", "value")
-                                    
-                                    # assign values from output filled df
-                                    for (j in test5$Date) {
-                                        outDF9[outDF9$date == j, "value"] <- test5[test5$Date == j, "s9"]
-                                    }
+                                    outDF9$value <- modDF9$s9[match(outDF9$date, modDF9$date)]
+                                    outDF9$value <- test5$s9[match(outDF9$date, test5$date)]
                                     
                                     outDF9$Year <- as.numeric(format(outDF9$date, "%Y"))
                                     outDF9$Month <- as.numeric(format(outDF9$date, "%m"))
@@ -6059,9 +5940,9 @@ Gap_Fill_2 <- function(stationDF = STATION.DATAFRAME, threshold,
                               format = "%Y-%m-%d")
             
             modDF <- data.frame(X$date, X$value)
-            colnames(modDF) <- c("date", "value")
+            colnames(modDF) <- c("date", "s1")
             
-            modDF[modDF$value == -99.9, "value"] <- NA
+            modDF[modDF$s1 == -99.9, "s1"] <- NA
         } else {
             modDF <- NA
         }
@@ -6077,9 +5958,9 @@ Gap_Fill_2 <- function(stationDF = STATION.DATAFRAME, threshold,
                                format = "%Y-%m-%d")
             
             modDF2 <- data.frame(X2$date, X2$value)
-            colnames(modDF2) <- c("date", "value")
+            colnames(modDF2) <- c("date", "s2")
             
-            modDF2[modDF2$value == -99.9, "value"] <- NA
+            modDF2[modDF2$s2 == -99.9, "s2"] <- NA
         } else { 
             modDF2 <- modDF
         }
@@ -6096,9 +5977,9 @@ Gap_Fill_2 <- function(stationDF = STATION.DATAFRAME, threshold,
                                    format = "%Y-%m-%d")
                 
                 modDF3 <- data.frame(X3$date, X3$value)
-                colnames(modDF3) <- c("date", "value")
+                colnames(modDF3) <- c("date", "s3")
                 
-                modDF3[modDF3$value == -99.9, "value"] <- NA
+                modDF3[modDF3$s3 == -99.9, "s3"] <- NA
             } else { 
                 modDF3 <- modDF 
             }
@@ -6117,9 +5998,9 @@ Gap_Fill_2 <- function(stationDF = STATION.DATAFRAME, threshold,
                                    format = "%Y-%m-%d")
                 
                 modDF4 <- data.frame(X4$date, X4$value)
-                colnames(modDF4) <- c("date", "value")
+                colnames(modDF4) <- c("date", "s4")
                 
-                modDF4[modDF4$value == -99.9, "value"] <- NA
+                modDF4[modDF4$s4 == -99.9, "s4"] <- NA
             } else { modDF4 <- modDF }
         } else {
             modDF4 <- modDF
@@ -6137,9 +6018,9 @@ Gap_Fill_2 <- function(stationDF = STATION.DATAFRAME, threshold,
                                    format = "%Y-%m-%d")
                 
                 modDF5 <- data.frame(X5$date, X5$value)
-                colnames(modDF5) <- c("date", "value")
+                colnames(modDF5) <- c("date", "s5")
                 
-                modDF5[modDF5$value == -99.9, "value"] <- NA
+                modDF5[modDF5$s5 == -99.9, "s5"] <- NA
             } else { modDF5 <- modDF }
         } else {
             modDF5 <- modDF
@@ -6156,9 +6037,9 @@ Gap_Fill_2 <- function(stationDF = STATION.DATAFRAME, threshold,
                                    format = "%Y-%m-%d")
                 
                 modDF6 <- data.frame(X6$date, X6$value)
-                colnames(modDF6) <- c("date", "value")
+                colnames(modDF6) <- c("date", "s6")
                 
-                modDF6[modDF6$value == -99.9, "value"] <- NA
+                modDF6[modDF6$s6 == -99.9, "s6"] <- NA
             } else { modDF6 <- modDF }
         } else {
             modDF6 <- modDF
@@ -6175,9 +6056,9 @@ Gap_Fill_2 <- function(stationDF = STATION.DATAFRAME, threshold,
                                    format = "%Y-%m-%d")
                 
                 modDF7 <- data.frame(X7$date, X7$value)
-                colnames(modDF7) <- c("date", "value")
+                colnames(modDF7) <- c("date", "s7")
                 
-                modDF7[modDF7$value == -99.9, "value"] <- NA
+                modDF7[modDF7$s7 == -99.9, "s7"] <- NA
             } else { modDF7 <- modDF }
         } else {
             modDF7 <- modDF
@@ -6193,9 +6074,9 @@ Gap_Fill_2 <- function(stationDF = STATION.DATAFRAME, threshold,
                                    format = "%Y-%m-%d")
                 
                 modDF8 <- data.frame(X8$date, X8$value)
-                colnames(modDF8) <- c("date", "value")
+                colnames(modDF8) <- c("date", "s8")
                 
-                modDF8[modDF8$value == -99.9, "value"] <- NA
+                modDF8[modDF8$s8 == -99.9, "s8"] <- NA
             } else { 
                 modDF8 <- modDF 
             }
@@ -6217,42 +6098,23 @@ Gap_Fill_2 <- function(stationDF = STATION.DATAFRAME, threshold,
         # create new datamframe 
         t.series <- seq.Date(from = startDate, to = endDate,
                              by = "day")
-        testDF <- data.frame(t.series, NA, NA, NA, NA, NA, NA, NA, NA)
+        testDF <- data.frame(t.series, NA)
+        colnames(testDF) <- c("date", "value")
+        
+        out1 <- merge(testDF, modDF, by="date", all.x=T, sort=T)
+        out2 <- merge(out1, modDF2, by="date", all.x=T, sort=T)
+        out3 <- merge(out2, modDF3, by="date", all.x=T, sort=T)
+        out4 <- merge(out3, modDF4, by="date", all.x=T, sort=T)
+        out5 <- merge(out4, modDF5, by="date", all.x=T, sort=T)
+        out6 <- merge(out5, modDF6, by="date", all.x=T, sort=T)
+        out7 <- merge(out6, modDF7, by="date", all.x=T, sort=T)
+        out8 <- merge(out7, modDF8, by="date", all.x=T, sort=T)
+        
+        
+        testDF <- out8[,-2]
+        
         colnames(testDF) <- c("date", "s1", "s2", "s3", "s4", "s5",
                               "s6", "s7", "s8")
-        
-        # assign station values onto the dataframe
-        for (j in modDF$date) {
-            testDF[testDF$date == j, "s1"] <- modDF[modDF$date == j, "value"]
-        }
-        
-        for (j in modDF2$date) {
-            testDF[testDF$date == j, "s2"] <- modDF2[modDF2$date == j, "value"]
-        }
-        
-        for (j in modDF3$date) {
-            testDF[testDF$date == j, "s3"] <- modDF3[modDF3$date == j, "value"]
-        }
-        
-        for (j in modDF4$date) {
-            testDF[testDF$date == j, "s4"] <- modDF4[modDF4$date == j, "value"]
-        }
-        
-        for (j in modDF5$date) {
-            testDF[testDF$date == j, "s5"] <- modDF5[modDF5$date == j, "value"]
-        }
-        
-        for (j in modDF6$date) {
-            testDF[testDF$date == j, "s6"] <- modDF6[modDF6$date == j, "value"]
-        }
-        
-        for (j in modDF7$date) {
-            testDF[testDF$date == j, "s7"] <- modDF7[modDF7$date == j, "value"]
-        }
-        
-        for (j in modDF8$date) {
-            testDF[testDF$date == j, "s8"] <- modDF8[modDF8$date == j, "value"]
-        }
         
         if (threshold >= 7) {
             # Find minimum start date
@@ -6268,42 +6130,23 @@ Gap_Fill_2 <- function(stationDF = STATION.DATAFRAME, threshold,
             # create new datamframe 
             t.series <- seq.Date(from = startDate, to = endDate,
                                  by = "day")
-            testDF <- data.frame(t.series, NA, NA, NA, NA, NA, NA, NA, NA)
+            testDF <- data.frame(t.series, NA)
+            colnames(testDF) <- c("date", "value")
+            
+            out1 <- merge(testDF, modDF, by="date", all.x=T, sort=T)
+            out2 <- merge(out1, modDF2, by="date", all.x=T, sort=T)
+            out3 <- merge(out2, modDF3, by="date", all.x=T, sort=T)
+            out4 <- merge(out3, modDF4, by="date", all.x=T, sort=T)
+            out5 <- merge(out4, modDF5, by="date", all.x=T, sort=T)
+            out6 <- merge(out5, modDF6, by="date", all.x=T, sort=T)
+            out7 <- merge(out6, modDF7, by="date", all.x=T, sort=T)
+            out8 <- merge(out7, modDF8, by="date", all.x=T, sort=T)
+            
+            
+            testDF <- out8[,-2]
+            
             colnames(testDF) <- c("date", "s1", "s2", "s3", "s4", "s5",
                                   "s6", "s7", "s8")
-            
-            # assign station values onto the dataframe
-            for (j in modDF$date) {
-                testDF[testDF$date == j, "s1"] <- modDF[modDF$date == j, "value"]
-            }
-            
-            for (j in modDF2$date) {
-                testDF[testDF$date == j, "s2"] <- modDF2[modDF2$date == j, "value"]
-            }
-            
-            for (j in modDF3$date) {
-                testDF[testDF$date == j, "s3"] <- modDF3[modDF3$date == j, "value"]
-            }
-            
-            for (j in modDF4$date) {
-                testDF[testDF$date == j, "s4"] <- modDF4[modDF4$date == j, "value"]
-            }
-            
-            for (j in modDF5$date) {
-                testDF[testDF$date == j, "s5"] <- modDF5[modDF5$date == j, "value"]
-            }
-            
-            for (j in modDF6$date) {
-                testDF[testDF$date == j, "s6"] <- modDF6[modDF6$date == j, "value"]
-            }
-            
-            for (j in modDF7$date) {
-                testDF[testDF$date == j, "s7"] <- modDF7[modDF7$date == j, "value"]
-            }
-            
-            for (j in modDF8$date) {
-                testDF[testDF$date == j, "s8"] <- modDF8[modDF8$date == j, "value"]
-            }
             
             
             # delete row entries where the entire row are full with NAs
@@ -6358,39 +6201,22 @@ Gap_Fill_2 <- function(stationDF = STATION.DATAFRAME, threshold,
             # create new datamframe 
             t.series <- seq.Date(from = startDate, to = endDate,
                                  by = "day")
-            testDF <- data.frame(t.series, NA, NA, NA, NA, NA, NA, NA)
+            testDF <- data.frame(t.series, NA)
+            colnames(testDF) <- c("date", "value")
+            
+            out1 <- merge(testDF, modDF, by="date", all.x=T, sort=T)
+            out2 <- merge(out1, modDF2, by="date", all.x=T, sort=T)
+            out3 <- merge(out2, modDF3, by="date", all.x=T, sort=T)
+            out4 <- merge(out3, modDF4, by="date", all.x=T, sort=T)
+            out5 <- merge(out4, modDF5, by="date", all.x=T, sort=T)
+            out6 <- merge(out5, modDF6, by="date", all.x=T, sort=T)
+            out7 <- merge(out6, modDF7, by="date", all.x=T, sort=T)
+
+            
+            testDF <- out7[,-2]
+            
             colnames(testDF) <- c("date", "s1", "s2", "s3", "s4", "s5",
                                   "s6", "s7")
-            
-            
-            # assign station values onto the dataframe
-            for (j in modDF$date) {
-                testDF[testDF$date == j, "s1"] <- modDF[modDF$date == j, "value"]
-            }
-            
-            for (j in modDF2$date) {
-                testDF[testDF$date == j, "s2"] <- modDF2[modDF2$date == j, "value"]
-            }
-            
-            for (j in modDF3$date) {
-                testDF[testDF$date == j, "s3"] <- modDF3[modDF3$date == j, "value"]
-            }
-            
-            for (j in modDF4$date) {
-                testDF[testDF$date == j, "s4"] <- modDF4[modDF4$date == j, "value"]
-            }
-            
-            for (j in modDF5$date) {
-                testDF[testDF$date == j, "s5"] <- modDF5[modDF5$date == j, "value"]
-            }
-            
-            for (j in modDF6$date) {
-                testDF[testDF$date == j, "s6"] <- modDF6[modDF6$date == j, "value"]
-            }
-            
-            for (j in modDF7$date) {
-                testDF[testDF$date == j, "s7"] <- modDF7[modDF7$date == j, "value"]
-            }
             
             # delete row entries where the entire row are full with NAs
             test2 <- testDF[rowSums(is.na(testDF[,2:8]))<=threshold, ]  
@@ -6439,34 +6265,21 @@ Gap_Fill_2 <- function(stationDF = STATION.DATAFRAME, threshold,
             # create new datamframe 
             t.series <- seq.Date(from = startDate, to = endDate,
                                  by = "day")
-            testDF <- data.frame(t.series, NA, NA, NA, NA, NA, NA)
+            testDF <- data.frame(t.series, NA)
+            colnames(testDF) <- c("date", "value")
+            
+            out1 <- merge(testDF, modDF, by="date", all.x=T, sort=T)
+            out2 <- merge(out1, modDF2, by="date", all.x=T, sort=T)
+            out3 <- merge(out2, modDF3, by="date", all.x=T, sort=T)
+            out4 <- merge(out3, modDF4, by="date", all.x=T, sort=T)
+            out5 <- merge(out4, modDF5, by="date", all.x=T, sort=T)
+            out6 <- merge(out5, modDF6, by="date", all.x=T, sort=T)
+
+            
+            testDF <- out6[,-2]
+            
             colnames(testDF) <- c("date", "s1", "s2", "s3", "s4", "s5",
                                   "s6")
-            
-            # assign station values onto the dataframe
-            for (j in modDF$date) {
-                testDF[testDF$date == j, "s1"] <- modDF[modDF$date == j, "value"]
-            }
-            
-            for (j in modDF2$date) {
-                testDF[testDF$date == j, "s2"] <- modDF2[modDF2$date == j, "value"]
-            }
-            
-            for (j in modDF3$date) {
-                testDF[testDF$date == j, "s3"] <- modDF3[modDF3$date == j, "value"]
-            }
-            
-            for (j in modDF4$date) {
-                testDF[testDF$date == j, "s4"] <- modDF4[modDF4$date == j, "value"]
-            }
-            
-            for (j in modDF5$date) {
-                testDF[testDF$date == j, "s5"] <- modDF5[modDF5$date == j, "value"]
-            }
-            
-            for (j in modDF6$date) {
-                testDF[testDF$date == j, "s6"] <- modDF6[modDF6$date == j, "value"]
-            }
             
             # delete row entries where the entire row are full with NAs
             test2 <- testDF[rowSums(is.na(testDF[,2:7]))<=threshold, ]  
@@ -6512,29 +6325,19 @@ Gap_Fill_2 <- function(stationDF = STATION.DATAFRAME, threshold,
             # create new datamframe 
             t.series <- seq.Date(from = startDate, to = endDate,
                                  by = "day")
-            testDF <- data.frame(t.series, NA, NA, NA, NA, NA)
+            testDF <- data.frame(t.series, NA)
+            colnames(testDF) <- c("date", "value")
+            
+            out1 <- merge(testDF, modDF, by="date", all.x=T, sort=T)
+            out2 <- merge(out1, modDF2, by="date", all.x=T, sort=T)
+            out3 <- merge(out2, modDF3, by="date", all.x=T, sort=T)
+            out4 <- merge(out3, modDF4, by="date", all.x=T, sort=T)
+            out5 <- merge(out4, modDF5, by="date", all.x=T, sort=T)
+            
+            
+            testDF <- out5[,-2]
+            
             colnames(testDF) <- c("date", "s1", "s2", "s3", "s4", "s5")
-            
-            # assign station values onto the dataframe
-            for (j in modDF$date) {
-                testDF[testDF$date == j, "s1"] <- modDF[modDF$date == j, "value"]
-            }
-            
-            for (j in modDF2$date) {
-                testDF[testDF$date == j, "s2"] <- modDF2[modDF2$date == j, "value"]
-            }
-            
-            for (j in modDF3$date) {
-                testDF[testDF$date == j, "s3"] <- modDF3[modDF3$date == j, "value"]
-            }
-            
-            for (j in modDF4$date) {
-                testDF[testDF$date == j, "s4"] <- modDF4[modDF4$date == j, "value"]
-            }
-            
-            for (j in modDF5$date) {
-                testDF[testDF$date == j, "s5"] <- modDF5[modDF5$date == j, "value"]
-            }
             
             # delete row entries where the entire row are full with NAs
             test2 <- testDF[rowSums(is.na(testDF[,2:6]))<=threshold, ]  
@@ -6575,25 +6378,18 @@ Gap_Fill_2 <- function(stationDF = STATION.DATAFRAME, threshold,
             # create new datamframe 
             t.series <- seq.Date(from = startDate, to = endDate,
                                  by = "day")
-            testDF <- data.frame(t.series, NA, NA, NA, NA)
+            testDF <- data.frame(t.series, NA)
+            colnames(testDF) <- c("date", "value")
+            
+            out1 <- merge(testDF, modDF, by="date", all.x=T, sort=T)
+            out2 <- merge(out1, modDF2, by="date", all.x=T, sort=T)
+            out3 <- merge(out2, modDF3, by="date", all.x=T, sort=T)
+            out4 <- merge(out3, modDF4, by="date", all.x=T, sort=T)
+            
+            
+            testDF <- out4[,-2]
+            
             colnames(testDF) <- c("date", "s1", "s2", "s3", "s4")
-            
-            # assign station values onto the dataframe
-            for (j in modDF$date) {
-                testDF[testDF$date == j, "s1"] <- modDF[modDF$date == j, "value"]
-            }
-            
-            for (j in modDF2$date) {
-                testDF[testDF$date == j, "s2"] <- modDF2[modDF2$date == j, "value"]
-            }
-            
-            for (j in modDF3$date) {
-                testDF[testDF$date == j, "s3"] <- modDF3[modDF3$date == j, "value"]
-            }
-            
-            for (j in modDF4$date) {
-                testDF[testDF$date == j, "s4"] <- modDF4[modDF4$date == j, "value"]
-            }
             
             # delete row entries where the entire row are full with NAs
             test2 <- testDF[rowSums(is.na(testDF[,2:5]))<=threshold, ]  
@@ -6628,21 +6424,17 @@ Gap_Fill_2 <- function(stationDF = STATION.DATAFRAME, threshold,
             # create new datamframe 
             t.series <- seq.Date(from = startDate, to = endDate,
                                  by = "day")
-            testDF <- data.frame(t.series, NA, NA, NA)
+            testDF <- data.frame(t.series, NA)
+            colnames(testDF) <- c("date", "value")
+            
+            out1 <- merge(testDF, modDF, by="date", all.x=T, sort=T)
+            out2 <- merge(out1, modDF2, by="date", all.x=T, sort=T)
+            out3 <- merge(out2, modDF3, by="date", all.x=T, sort=T)
+            
+            
+            testDF <- out3[,-2]
+            
             colnames(testDF) <- c("date", "s1", "s2", "s3")
-            
-            # assign station values onto the dataframe
-            for (j in modDF$date) {
-                testDF[testDF$date == j, "s1"] <- modDF[modDF$date == j, "value"]
-            }
-            
-            for (j in modDF2$date) {
-                testDF[testDF$date == j, "s2"] <- modDF2[modDF2$date == j, "value"]
-            }
-            
-            for (j in modDF3$date) {
-                testDF[testDF$date == j, "s3"] <- modDF3[modDF3$date == j, "value"]
-            }
             
             # delete row entries where the entire row are full with NAs
             test2 <- testDF[rowSums(is.na(testDF[,2:4]))<=threshold, ]  
@@ -6673,17 +6465,16 @@ Gap_Fill_2 <- function(stationDF = STATION.DATAFRAME, threshold,
             # create new datamframe 
             t.series <- seq.Date(from = startDate, to = endDate,
                                  by = "day")
-            testDF <- data.frame(t.series, NA, NA)
+            testDF <- data.frame(t.series, NA)
+            colnames(testDF) <- c("date", "value")
+            
+            out1 <- merge(testDF, modDF, by="date", all.x=T, sort=T)
+            out2 <- merge(out1, modDF2, by="date", all.x=T, sort=T)
+            
+            
+            testDF <- out2[,-2]
+            
             colnames(testDF) <- c("date", "s1", "s2")
-            
-            # assign station values onto the dataframe
-            for (j in modDF$date) {
-                testDF[testDF$date == j, "s1"] <- modDF[modDF$date == j, "value"]
-            }
-            
-            for (j in modDF2$date) {
-                testDF[testDF$date == j, "s2"] <- modDF2[modDF2$date == j, "value"]
-            }
             
             # delete row entries where the entire row are full with NAs
             test2 <- testDF[rowSums(is.na(testDF[,2:3]))<=threshold, ]  
@@ -7601,86 +7392,130 @@ Gap_Fill_3 <- function(stationDF = STATION.DATAFRAME, threshold,
 
 ##############################################################################################################
 ### Gap filling using the hyfo package as an easy solution
-Gap_Fill_within_station <- function(stationDF, 
+Gap_Fill_within_station <- function(station.list.input, 
                                     sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECTORY) {
     
     dir.create(destDir, showWarnings = FALSE)
     
-     targList <- paste0(stationDF$ghcn1,".csv")
+    targList <- paste0(station.list.input,".csv")
     
     for (i in 1:length(targList)) 
     {
         inName <- file.path(sourceDir, targList[i], fsep = .Platform$file.sep)
         outName <- file.path(destDir, targList[i], fsep = .Platform$file.sep)
         
-        # read in 1st file
-        X <- read.csv(inName)
-        X$date <- as.Date(paste(X$Year, X$Month, X$Day, sep="-"),
-                          format = "%Y-%m-%d")
-        
-        X[X$value == -99.9, "value"] <- NA
-        
-        
-        for (j in c(2:12, 1)) {
+        if (file.exists(inName)) {
+            # read in 1st file
+            X <- read.csv(inName)
+            X$date <- as.Date(paste(X$Year, X$Month, X$Day, sep="-"),
+                              format = "%Y-%m-%d")
             
-            # select the month
-            mt <- subset(X, Month == j)
-            check.na <- sum(is.na(mt$value))
+            X[X$value == -99.9, "value"] <- NA
             
-            if (check.na/nrow(mt) == 0) {
-                print(paste0("Data ", i, " Month ", j, "has no missing values"))
+            
+            for (j in c(2:12, 1)) {
                 
-            } else if (check.na/nrow(mt) == 1) {
-                # fill current month with previous month values
-                if (j >= 2) {
-                    prev.mt <- subset(X, Month = j-1)
+                # select the month
+                mt <- subset(X, Month == j)
+                check.na <- sum(is.na(mt$value))
+                
+                if (check.na/nrow(mt) == 0) {
+                    print(paste0("Data ", i, " Month ", j, "has no missing values"))
                     
-                    v.list <- mt[!is.na(prev.mt$value), "value"]
-                    
-                    # computing frequency
-                    rg <- range(v.list)
-                    
-                    # insert a conditional check to make sure breaks have values
-                    if(rg[2]-rg[1] <= 1) {
-                        by.value <- 0.01
-                    } else if (rg[2] - rg[1] <= 100) {
-                        by.value <- 0.1
-                    } else if (rg[2] - rg[1] <= 10000) {
-                        by.value <- 10
+                } else if (check.na/nrow(mt) == 1) {
+                    # fill current month with previous month values
+                    if (j >= 2) {
+                        prev.mt <- subset(X, Month = j-1)
+                        
+                        v.list <- mt[!is.na(prev.mt$value), "value"]
+                        
+                        # computing frequency
+                        rg <- range(v.list)
+                        
+                        # insert a conditional check to make sure breaks have values
+                        if(rg[2]-rg[1] <= 1) {
+                            by.value <- 0.01
+                        } else if (rg[2] - rg[1] <= 100) {
+                            by.value <- 0.1
+                        } else if (rg[2] - rg[1] <= 10000) {
+                            by.value <- 10
+                        }
+                        
+                        s.value <- rg[1] - 0.0001
+                        e.value <- rg[2] + by.value - 0.0001
+                        
+                        breaks <- seq(s.value, e.value, by = by.value)
+                        fill.list <- seq(rg[1], rg[2]+by.value, by = by.value)
+                        precip.cut <- cut(v.list, breaks)
+                        precip.freq <- table(precip.cut)
+                        
+                        # computing probability
+                        myprob <- data.frame(precip.freq, NA)
+                        colnames(myprob) <- c("range", "freq", "prob")
+                        csum <- sum(myprob$freq)
+                        myprob$prob <- myprob$freq/csum
+                        
+                        # computing selection number list
+                        mynumbers <- fill.list[1:length(fill.list)-1]
+                        
+                        # count number of missing values
+                        mis <- sum(is.na(mt$value))
+                        
+                        # sampling from the number list following distribution probability
+                        d <- sample(mynumbers, size=mis, replace=T, prob=myprob$prob)
+                        
+                        X[X$Month == j & is.na(X$value), "value"] <- d
+                        
+                    } else {  # for month 1, use Dec values
+                        prev.mt <- subset(X, Month = 12)
+                        
+                        v.list <- mt[!is.na(prev.mt$value), "value"]
+                        
+                        # computing frequency
+                        rg <- range(v.list)
+                        
+                        # insert a conditional check to make sure breaks have values
+                        if(rg[2]-rg[1] <= 1) {
+                            by.value <- 0.01
+                        } else if (rg[2] - rg[1] <= 100) {
+                            by.value <- 0.1
+                        } else if (rg[2] - rg[1] <= 10000) {
+                            by.value <- 10
+                        }
+                        
+                        s.value <- rg[1] - 0.0001
+                        e.value <- rg[2] + by.value - 0.0001
+                        
+                        breaks <- seq(s.value, e.value, by = by.value)
+                        fill.list <- seq(rg[1], rg[2]+by.value, by = by.value)
+                        precip.cut <- cut(v.list, breaks)
+                        precip.freq <- table(precip.cut)
+                        
+                        # computing probability
+                        myprob <- data.frame(precip.freq, NA)
+                        colnames(myprob) <- c("range", "freq", "prob")
+                        csum <- sum(myprob$freq)
+                        myprob$prob <- myprob$freq/csum
+                        
+                        # computing selection number list
+                        mynumbers <- fill.list[1:length(fill.list)-1]
+                        
+                        # count number of missing values
+                        mis <- sum(is.na(mt$value))
+                        
+                        # sampling from the number list following distribution probability
+                        d <- sample(mynumbers, size=mis, replace=T, prob=myprob$prob)
+                        
+                        X[X$Month == j & is.na(X$value), "value"] <- d
                     }
                     
-                    s.value <- rg[1] - 0.0001
-                    e.value <- rg[2] + by.value - 0.0001
+                } else {
+                    v.list <- mt[!is.na(mt$value), "value"]
                     
-                    breaks <- seq(s.value, e.value, by = by.value)
-                    fill.list <- seq(rg[1], rg[2]+by.value, by = by.value)
-                    precip.cut <- cut(v.list, breaks)
-                    precip.freq <- table(precip.cut)
-                    
-                    # computing probability
-                    myprob <- data.frame(precip.freq, NA)
-                    colnames(myprob) <- c("range", "freq", "prob")
-                    csum <- sum(myprob$freq)
-                    myprob$prob <- myprob$freq/csum
-                    
-                    # computing selection number list
-                    mynumbers <- fill.list[1:length(fill.list)-1]
-                    
-                    # count number of missing values
-                    mis <- sum(is.na(mt$value))
-                    
-                    # sampling from the number list following distribution probability
-                    d <- sample(mynumbers, size=mis, replace=T, prob=myprob$prob)
-                    
-                    X[X$Month == j & is.na(X$value), "value"] <- d
-                    
-                } else {  # for month 1, use Dec values
-                    prev.mt <- subset(X, Month = 12)
-                    
-                    v.list <- mt[!is.na(prev.mt$value), "value"]
                     
                     # computing frequency
                     rg <- range(v.list)
+                    
                     
                     # insert a conditional check to make sure breaks have values
                     if(rg[2]-rg[1] <= 1) {
@@ -7717,54 +7552,15 @@ Gap_Fill_within_station <- function(stationDF,
                     X[X$Month == j & is.na(X$value), "value"] <- d
                 }
                 
-            } else {
-                v.list <- mt[!is.na(mt$value), "value"]
-                
-                
-                # computing frequency
-                rg <- range(v.list)
-                
-                
-                # insert a conditional check to make sure breaks have values
-                if(rg[2]-rg[1] <= 1) {
-                    by.value <- 0.01
-                } else if (rg[2] - rg[1] <= 100) {
-                    by.value <- 0.1
-                } else if (rg[2] - rg[1] <= 10000) {
-                    by.value <- 10
-                }
-                
-                s.value <- rg[1] - 0.0001
-                e.value <- rg[2] + by.value - 0.0001
-                
-                breaks <- seq(s.value, e.value, by = by.value)
-                fill.list <- seq(rg[1], rg[2]+by.value, by = by.value)
-                precip.cut <- cut(v.list, breaks)
-                precip.freq <- table(precip.cut)
-                
-                # computing probability
-                myprob <- data.frame(precip.freq, NA)
-                colnames(myprob) <- c("range", "freq", "prob")
-                csum <- sum(myprob$freq)
-                myprob$prob <- myprob$freq/csum
-                
-                # computing selection number list
-                mynumbers <- fill.list[1:length(fill.list)-1]
-                
-                # count number of missing values
-                mis <- sum(is.na(mt$value))
-                
-                # sampling from the number list following distribution probability
-                d <- sample(mynumbers, size=mis, replace=T, prob=myprob$prob)
-                
-                X[X$Month == j & is.na(X$value), "value"] <- d
             }
             
+            write.csv(X,outName, row.names=F)
+            
+            print(i)
+        } else {
+            print(paste0("file ", i, " doesn't exist!"))
         }
         
-        write.csv(X,outName, row.names=F)
-        
-        print(i)
         
     }  # i loop
     
