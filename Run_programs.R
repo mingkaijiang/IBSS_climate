@@ -32,7 +32,6 @@ stationDF <- select_9_ghcn_stations(corDF, gDF)
 station.list <- c(stationDF$ghcn1, stationDF$ghcn2, stationDF$ghcn3,
                   stationDF$ghcn4, stationDF$ghcn5, stationDF$ghcn6,
                   stationDF$ghcn7, stationDF$ghcn8, stationDF$ghcn9)
-station.list <- unique(station.list)
 
 ##############################################################################################################
 #### select on SCCS sites based on their information sheet
@@ -54,7 +53,12 @@ ReStructureFile(sourceDir = "data/ghcnd_selected", destDir = "data/restructured"
 ### Step 4:
 ### Check year range quality - only include data with > 10 yrs of data
 ###                          - and data with < 20% missing values
-Missing_check(station.list, sourceDir = "data/restructured", destDir = "data/ghcnd_gap_filled")
+station.list.upd <- Missing_check(station.list, 
+                                  sourceDir = "data/restructured", 
+                                  destDir = "data/ghcnd_gap_filled")
+
+## update stationDF
+stationDF.upd <- Update_station_list(station.list.upd, stationDF)
 
 ### Step 5: 
 ### Gap filling 1. - use statistical correlation among 9 stations to gap fill all 9 stations

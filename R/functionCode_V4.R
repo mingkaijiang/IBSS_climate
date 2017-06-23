@@ -4981,44 +4981,47 @@ Missing_check<-function(station.list.input, sourceDir = DAILY.DATA.DIRECTORY, de
     for (thisFile in 1:length(DatFiles)) 
     {
         inName <- file.path(sourceDir, DatFiles[thisFile], fsep = .Platform$file.sep)
-        outName <- file.path(destDir, DatFiles[thisFile], fsep = .Platform$file.sep)
         
-        dd <- read.csv(inName,header=F,skip = 1, sep=",")
-        colnames(dd) <- c("id", "Year", "Month", "Day", "value")
-        dd$date <- as.Date(paste(dd$Year, dd$Month, dd$Day, sep="-"),
-                           format = "%Y-%m-%d")
-        
-        t.series <- seq.Date(from = min(dd$date), to = max(dd$date),
-                             by = "day")
-        
-        dd[dd$value == -99.9, "value"] <- NA
-        
-        # create outout df
-        out <- data.frame(t.series, NA, NA, NA, NA)
-        
-        colnames(out) <- c("date", "Year", "Month", "Day", "value")
-        out$value <- dd$value[match(out$date, dd$date)]
-        out$Year <- dd$Year[match(out$date, dd$date)]
-        out$Month <- dd$Month[match(out$date, dd$date)]
-        out$Day <- dd$Day[match(out$date, dd$date)]
-        out[is.na(out$value), "value"] <- -99.9
-        
-        # check for missing data issue
-        target <- length(t.series)
-        
-        d2 <- dd[complete.cases(dd),]
-        reality <- nrow(d2)
-        miss_percent <- (target - reality) / target
-        
-        if (miss_percent <= 0.2)
-        {  
-            print(station.list.input[thisFile])
-            write.csv(out, outName, row.names=F)
-            station.list.output[thisFile, "station"] <- station.list.input[thisFile]
+        if(file.exists(inName)) {
+            outName <- file.path(destDir, DatFiles[thisFile], fsep = .Platform$file.sep)
+            
+            dd <- read.csv(inName,header=F,skip = 1, sep=",")
+            colnames(dd) <- c("id", "Year", "Month", "Day", "value")
+            dd$date <- as.Date(paste(dd$Year, dd$Month, dd$Day, sep="-"),
+                               format = "%Y-%m-%d")
+            
+            t.series <- seq.Date(from = min(dd$date), to = max(dd$date),
+                                 by = "day")
+            
+            dd[dd$value == -99.9, "value"] <- NA
+            
+            # create outout df
+            out <- data.frame(t.series, NA, NA, NA, NA)
+            
+            colnames(out) <- c("date", "Year", "Month", "Day", "value")
+            out$value <- dd$value[match(out$date, dd$date)]
+            out$Year <- dd$Year[match(out$date, dd$date)]
+            out$Month <- dd$Month[match(out$date, dd$date)]
+            out$Day <- dd$Day[match(out$date, dd$date)]
+            out[is.na(out$value), "value"] <- -99.9
+            
+            # check for missing data issue
+            target <- length(t.series)
+            
+            d2 <- dd[complete.cases(dd),]
+            reality <- nrow(d2)
+            miss_percent <- (target - reality) / target
+            
+            if (miss_percent <= 0.2)
+            {  
+                print(paste0(thisFile, "------", station.list.input[thisFile]))
+                write.csv(out, outName, row.names=F)
+                station.list.output[thisFile, "station"] <- station.list.input[thisFile]
+            }
         }
-        
     }
 
+    return(station.list.output)
 }
 
 ##############################################################################################################
@@ -5051,6 +5054,73 @@ YrRange60<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIR
     }
     
   }
+}
+##############################################################################################################
+Update_station_list <- function(station.list.input, sDF) {
+    t1 <- matrix(ncol=9, nrow=80, station.list.input[,2])
+    t1 <- as.data.frame(t1)
+    colnames(t1) <- c("s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9")
+    
+    # update stationDF 
+    sDF$ghcn1 <- t1$s1
+    sDF$ghcn2 <- t1$s2
+    sDF$ghcn3 <- t1$s3
+    sDF$ghcn4 <- t1$s4
+    sDF$ghcn5 <- t1$s5
+    sDF$ghcn6 <- t1$s6
+    sDF$ghcn7 <- t1$s7
+    sDF$ghcn8 <- t1$s8
+    sDF$ghcn9 <- t1$s9
+    
+    # count number of NAs in each row
+    csum <- rowSums(is.na(t1))
+    
+    # swap positions of NAs on each row
+    
+    for (i in 1:nrow(sDF)) {
+        
+        if(is.na(sDF[i, "ghcn1"])) {
+            sDF[i,4:35] <- shift(sDF[i, 8:39], 4, dir="left")
+            sDF[i,4:35] <- sDF[i, 8:39]
+            sDF[i,36:39] <- NA
+        }
+        
+        if(is.na(sDF[i, "ghcn2"])) {
+            sDF[i,8:35] <- sDF[i, 12:39]
+            sDF[i,36:39] <- NA
+        }
+        
+        if(is.na(sDF[i, "ghcn3"])) {
+            sDF[i,12:35] <- sDF[i, 16:39]
+            sDF[i,36:39] <- NA
+        }
+        
+        if(is.na(sDF[i, "ghcn4"])) {
+            sDF[i,16:35] <- sDF[i, 20:39]
+            sDF[i,36:39] <- NA
+        }
+        
+        if(is.na(sDF[i, "ghcn5"])) {
+            sDF[i,20:35] <- sDF[i, 24:39]
+            sDF[i,36:39] <- NA
+        }
+        
+        if(is.na(sDF[i, "ghcn6"])) {
+            sDF[i,24:35] <- sDF[i, 28:39]
+            sDF[i,36:39] <- NA
+        }
+        
+        if(is.na(sDF[i, "ghcn7"])) {
+            sDF[i,28:35] <- sDF[i, 32:39]
+            sDF[i,36:39] <- NA
+        }
+        
+        if(is.na(sDF[i, "ghcn8"])) {
+            sDF[i,32:35] <- sDF[i, 36:39]
+            sDF[i,36:39] <- NA
+        }
+    }
+
 }
 
 
