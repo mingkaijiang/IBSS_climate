@@ -65,78 +65,25 @@ stationDF.upd <- Update_station_list(station.list.upd, stationDF)
 ###                - excluding big chunk of missing data which will be filled later use a different function
 
 ## the following sites are problematic, so excluded in the first run
-## problem sites: 0 (non-NA) cases: 10, 18, 22, 30, 34, 40, 42, 44, 46, 48, 62, 65, 69, 
-##                lmCoef[j, i]: subscript out of bounds, 12, 17, 41, 54, 63, 
+## problem sites: 0 (non-NA) cases: non-missing data do not overlap across all sites
+##                 dim(X) must hvae a postive length: two sites overlapping problem
+##                lmCoef[j, i]: subscript out of bounds: 
 ##                error in modDF$date: 14, 15, 53, 61, 71, 
-stationDF2 <- stationDF[-c(10, 18, 22, 30, 34, 42, 44, 46, 48, 62, 65, 69,
-                           12, 17, 41, 54, 63, 
-                           14, 15, 53, 61, 71),]
-Gap_Fill(stationDF, threshold=8,
+stationDF2 <- stationDF.upd[-c(18, 20, 22, 44, 65, 69,            # 0 (non-NA) cases
+                               24, 40, 46, 60,                    # dim(X) must have a positive length
+                               41, 54),]                          # lmCoef[j, i]: subscript out of bounds
+Gap_Fill(stationDF2, 
          sourceDir = "data/ghcnd_gap_filled", 
          destDir = "data/ghcnd_gap_filled")
 
-## solve all problematic sites by lowering threshold
-## the following sites are OK with this threshold
-staionDF3 <- stationDF[c(18, 30, 34, 42, 46, 48, 65,
-                         12, 17, 41, 54,
-                         14), ]
+# Fill all remaining stations using data within the station
 
-Gap_Fill(stationDF3, threshold=2,
-         sourceDir = "data/ghcnd_gap_filled", 
-         destDir = "data/ghcnd_gap_filled")
-
-## solve remaining sites by finding the 2nd closest station 
-stationDF4 <- statonDf[c(22, 44, 62, 69, 
-                         15, 53, 71)]
-Gap_Fill_2(stationDF4, threshold=2,
-           sourceDir = "data/ghcnd_gap_filled", 
-           destDir = "data/ghcnd_gap_filled")
-
-## solve remaining sites by finding the 3rd closest station
-## Two sites omitted still: 61, 63
-stationDF5 <- stationDF[10, ]
-
-Gap_Fill_3(stationDF5, threshold=2,
-           sourceDir = "data/ghcnd_gap_filled", 
-           destDir = "data/ghcnd_gap_filled")
-
-### Step 6. Update stationDF list
-## update stationDF to reflect the closest stations not always the chosen ones
-## Since Step 1 - 5 take very long to run, they are only run once, then we can 
-## restart all analyses from here
-stationDF_updated <- stationDF
-s.list <- c(22, 44, 62, 69, 15, 53, 71)
-for (m in s.list) {
-    stationDF_updated[m, "ghcn1"] <- stationDF_updated[m, "ghcn2"]
-    stationDF_updated[m, "lat1"] <- stationDF_updated[m, "lat2"]
-    stationDF_updated[m, "lon1"] <- stationDF_updated[m, "lon2"]
-    stationDF_updated[m, "elev1"] <- stationDF_updated[m, "elev2"]
-}
-
-s.list <- c(10)
-for (m in s.list) {
-    stationDF_updated[m, "ghcn1"] <- stationDF_updated[m, "ghcn3"]
-    stationDF_updated[m, "lat1"] <- stationDF_updated[m, "lat3"]
-    stationDF_updated[m, "lon1"] <- stationDF_updated[m, "lon3"]
-    stationDF_updated[m, "elev1"] <- stationDF_updated[m, "elev3"]
-}
-
-## something wrong with site 16
-stationDF_updated <- stationDF_updated[-c(16,61,63),]
-
-## Obtain GHCN station list to process
-station.list.upd <- c(stationDF_updated$ghcn1, stationDF_updated$ghcn2, stationDF_updated$ghcn3,
-                      stationDF_updated$ghcn4, stationDF_updated$ghcn5, stationDF_updated$ghcn6,
-                      stationDF_updated$ghcn7, stationDF_updated$ghcn8, stationDF_updated$ghcn9)
-station.list.upd <- unique(station.list)
-
-    
-### Step 7:
+### Step 6:
 ### Gap filling 2. - use same period in other years to fill big chunk of missing data
 ###                - and the remaining unfilled sites
 Gap_Fill_within_station(station.list.upd, 
                         sourceDir = "data/ghcnd_gap_filled",
-                        destDir = "data/ghcnd_gap_filled_2")
+                        destDir = "data/ghcnd_gap_filled")
 
 ##############################################################################################################
 #### Compute indices
