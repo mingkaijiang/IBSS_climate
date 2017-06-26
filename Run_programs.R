@@ -4,20 +4,13 @@
 ################################### Modified on: 2017-06-08                             #######################
 ##############################################################################################################
 ##############################################################################################################
-
-
-##get relevant library functions
-#library(reshape)
-#library(reshape2)
-#library(lubridate) #needed for the leap_year function
-#library(eeptools)
 ##############################################################################################################
 #### Prepare all functions and coordinate files
 ### clear workspace
 rm(list=ls())
 
 ### Calls script containing all necessary functions
-source("R/functionCode_V4.R")
+source("R/prepare_R.R")
 
 ### Get SCCS coordinates and Station ID Files
 corDF <- read.csv("data/weight_dis_ht.csv")
