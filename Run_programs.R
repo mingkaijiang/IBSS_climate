@@ -158,3 +158,5 @@ SDIIS_pred(sourceDir = "data/indices/SDIIS", destDir = "data/predictability")
 ##Filter data with year range > 60 years for long term trend analysis
 YrRange60(sourceDir = "E:/IBSS/Output/selected10", destDir = "E:/IBSS/Output/selected60")
 
+# this is new changes by Mingkai
+
