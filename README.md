@@ -16,9 +16,18 @@ SDII:
 
 Predictabiilty scores are calculated based on the Colwell index.
 
+# Repository structure
+To run the script, simply run the "Run_programs.R" in the repository.
+All functions are stored in folder "modules".
+All processing scripts are stored in folder "R".
+Raw GHCN daily dataset must be downloaded from the GHCN website and store in  data/ghcnd_all/ghcnd_all
+
+
 
 More to be written...
 
 
 # References:
-To be written...
+Colwell (1974)
+Jiang et al. (2016) Journal of Climate
+Jiang et al. (2016) Scientific Reports
