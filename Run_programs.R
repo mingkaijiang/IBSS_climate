@@ -79,33 +79,28 @@ Gap_Fill_within_station(station.list.upd,
                         destDir = "data/ghcnd_gap_filled")
 
 
-### Issue to solve: Gap_Fill returns all NAs, when station is called multiple times
-
-
-
-
 ##############################################################################################################
 #### Compute indices
 
 ### Step 1:
 ### Compute coefficient of variation for all GHCN stations
-CoefVar(sourceDir = "data/ghcnd_gap_filled_2", destDir = "data/indices")
+CoefVar(sourceDir = "data/ghcnd_gap_filled", destDir = "data/indices")
 
 ### Step 2: 
 ### Calculate seasonal 1D prcp and save into corresponding directory
-RX1S(sourceDir = "data/ghcnd_gap_filled_2", destDir = "data/indices/rx1s")
+RX1S(sourceDir = "data/ghcnd_gap_filled", destDir = "data/indices/rx1s")
 
 ### Step 3:
 ##Calculate seasonal 5D prcp and save into corresponding directory
-RX5S(sourceDir = "data/ghcnd_gap_filled_2", destDir = "data/indices/rx5s")
+RX5S(sourceDir = "data/ghcnd_gap_filled", destDir = "data/indices/rx5s")
 
 ### Step 4: 
 ### Calculate threshold based indices, R10, R20, R95P, R99P,PRCPTOT at seasonal timestep
-ThrIndS(sourceDir = "data/ghcnd_gap_filled_2", destDir = "data/indices/ThrIndS")
+ThrIndS(sourceDir = "data/ghcnd_gap_filled", destDir = "data/indices/ThrIndS")
 
 ### Step 5:
 ### Calculate prcp/# of wet days over each season and save into corresponding directory
-SDIIS(sourceDir = "data/ghcnd_gap_filled_2", destDir = "data/indices/SDIIS")
+SDIIS(sourceDir = "data/ghcnd_gap_filled", destDir = "data/indices/SDIIS")
 
 
 ##############################################################################################################

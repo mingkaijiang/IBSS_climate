@@ -23,22 +23,23 @@ Gap_Fill_within_station <- function(station.list.input,
             
             X[X$value == -99.9, "value"] <- NA
             
+            m.list <- unique(X$Month)
             
-            for (j in c(2:12, 1)) {
+            for (j in m.list) {
                 
                 # select the month
                 mt <- subset(X, Month == j)
                 check.na <- sum(is.na(mt$value))
                 
                 if (check.na/nrow(mt) == 0) {
-                    print(paste0("Data ", i, " Month ", j, "has no missing values"))
+                    print(paste0("Data ", i, " Month ", j, " has no missing values"))
                     
                 } else if (check.na/nrow(mt) == 1) {
                     # fill current month with previous month values
                     if (j >= 2) {
-                        prev.mt <- subset(X, Month = j-1)
+                        prev.mt <- subset(X, Month == (j-1))
                         
-                        v.list <- mt[!is.na(prev.mt$value), "value"]
+                        v.list <- prev.mt[!is.na(prev.mt$value), "value"]
                         
                         # computing frequency
                         rg <- range(v.list)
@@ -78,9 +79,9 @@ Gap_Fill_within_station <- function(station.list.input,
                         X[X$Month == j & is.na(X$value), "value"] <- d
                         
                     } else {  # for month 1, use Dec values
-                        prev.mt <- subset(X, Month = 12)
+                        prev.mt <- subset(X, Month == 12)
                         
-                        v.list <- mt[!is.na(prev.mt$value), "value"]
+                        v.list <- prev.mt[!is.na(prev.mt$value), "value"]
                         
                         # computing frequency
                         rg <- range(v.list)
