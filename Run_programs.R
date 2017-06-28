@@ -36,6 +36,7 @@ ConvertFiles(sourceDir = "data/ghcnd_all/ghcnd_all/",
 
 ### Step 2:
 ### Check year range quality - only include data with > 10 yrs of data
+### commented out because Missing_check is doing this
 #YrRange10(sourceDir = "data/ghcnd_selected")
 
 ### Step 3:
@@ -70,13 +71,18 @@ Gap_Fill(stationDF2,
          destDir = "data/ghcnd_gap_filled")
 
 # Fill all remaining stations using data within the station
-
 ### Step 6:
 ### Gap filling 2. - use same period in other years to fill big chunk of missing data
 ###                - and the remaining unfilled sites
 Gap_Fill_within_station(station.list.upd, 
                         sourceDir = "data/ghcnd_gap_filled",
                         destDir = "data/ghcnd_gap_filled")
+
+
+### Issue to solve: Gap_Fill returns all NAs, when station is called multiple times
+
+
+
 
 ##############################################################################################################
 #### Compute indices

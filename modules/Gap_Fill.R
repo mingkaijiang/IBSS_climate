@@ -633,23 +633,34 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME,
             
             # gap fill the rest missing values
             test5 <- fillGap(test4, corPeriod="daily")
+            colnames(test5)[1] <- "date"
             
             # re-create the dataframe over the entire period with no missing values
             t.series <- seq.Date(from = min(modDF$date), to = max(modDF$date),
                                  by = "day")
             outDF <- data.frame(t.series, NA)
             colnames(outDF) <- c("date", "value")
-            outDF$value <- modDF$s1[match(outDF$date, modDF$date)]
-            outDF$value <- test5$s1[match(outDF$date, test5$Date)]
+            c <- nrow(outDF)
+            
+            t1 <- data.frame(test5$date, test5$s1)
+            colnames(t1) <- c("date", "s1")
+            outDF$value[modDF$date %in% outDF$date] <- modDF$s1[modDF$date %in% outDF$date]
+            outDF <- left_join(outDF, t1, by = "date")
+            outDF$value[is.na(outDF$value)] <- outDF$s1[is.na(outDF$value)]
+            
             
             
             t.series <- seq.Date(from = min(modDF2$date), to = max(modDF2$date),
                                  by = "day")
             outDF2 <- data.frame(t.series, NA)
             colnames(outDF2) <- c("date", "value")
-            outDF2$value <- modDF2$s2[match(outDF2$date, modDF2$date)]
-            outDF2$value <- test5$s2[match(outDF2$date, test5$Date)]
+            t2 <- data.frame(test5$date, test5$s2)
+            colnames(t2) <- c("date", "s2")
+            outDF2$value[modDF2$date %in% outDF2$date] <- modDF2$s2[modDF2$date %in% outDF2$date]
+            outDF2 <- left_join(outDF2, t2, by = "date")
+            outDF2$value[is.na(outDF2$value)] <- outDF2$s2[is.na(outDF2$value)]
             
+
             # assign values from output filled df
             
             outDF$Year <- as.numeric(format(outDF$date, "%Y"))
@@ -677,8 +688,13 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME,
                                      by = "day")
                 outDF3 <- data.frame(t.series, NA)
                 colnames(outDF3) <- c("date", "value")
-                outDF3$value <- modDF3$s3[match(outDF3$date, modDF3$date)]
-                outDF3$value <- test5$s3[match(outDF3$date, test5$Date)]
+                c <- nrow(outDF3)
+                t3 <- data.frame(test5$date, test5$s3)
+                colnames(t3) <- c("date", "s3")
+                outDF3$value[modDF3$date %in% outDF3$date] <- modDF3$s3[modDF3$date %in% outDF3$date]
+                outDF3 <- left_join(outDF3, t3, by = "date")
+                outDF3$value[is.na(outDF3$value)] <- outDF3$s3[is.na(outDF3$value)]
+                
                 
                 outDF3$Year <- as.numeric(format(outDF3$date, "%Y"))
                 outDF3$Month <- as.numeric(format(outDF3$date, "%m"))
@@ -695,8 +711,13 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME,
                                          by = "day")
                     outDF4 <- data.frame(t.series, NA)
                     colnames(outDF4) <- c("date", "value")
-                    outDF4$value <- modDF4$s4[match(outDF4$date, modDF4$date)]
-                    outDF4$value <- test5$s4[match(outDF4$date, test5$Date)]
+                    c <- nrow(outDF4)
+                    t4 <- data.frame(test5$date, test5$s4)
+                    colnames(t4) <- c("date", "s4")
+                    outDF4$value[modDF4$date %in% outDF4$date] <- modDF4$s4[modDF4$date %in% outDF4$date]
+                    outDF4 <- left_join(outDF4, t4, by = "date")
+                    outDF4$value[is.na(outDF4$value)] <- outDF4$s4[is.na(outDF4$value)]
+                    
                     
                     outDF4$Year <- as.numeric(format(outDF4$date, "%Y"))
                     outDF4$Month <- as.numeric(format(outDF4$date, "%m"))
@@ -713,8 +734,12 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME,
                                              by = "day")
                         outDF5 <- data.frame(t.series, NA)
                         colnames(outDF5) <- c("date", "value")
-                        outDF5$value <- modDF5$s5[match(outDF5$date, modDF5$date)]
-                        outDF5$value <- test5$s5[match(outDF5$date, test5$Date)]
+                        c <- nrow(outDF5)
+                        t5 <- data.frame(test5$date, test5$s5)
+                        colnames(t5) <- c("date", "s5")
+                        outDF5$value[modDF5$date %in% outDF5$date] <- modDF5$s5[modDF5$date %in% outDF5$date]
+                        outDF5 <- left_join(outDF5, t5, by = "date")
+                        outDF5$value[is.na(outDF5$value)] <- outDF5$s5[is.na(outDF5$value)]
                         
                         outDF5$Year <- as.numeric(format(outDF5$date, "%Y"))
                         outDF5$Month <- as.numeric(format(outDF5$date, "%m"))
@@ -731,8 +756,12 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME,
                                                  by = "day")
                             outDF6 <- data.frame(t.series, NA)
                             colnames(outDF6) <- c("date", "value")
-                            outDF6$value <- modDF6$s6[match(outDF6$date, modDF6$date)]
-                            outDF6$value <- test5$s6[match(outDF6$date, test5$Date)]
+                            c <- nrow(outDF6)
+                            t6 <- data.frame(test5$date, test5$s6)
+                            colnames(t6) <- c("date", "s6")
+                            outDF6$value[modDF6$date %in% outDF6$date] <- modDF6$s6[modDF6$date %in% outDF6$date]
+                            outDF6 <- left_join(outDF6, t6, by = "date")
+                            outDF6$value[is.na(outDF6$value)] <- outDF6$s6[is.na(outDF6$value)]
                             
                             outDF6$Year <- as.numeric(format(outDF6$date, "%Y"))
                             outDF6$Month <- as.numeric(format(outDF6$date, "%m"))
@@ -749,8 +778,12 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME,
                                                      by = "day")
                                 outDF7 <- data.frame(t.series, NA)
                                 colnames(outDF7) <- c("date", "value")
-                                outDF7$value <- modDF7$s7[match(outDF7$date, modDF7$date)]
-                                outDF7$value <- test5$s7[match(outDF7$date, test5$Date)]
+                                c <- nrow(outDF7)
+                                t7 <- data.frame(test5$date, test5$s7)
+                                colnames(t7) <- c("date", "s7")
+                                outDF7$value[modDF7$date %in% outDF7$date] <- modDF7$s7[modDF7$date %in% outDF7$date]
+                                outDF7 <- left_join(outDF7, t7, by = "date")
+                                outDF7$value[is.na(outDF7$value)] <- outDF7$s7[is.na(outDF7$value)]
                                 
                                 outDF7$Year <- as.numeric(format(outDF7$date, "%Y"))
                                 outDF7$Month <- as.numeric(format(outDF7$date, "%m"))
@@ -767,8 +800,12 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME,
                                                          by = "day")
                                     outDF8 <- data.frame(t.series, NA)
                                     colnames(outDF8) <- c("date", "value")
-                                    outDF8$value <- modDF8$s8[match(outDF8$date, modDF8$date)]
-                                    outDF8$value <- test5$s8[match(outDF8$date, test5$Date)]
+                                    c <- nrow(outDF8)
+                                    t8 <- data.frame(test5$date, test5$s8)
+                                    colnames(t8) <- c("date", "s8")
+                                    outDF8$value[modDF8$date %in% outDF8$date] <- modDF8$s8[modDF8$date %in% outDF8$date]
+                                    outDF8 <- left_join(outDF8, t8, by = "date")
+                                    outDF8$value[is.na(outDF8$value)] <- outDF8$s8[is.na(outDF8$value)]
                                     
                                     outDF8$Year <- as.numeric(format(outDF8$date, "%Y"))
                                     outDF8$Month <- as.numeric(format(outDF8$date, "%m"))
@@ -785,8 +822,12 @@ Gap_Fill <- function(stationDF = STATION.DATAFRAME,
                                                              by = "day")
                                         outDF9 <- data.frame(t.series, NA)
                                         colnames(outDF9) <- c("date", "value")
-                                        outDF9$value <- modDF9$s9[match(outDF9$date, modDF9$date)]
-                                        outDF9$value <- test5$s9[match(outDF9$date, test5$Date)]
+                                        c <- nrow(outDF9)
+                                        t9 <- data.frame(test5$date, test5$s9)
+                                        colnames(t9) <- c("date", "s9")
+                                        outDF9$value[modDF9$date %in% outDF9$date] <- modDF9$s9[modDF9$date %in% outDF9$date]
+                                        outDF9 <- left_join(outDF9, t9, by = "date")
+                                        outDF9$value[is.na(outDF9$value)] <- outDF9$s9[is.na(outDF9$value)]
                                         
                                         outDF9$Year <- as.numeric(format(outDF9$date, "%Y"))
                                         outDF9$Month <- as.numeric(format(outDF9$date, "%m"))

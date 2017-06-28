@@ -5,7 +5,10 @@ Gap_Fill_within_station <- function(station.list.input,
     
     dir.create(destDir, showWarnings = FALSE)
     
-    targList <- paste0(station.list.input,".csv")
+    station.list <- unique(station.list.input$station)
+    station.list <- station.list[!is.na(station.list)]
+    
+    targList <- paste0(station.list,".csv")
     
     for (i in 1:length(targList)) 
     {
