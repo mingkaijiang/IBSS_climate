@@ -1,5 +1,10 @@
 #### prepare R scripts
 
+### install packages
+if(!require(Imap))install.packages("Imap")
+if(!require(scales))install.packages("scales")
+
+
 #### all functions
 if(!require(pacman))install.packages("pacman")
 pacman::p_load(reshape, reshape2, lubridate, eeptools, hyfo,
