@@ -9,7 +9,7 @@ YrRange10<-function(sourceDir = DAILY.DATA.DIRECTORY)
     {
         inName <- file.path(sourceDir, DatFiles[thisFile], fsep = .Platform$file.sep)
         
-        dd <- read.table(inName, sep=" ", header=T)
+        dd <- read.table(inName, sep=",", header=T)
         
         yrrange <- max(as.numeric(dd$Year)) - min(as.numeric(dd$Year))
         

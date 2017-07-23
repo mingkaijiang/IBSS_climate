@@ -124,19 +124,19 @@ SDIIS<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECTO
         {
             mid_spr<-dd[dd$year==year & dd$month >= 3 & dd$month <= 5,"prcp"]
             mid_spr<-mid_spr[mid_spr>=1]
-            b[i,"sdii_spr"]<-mean(mid_spr,na.rm=T)
+            b[i,"sdii_spr"]<- ifelse(mean(mid_spr,na.rm=T) > 0, mean(mid_spr,na.rm=T), 0)
             
             mid_sum<-dd[dd$year==year & dd$month >= 6 & dd$month <= 8,"prcp"]
             mid_sum<-mid_sum[mid_sum>=1]
-            b[i,"sdii_sum"]<-mean(mid_sum,na.rm=T)
+            b[i,"sdii_sum"]<-ifelse(mean(mid_sum,na.rm=T) > 0, mean(mid_sum,na.rm=T), 0)
             
             mid_aut<-dd[dd$year==year & dd$month >= 9 & dd$month <= 11,"prcp"]
             mid_aut<-mid_aut[mid_aut>=1]
-            b[i,"sdii_aut"]<-mean(mid_aut,na.rm=T)
+            b[i,"sdii_aut"]<-ifelse(mean(mid_aut,na.rm=T) > 0, mean(mid_aut,na.rm=T), 0)
             
             mid_win<-dd[dd$year==year & (dd$month ==12 | dd$month == 1 | dd$month == 2),"prcp"]
             mid_win<-mid_win[mid_win>=1]
-            b[i,"sdii_win"]<-mean(mid_win,na.rm=T)
+            b[i,"sdii_win"]<-ifelse(mean(mid_win,na.rm=T) > 0, mean(mid_win,na.rm=T), 0)
             
             year=year+1  
         }

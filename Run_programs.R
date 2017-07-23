@@ -35,16 +35,11 @@ ConvertFiles(sourceDir = "data/ghcnd_all/ghcnd_all/",
              destDir = "data/ghcnd_selected")
 
 ### Step 2:
-### Check year range quality - only include data with > 10 yrs of data
-### commented out because Missing_check is doing this
-#YrRange10(sourceDir = "data/ghcnd_selected")
-
-### Step 3:
 ### Restructure the files to continuous days, added leap years
 ### Replacing old with new files
 ReStructureFile(sourceDir = "data/ghcnd_selected", destDir = "data/restructured")
 
-### Step 4:
+### Step 3:
 ### Check year range quality - only include data with > 10 yrs of data
 ###                          - and data with < 20% missing values
 station.list.upd <- Missing_check(station.list, 
@@ -54,7 +49,7 @@ station.list.upd <- Missing_check(station.list,
 ## update stationDF
 stationDF.upd <- Update_station_list(station.list.upd, stationDF)
 
-### Step 5: 
+### Step 4: 
 ### Gap filling 1. - use statistical correlation among 9 stations to gap fill all 9 stations
 ###                - excluding big chunk of missing data which will be filled later use a different function
 
@@ -71,12 +66,17 @@ Gap_Fill(stationDF2,
          destDir = "data/ghcnd_gap_filled")
 
 # Fill all remaining stations using data within the station
-### Step 6:
+### Step 5:
 ### Gap filling 2. - use same period in other years to fill big chunk of missing data
 ###                - and the remaining unfilled sites
 Gap_Fill_within_station(station.list.upd, 
                         sourceDir = "data/ghcnd_gap_filled",
                         destDir = "data/ghcnd_gap_filled")
+
+### Step 6:
+### Check year range quality - only include data with > 10 yrs of data
+### commented out because Missing_check is doing this
+YrRange10(sourceDir = "data/ghcnd_gap_filled")
 
 
 ##############################################################################################################
@@ -124,17 +124,10 @@ PRCPTOTS_pred(sourceDir = "data/indices/ThrIndS", destDir = "data/predictability
 R95PS_pred(sourceDir = "data/indices/ThrIndS", destDir = "data/predictability")
 
 
-
-### To do next
-
-##Calculate R99P predictability
-##Need to exclude two files:  
-##ASN00015628.csv & WA004150450.csv in the ThrIndS folder
 R99PS_pred(sourceDir = "data/indices/ThrIndS", destDir = "data/predictability")
 
 
 R05PS_pred(sourceDir = "data/indices/ThrIndS", destDir = "data/predictability")
-
 
 
 R01PS_pred(sourceDir = "data/indices/ThrIndS", destDir = "data/predictability")
@@ -147,6 +140,8 @@ RX1S_pred(sourceDir = "data/indices/rx1s", destDir = "data/predictability")
 ##Calculate RX5S predictability
 RX5S_pred(sourceDir = "data/indices/rx5s", destDir = "data/predictability")
 
+### To do next
+source("R/prepare_R.R")
 
 ##Calculate SDII predictability
 SDIIS_pred(sourceDir = "data/indices/SDIIS", destDir = "data/predictability")
