@@ -119,8 +119,6 @@ PRCPTOTS_pred(sourceDir = "data/indices/ThrIndS", destDir = "data/predictability
 
 
 ##Calculate R95P predictability
-##Need to exclude two files:
-##SU000062650.csv in the ThrIndS folder
 R95PS_pred(sourceDir = "data/indices/ThrIndS", destDir = "data/predictability")
 
 
@@ -140,19 +138,8 @@ RX1S_pred(sourceDir = "data/indices/rx1s", destDir = "data/predictability")
 ##Calculate RX5S predictability
 RX5S_pred(sourceDir = "data/indices/rx5s", destDir = "data/predictability")
 
-### To do next
-source("R/prepare_R.R")
-
 ##Calculate SDII predictability
 SDIIS_pred(sourceDir = "data/indices/SDIIS", destDir = "data/predictability")
-
-
-
-
-
-##############################################################################################################
-##Filter data with year range > 60 years for long term trend analysis
-YrRange60(sourceDir = "E:/IBSS/Output/selected10", destDir = "E:/IBSS/Output/selected60")
 
 
 
