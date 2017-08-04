@@ -76,7 +76,7 @@ Gap_Fill_within_station(station.list.upd,
 ### Step 6:
 ### Check year range quality - only include data with > 10 yrs of data
 ### commented out because Missing_check is doing this
-YrRange10(sourceDir = "data/ghcnd_gap_filled")
+YrRange10(sourceDir = "data/ghcnd_gap_filled", stationDF2)
 
 
 ##############################################################################################################
@@ -141,6 +141,9 @@ RX5S_pred(sourceDir = "data/indices/rx5s", destDir = "data/predictability")
 ##Calculate SDII predictability
 SDIIS_pred(sourceDir = "data/indices/SDIIS", destDir = "data/predictability")
 
+
+##############################################################################################################
+#### add SCCS information onto each GHCN station
 
 
 # To do list: 

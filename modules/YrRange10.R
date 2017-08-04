@@ -1,7 +1,7 @@
 ##############################################################################################################
 ## Filter data for Year range > 10 for long-term trend analysis 
 ## Also check for missing data issue, missing data should not be > 80%
-YrRange10<-function(sourceDir = DAILY.DATA.DIRECTORY)
+YrRange10<-function(sourceDir = DAILY.DATA.DIRECTORY, sDF)
 {
     DatFiles <- list.files(path = sourceDir, pattern = "\\.csv")
     
@@ -21,4 +21,7 @@ YrRange10<-function(sourceDir = DAILY.DATA.DIRECTORY)
         }
         
     }
+    
+    write.csv(sDF, "data/sccs_ghcn_station_list_final.csv",
+              col.names=T, row.names=F, sep=",")
 }
