@@ -38,6 +38,7 @@ vignettes/*.pdf
 
 # raw GHCN data
 /data/ghcnd_all/ghcnd_all/*.dly
+/data/cpc/*.nc
 /data/ghcnd_selected/*.csv
 /data/ghcnd_coef_var/*.csv
 /data/Indices/*.csv
