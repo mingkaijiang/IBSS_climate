@@ -21,7 +21,7 @@ corDF <- read.csv("data/weight_dis_ht.csv")
 corDF_upd <- Convert_coordinates(corDF)
 
 ### Create df to store CPC climate data
-nc_to_csv(corDF_upd)
+nc_to_csv(corDF_upd)    # problems: many CPC coordinates have no prcp values
 
 ### Gap fill some random missing values
 Gap_Fill_within_station(station.list.upd, 

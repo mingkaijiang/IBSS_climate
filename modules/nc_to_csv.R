@@ -42,8 +42,8 @@ nc_to_csv <- function(inDF) {
             nc_close(ncDF)
         }   # end of year loop
         
-        outName <- outDF[1, "SCCSID"]
-        outFile <- paste0(outDir, "/SCCSID", outName, ".csv")
+        outName <- outDF[1, "SITEID"]
+        outFile <- paste0(outDir, "/SITEID", outName, ".csv")
 
         write.table(outDF, outFile, 
                     row.names = F,col.names=T, sep = ",")
