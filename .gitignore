@@ -52,6 +52,7 @@ vignettes/*.pdf
 /data/ghcnd_gap_filled_2/*.csv
 /data/restructured/*.csv
 /data/cpc_selected/*.csv
+/data/Indices/CDS/*.csv
 
 # R project
 *.Rproj

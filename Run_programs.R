@@ -18,6 +18,9 @@ corDF <- read.csv("data/weight_dis_ht.csv")
 ### Get GHCN station list
 gDF <- read.csv("data/ghcnd-stations.csv")
 
+### Get growing season information
+growDF <- read.csv("data/PlantSeasonality.csv")
+
 ### Obtain SCCS based GHCN stations that are closest to the SCCS point
 stationDF <- select_9_ghcn_stations(corDF, gDF)
 
@@ -61,6 +64,7 @@ stationDF.upd <- Update_station_list(station.list.upd, stationDF)
 stationDF2 <- stationDF.upd[-c(18, 20, 22, 44, 65, 69,            # 0 (non-NA) cases
                                24, 40, 46, 60,                    # dim(X) must have a positive length
                                41, 54),]                          # lmCoef[j, i]: subscript out of bounds
+
 Gap_Fill(stationDF2, 
          sourceDir = "data/ghcnd_gap_filled", 
          destDir = "data/ghcnd_gap_filled")
@@ -102,6 +106,10 @@ ThrIndS(sourceDir = "data/ghcnd_gap_filled", destDir = "data/indices/ThrIndS")
 ### Calculate prcp/# of wet days over each season and save into corresponding directory
 SDIIS(sourceDir = "data/ghcnd_gap_filled", destDir = "data/indices/SDIIS")
 
+
+### Step 6: 
+### Calculate consecutive days indices
+Consecutive_days_indices(sourceDir = "data/ghcnd_gap_filled", destDir = "data/indices/CDS")
 
 ##############################################################################################################
 #### Calculate whole year range predictability
