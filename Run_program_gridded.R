@@ -17,10 +17,13 @@ source("R/prepare_R.R")
 ### Get SCCS coordinates and Station ID Files
 corDF <- read.csv("data/weight_dis_ht.csv")
 
+### To convert SCCS site coordinates onto CPC gridded 0.5 resolution grid
+corDF_upd <- Convert_coordinates(corDF)
 
+### Create df to store CPC climate data
+nc_to_csv(corDF_upd)
 
-
-### Convert all files from .dly to .csv format, removed data quality flag
-ConvertFiles(sourceDir = "data/cpc/",
-             stations = station.list,
-             destDir = "data/cpc_selected")
+### Gap fill some random missing values
+Gap_Fill_within_station(station.list.upd, 
+                        sourceDir = "data/ghcnd_gap_filled",
+                        destDir = "data/ghcnd_gap_filled")
