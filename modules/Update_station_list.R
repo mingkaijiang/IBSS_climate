@@ -1,6 +1,6 @@
 ##############################################################################################################
 Update_station_list <- function(station.list.input, sDF) {
-    t1 <- matrix(ncol=9, nrow=80, station.list.input[,2])
+    t1 <- matrix(ncol=9, nrow=nrow(sDF), station.list.input[,2])
     t1 <- as.data.frame(t1,stringsAsFactors=F)
     colnames(t1) <- c("s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9")
     

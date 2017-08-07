@@ -45,7 +45,7 @@ Missing_check<-function(station.list.input, sourceDir = DAILY.DATA.DIRECTORY, de
             reality <- nrow(d2)
             miss_percent <- (target - reality) / target
             
-            if (miss_percent <= 0.2)
+            if (miss_percent <= 0.5)
             {  
                 print(paste0(thisFile, "------", station.list.input[thisFile]))
                 write.csv(out, outName, row.names=F)

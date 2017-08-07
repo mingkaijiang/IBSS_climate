@@ -1,5 +1,8 @@
 ##############################################################################################################
-select_9_ghcn_stations <- function(corDF, gDF) {
+select_9_ghcn_stations <- function(corDF, gDF, grDF) {
+    # corDF: DF with SCCS coordinates and GHCN coordinates
+    # gDF: GHCN station list
+    # grDF: growing season DF
     
     ### libraries
     library(sp)
@@ -8,15 +11,31 @@ select_9_ghcn_stations <- function(corDF, gDF) {
     
     
     ### SCCS station list
-    corDF$SCCSID <- as.character(corDF$SCCSID)
-    sDF <- corDF[!duplicated(corDF$SCCSID), ] 
+#    corDF$SCCSID <- as.character(corDF$SCCSID)
+#    sDF <- corDF[!duplicated(corDF$SCCSID), ] 
     
-    newDF <- data.frame(sDF$SCCSID, sDF$slat, sDF$slon,
+    newDF <- data.frame(grDF$SCCS_ID, grDF$Lat, grDF$Lon,
+                        grDF$Time.focus, grDF$Plant1.start,
+                        grDF$Plant1.end,
+                        grDF$Plant2.start, 
+                        grDF$Plant2.end, 
+                        grDF$Plant3.start, 
+                        grDF$Plant3.end,
+                        grDF$Plant4.start, 
+                        grDF$Plant4.end,
                         0,0,0,0,0,0,0,0,0,0,0,0,
                         0,0,0,0,0,0,0,0,0,0,0,0,
                         0,0,0,0,0,0,0,0,0,0,0,0)
     
     colnames(newDF) <- c("sccs_id", "slat", "slon",
+                         "focal_yr", "plant1_start", 
+                         "plant1_end", 
+                         "plant2_start",
+                         "plant2_end", 
+                         "plant3_start", 
+                         "plant3_end", 
+                         "plant4_start", 
+                         "plant4_end", 
                          "ghcn1", "lat1", "lon1", "elev1",
                          "ghcn2", "lat2", "lon2", "elev2",
                          "ghcn3", "lat3", "lon3", "elev3",

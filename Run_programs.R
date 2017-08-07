@@ -21,8 +21,11 @@ gDF <- read.csv("data/ghcnd-stations.csv")
 ### Get growing season information
 growDF <- read.csv("data/PlantSeasonality.csv")
 
+### Process growing season data to have single entry for each SCCS society
+growDF <- growing_season_single_entry(growDF)
+
 ### Obtain SCCS based GHCN stations that are closest to the SCCS point
-stationDF <- select_9_ghcn_stations(corDF, gDF)
+stationDF <- select_9_ghcn_stations(corDF, gDF, growDF)
 
 ### Obtain GHCN station list to process
 station.list <- c(stationDF$ghcn1, stationDF$ghcn2, stationDF$ghcn3,
@@ -44,7 +47,7 @@ ReStructureFile(sourceDir = "data/ghcnd_selected", destDir = "data/restructured"
 
 ### Step 3:
 ### Check year range quality - only include data with > 10 yrs of data
-###                          - and data with < 20% missing values
+###                          - and data with < 50% missing values
 station.list.upd <- Missing_check(station.list, 
                                   sourceDir = "data/restructured", 
                                   destDir = "data/ghcnd_gap_filled")
@@ -60,10 +63,10 @@ stationDF.upd <- Update_station_list(station.list.upd, stationDF)
 ## problem sites: 0 (non-NA) cases: non-missing data do not overlap across all sites
 ##                 dim(X) must hvae a postive length: two sites overlapping problem
 ##                lmCoef[j, i]: subscript out of bounds: 
-##                error in modDF$date: 14, 15, 53, 61, 71, 
-stationDF2 <- stationDF.upd[-c(18, 20, 22, 44, 65, 69,            # 0 (non-NA) cases
-                               24, 40, 46, 60,                    # dim(X) must have a positive length
-                               41, 54),]                          # lmCoef[j, i]: subscript out of bounds
+##                error in modDF$date
+stationDF2 <- stationDF.upd[-c(23,30,38,53,55,77,80,84,85,       # 0 (non-NA) cases
+                               21,49,96,97,                  # dim(X) must have a positive length
+                               24,51,62,69,70,78),]                          # lmCoef[j, i]: subscript out of bounds
 
 Gap_Fill(stationDF2, 
          sourceDir = "data/ghcnd_gap_filled", 

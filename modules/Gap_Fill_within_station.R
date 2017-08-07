@@ -7,6 +7,7 @@ Gap_Fill_within_station <- function(station.list.input,
     
     station.list <- unique(station.list.input$station)
     station.list <- station.list[!is.na(station.list)]
+    station.list <- station.list[-490]
     
     targList <- paste0(station.list,".csv")
     
