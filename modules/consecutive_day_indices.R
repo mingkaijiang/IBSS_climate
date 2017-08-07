@@ -60,6 +60,7 @@ consecutive_day_indices<-function(sDF,
     }
     
     for (i in sccs.id) {
+        print(paste0("within i loop ", i))
         # check if there is growing season information
         if (is.na(sDF[sDF$sccs_id == i, "plant1_start"])) {
             print(paste0("No growing season information for sccs id ", i))
@@ -125,6 +126,7 @@ consecutive_day_indices<-function(sDF,
             ghcn.list <- ghcn.list[!is.na(ghcn.list)]
             ghcn.l <- length(ghcn.list)
             
+
             # compute consecutive days indices
             ifelse(ghcn.l == 0, print(paste0("No GHCN station for SCCS ", i)), 
                    compute_consecutive_indices_3(s1.doy, e1.doy, s2.doy, e2.doy, s3.doy, e3.doy,
@@ -153,7 +155,7 @@ consecutive_day_indices<-function(sDF,
             
             # compute consecutive days indices
             ifelse(ghcn.l == 0, print(paste0("No GHCN station for SCCS ", i)), 
-                   compute_consecutive_indices_3(s1.doy, e1.doy, s2.doy, e2.doy, 
+                   compute_consecutive_indices_4(s1.doy, e1.doy, s2.doy, e2.doy, 
                                                  s3.doy, e3.doy, s4.doy, e4.doy,
                                                  ghcn.list, i, sourceDir, destDir))
         }

@@ -394,5 +394,7 @@ compute_consecutive_indices_4 <- function(s1.date, e1.date, s2.date, e2.date,
         # write output
         write.csv(outDF, outName4)
     }
+    print(paste0("finish k loop ", k))
+    
 }
 

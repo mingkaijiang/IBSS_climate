@@ -157,5 +157,11 @@ RX5S_pred(sourceDir = "data/indices/rx5s", destDir = "data/predictability")
 ##Calculate SDII predictability
 SDIIS_pred(sourceDir = "data/indices/SDIIS", destDir = "data/predictability")
 
+## Calculate dry consecutive predictability
+consec_dry_pred(sourceDir = "data/indices/CDS", destDir = "data/predictability")
+
+## Calculate wet consecutive predictability
+consec_wet_pred(sourceDir = "data/indices/CDS", destDir = "data/predictability")
+
 ##############################################################################################################
 ### End

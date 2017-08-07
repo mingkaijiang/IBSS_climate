@@ -181,7 +181,7 @@ compute_consecutive_indices_2 <- function(s1.date, e1.date, s2.date, e2.date, we
                 # extract the three periods
                 before_g <- subset(dd[dd$year == (j - 1), ], doy < s2.date & doy >= 181)
                 d1 <- subset(dd[dd$year == (j - 1), ], doy >= s2.date)
-                d2 <- subset(dd[dd4year == j, ], doy <= e2.date)
+                d2 <- subset(dd[dd$year == j, ], doy <= e2.date)
                 during_g <- rbind(d1, d2)
                 after_g <- subset(dd[dd$year == j,],  doy > e2.date & doy < 181)
                 
@@ -208,5 +208,7 @@ compute_consecutive_indices_2 <- function(s1.date, e1.date, s2.date, e2.date, we
         # write output
         write.csv(outDF, outName2)
     }
+    print(paste0("finish k loop ", k))
+    
 }
 

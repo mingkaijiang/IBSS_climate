@@ -24,7 +24,7 @@ compute_consecutive_indices_3 <- function(s1.date, e1.date, s2.date, e2.date, s3
     for (k in 1:length(wea.station)) 
     {
         # print the file to screen
-        print(wea.station[k])
+        # print(wea.station[k])
         
         # prepare input and output file names
         inName <- file.path(sourceDir, in.list[k], fsep = .Platform$file.sep)
@@ -300,6 +300,10 @@ compute_consecutive_indices_3 <- function(s1.date, e1.date, s2.date, e2.date, s3
         
         # write output
         write.csv(outDF, outName3)
+        
+        print(wea.station[k])
+        
     }
+    print(paste0("finish k loop ", k))
 }
 

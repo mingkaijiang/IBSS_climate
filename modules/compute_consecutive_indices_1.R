@@ -115,5 +115,7 @@ compute_consecutive_indices_1 <- function(s.date, e.date, wea.station, sccs.id, 
         # write output
         write.csv(outDF, outName)
     }
+    print(paste0("finish k loop ", k))
+    
 }
 
