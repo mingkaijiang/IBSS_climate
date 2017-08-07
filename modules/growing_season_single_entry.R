@@ -60,6 +60,8 @@ growing_season_single_entry <- function(grDF) {
         }  # ignore the rest
         
         
+        
+        
     }
     
     return(outDF)    

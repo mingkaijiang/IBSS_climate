@@ -116,7 +116,8 @@ SDIIS(sourceDir = "data/ghcnd_gap_filled", destDir = "data/indices/SDIIS")
 
 ### Step 6: 
 ### Calculate consecutive days indices
-Consecutive_days_indices(sourceDir = "data/ghcnd_gap_filled", destDir = "data/indices/CDS")
+consecutive_day_indices(final_station_DF, 
+                        sourceDir = "data/ghcnd_gap_filled", destDir = "data/indices/CDS")
 
 ##############################################################################################################
 #### Calculate whole year range predictability
@@ -156,12 +157,5 @@ RX5S_pred(sourceDir = "data/indices/rx5s", destDir = "data/predictability")
 ##Calculate SDII predictability
 SDIIS_pred(sourceDir = "data/indices/SDIIS", destDir = "data/predictability")
 
-
 ##############################################################################################################
-#### add SCCS information onto each GHCN station
-
-
-# To do list: 
-# 1. Compute two consecutive day indices;
-# 2. gridded data global calculation
-# 3. 
+### End
