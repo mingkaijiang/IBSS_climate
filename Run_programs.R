@@ -83,8 +83,13 @@ Gap_Fill_within_station(station.list.upd,
 ### Step 6:
 ### Check year range quality - only include data with > 10 yrs of data
 ### commented out because Missing_check is doing this
-YrRange10(sourceDir = "data/ghcnd_gap_filled", stationDF2)
+YrRange10(sourceDir = "data/ghcnd_gap_filled")
 
+
+### Step 7:
+### Update stationDF2 to remove all removed stations from this list 
+### and add the growing season information
+final_station_DF <-Final_station_list(sourceDir = "data/ghcnd_gap_filled", stationDF.upd)
 
 ##############################################################################################################
 #### Compute indices
@@ -108,7 +113,6 @@ ThrIndS(sourceDir = "data/ghcnd_gap_filled", destDir = "data/indices/ThrIndS")
 ### Step 5:
 ### Calculate prcp/# of wet days over each season and save into corresponding directory
 SDIIS(sourceDir = "data/ghcnd_gap_filled", destDir = "data/indices/SDIIS")
-
 
 ### Step 6: 
 ### Calculate consecutive days indices
