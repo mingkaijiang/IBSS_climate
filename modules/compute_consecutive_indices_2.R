@@ -23,7 +23,7 @@ compute_consecutive_indices_2 <- function(s1.date, e1.date, s2.date, e2.date, we
         print(wea.station[k])
         
         # prepare input and output file names
-        inName <- file.path(sourceDir, in.list[k], fsep = .Platform$file.sep)
+        inName <- file.path(source, in.list[k], fsep = .Platform$file.sep)
         outName1 <- file.path(dest, out.list1[k], fsep = .Platform$file.sep)
         outName2 <- file.path(dest, out.list2[k], fsep = .Platform$file.sep)
         
