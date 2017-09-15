@@ -53,6 +53,8 @@ vignettes/*.pdf
 /data/restructured/*.csv
 /data/cpc_selected/*.csv
 /data/Indices/CDS/*.csv
+/data/Indices/CDS_hunter_gatherer/*.csv
+
 
 # R project
 *.Rproj

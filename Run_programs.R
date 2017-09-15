@@ -120,6 +120,10 @@ SDIIS(sourceDir = "data/ghcnd_gap_filled", destDir = "data/indices/SDIIS")
 consecutive_day_indices(final_station_DF, 
                         sourceDir = "data/ghcnd_gap_filled", destDir = "data/indices/CDS")
 
+### Calculate consecutive days indices for hunter/gatherer societies, i.e. sites without any plant grow information
+consecutive_day_indices_hunter_gatherer(final_station_DF, 
+                                        sourceDir = "data/ghcnd_gap_filled", destDir = "data/indices/CDS_hunter_gatherer")
+
 ##############################################################################################################
 #### Calculate whole year range predictability
 
@@ -163,6 +167,12 @@ consec_dry_pred(sourceDir = "data/indices/CDS", destDir = "data/predictability")
 
 ## Calculate wet consecutive predictability
 consec_wet_pred(sourceDir = "data/indices/CDS", destDir = "data/predictability")
+
+## Calculate dry consecutive predictability for hunter and gatherer societies
+consec_dry_pred_hunter_gatherer(sourceDir = "data/indices/CDS_hunter_gatherer", destDir = "data/predictability")
+
+## Calculate wet consecutive predictability for hunter and gatherer societies
+consec_wet_pred_hunter_gatherer(sourceDir = "data/indices/CDS_hunter_gatherer", destDir = "data/predictability")
 
 ##############################################################################################################
 ### End
