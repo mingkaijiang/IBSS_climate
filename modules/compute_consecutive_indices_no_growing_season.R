@@ -51,7 +51,7 @@ compute_consecutive_indices_no_growing_season <- function(wea.station, sccs.id, 
             dry_son <- rle(son$prcp)
             
             
-            outDF[outDF$year == j, "dry_DJF"] <- max(dry_djf$lengths[dry_djf$values==0]) / 90.0
+            outDF[outDF$year == j, "dry_DJF"] <- max(dry_djf$lengths[dry_djf$values==0]) / 91.0
             outDF[outDF$year == j, "dry_MAM"] <- max(dry_mam$lengths[dry_mam$values==0]) / 92.0
             outDF[outDF$year == j, "dry_JJA"] <- max(dry_jja$lengths[dry_jja$values==0]) / 92.0
             outDF[outDF$year == j, "dry_SON"] <- max(dry_son$lengths[dry_son$values==0]) / 91.0
@@ -62,15 +62,20 @@ compute_consecutive_indices_no_growing_season <- function(wea.station, sccs.id, 
             wet_jja <- rle(jja$prcp)
             wet_son <- rle(son$prcp)
             
-            outDF[outDF$year == j, "wet_DJF"] <- max(wet_djf$lengths[wet_djf$values>0]) / 90.0
-            outDF[outDF$year == j, "wet_MAM"] <- max(wet_mam$lengths[wet_mam$values>0]) / 92.0
-            outDF[outDF$year == j, "wet_JJA"] <- max(wet_jja$lengths[wet_jja$values>0]) / 92.0
-            outDF[outDF$year == j, "wet_SON"] <- max(wet_son$lengths[wet_son$values>0]) / 91.0
+            outDF[outDF$year == j, "wet_DJF"] <- ifelse(length(wet_djf$lengths[wet_djf$values>0]) == 0, 0, max(wet_djf$lengths[wet_djf$values>0]) / 91.0)
+            outDF[outDF$year == j, "wet_MAM"] <- ifelse(length(wet_mam$lengths[wet_mam$values>0]) == 0, 0, max(wet_mam$lengths[wet_mam$values>0]) / 92.0)
+            outDF[outDF$year == j, "wet_JJA"] <- ifelse(length(wet_jja$lengths[wet_jja$values>0]) == 0, 0, max(wet_jja$lengths[wet_jja$values>0]) / 92.0)
+            outDF[outDF$year == j, "wet_SON"] <- ifelse(length(wet_son$lengths[wet_son$values>0]) == 0, 0, max(wet_son$lengths[wet_son$values>0]) / 91.0)
             
         }
         
+        # remove the first and last year to avoid incomplete year problem
+        outDF1 <- outDF[-1,]
+        l <- dim(outDF1)[1]
+        outDF2 <- outDF1[-l,]
+        
         # write output
-        write.csv(outDF, outName)
+        write.csv(outDF2, outName, row.names=F)
     }
     print(paste0("finish k loop ", k))
     

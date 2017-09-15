@@ -112,8 +112,12 @@ compute_consecutive_indices_1 <- function(s.date, e.date, wea.station, sccs.id, 
             }
         }
         
+        outDF1 <- outDF[-1,]
+        l <- dim(outDF1)[1]
+        outDF2 <- outDF1[-l,]
+        
         # write output
-        write.csv(outDF, outName)
+        write.csv(outDF2, outName, row.names=F)
     }
     print(paste0("finish k loop ", k))
     

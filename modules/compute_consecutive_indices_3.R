@@ -122,8 +122,12 @@ compute_consecutive_indices_3 <- function(s1.date, e1.date, s2.date, e2.date, s3
             }
         }
         
+        outDF1 <- outDF[-1,]
+        l <- dim(outDF1)[1]
+        outDF2 <- outDF1[-l,]
+        
         # write output
-        write.csv(outDF, outName1)
+        write.csv(outDF2, outName1, row.names=F)
         
         # check if the location is in southern hemisphere
         if (s2.date < e2.date) {
@@ -210,8 +214,12 @@ compute_consecutive_indices_3 <- function(s1.date, e1.date, s2.date, e2.date, s3
             }
         }
         
+        outDF1 <- outDF[-1,]
+        l <- dim(outDF1)[1]
+        outDF2 <- outDF1[-l,]
+        
         # write output
-        write.csv(outDF, outName2)
+        write.csv(outDF2, outName2, row.names=F)
         
         # check if the location is in southern hemisphere
         if (s3.date < e3.date) {
@@ -298,8 +306,12 @@ compute_consecutive_indices_3 <- function(s1.date, e1.date, s2.date, e2.date, s3
             }
         }
         
+        outDF1 <- outDF[-1,]
+        l <- dim(outDF1)[1]
+        outDF2 <- outDF1[-l,]
+        
         # write output
-        write.csv(outDF, outName3)
+        write.csv(outDF2, outName3, row.names=F)
         
         print(wea.station[k])
         
