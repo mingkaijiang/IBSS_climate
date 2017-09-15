@@ -30,19 +30,31 @@ R95PS_pred<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DI
         
         max_top <- round_any(max(v.range), 10, f = ceiling)
         min_bot <- round_any(min(v.range), 10, f = floor)
-        diff <- max_top - min_bot
         interval <- 10
         
-        bin <- matrix(0, ncol=6, nrow=interval)
-        dimnames(bin) <- list(NULL,c("bin_size","spr","sum","aut","win","whole"))
+        diff <- max_top - min_bot
         
-        bin[,"bin_size"] <- c(min_bot+0.1*diff,min_bot+0.2*diff,min_bot+0.3*diff,min_bot+0.4*diff,
-                              min_bot+0.5*diff,min_bot+0.6*diff,min_bot+0.7*diff,min_bot+0.8*diff,
-                              min_bot+0.9*diff,max_top)
-        
-        breaks = c(min_bot,min_bot+0.1*diff,min_bot+0.2*diff,min_bot+0.3*diff,min_bot+0.4*diff,
-                   min_bot+0.5*diff,min_bot+0.6*diff,min_bot+0.7*diff,min_bot+0.8*diff,
-                   min_bot+0.9*diff,max_top)
+        if(diff == 0) {
+            bin <- matrix(0, ncol=6, nrow=interval)
+            dimnames(bin) <- list(NULL,c("bin_size","spr","sum","aut","win","whole"))
+            
+            bin[,"bin_size"] <- seq(0.1,1,0.1)
+            
+            breaks = seq(0,1,0.1)
+            
+        } else {
+            bin <- matrix(0, ncol=6, nrow=interval)
+            dimnames(bin) <- list(NULL,c("bin_size","spr","sum","aut","win","whole"))
+            
+            bin[,"bin_size"] <- c(min_bot+0.1*diff,min_bot+0.2*diff,min_bot+0.3*diff,min_bot+0.4*diff,
+                                  min_bot+0.5*diff,min_bot+0.6*diff,min_bot+0.7*diff,min_bot+0.8*diff,
+                                  min_bot+0.9*diff,max_top)
+            
+            breaks = c(min_bot,min_bot+0.1*diff,min_bot+0.2*diff,min_bot+0.3*diff,min_bot+0.4*diff,
+                       min_bot+0.5*diff,min_bot+0.6*diff,min_bot+0.7*diff,min_bot+0.8*diff,
+                       min_bot+0.9*diff,max_top)
+            
+        }
         
         spr_cut = cut(X[, "r95p_spr"], breaks, include.lowest=TRUE,right=TRUE)
         sum_cut = cut(X[, "r95p_sum"], breaks, include.lowest=TRUE,right=TRUE)
