@@ -1,6 +1,6 @@
 ##############################################################################################################
-##Calculate consecutive wet days predictability based on whole temporal range
-consec_wet_pred<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECTORY)
+##Calculate consecutive dry days predictability based on whole temporal range
+consec_dry_pred_hunter_gatherer<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECTORY)
 {
     dir.create(destDir, showWarnings = FALSE)
     DatFiles <- list.files(path = sourceDir, pattern = "\\.csv")
@@ -19,7 +19,6 @@ consec_wet_pred<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTP
         inName <- file.path(sourceDir, DatFiles[j], fsep = .Platform$file.sep)
         
         X <- read.csv(inName)
-        
         is.na(X)<-sapply(X, is.infinite)
         X[is.na(X)]<- 0
         
@@ -28,8 +27,8 @@ consec_wet_pred<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTP
         yearr <- yeare-years
         
         # site specific data range
-        v.range <- c(X$wet_before, X$wet_growing, 
-                     X$wet_after)
+        v.range <- c(X$dry_DJF, X$dry_MAM, 
+                     X$dry_JJA, X$dry_SON)
         
         max_top <- 1.0 # round_any(max(v.range), 0.1, f = ceiling)
         min_bot <- 0.0 # round_any(min(v.range), 0.1, f = floor)
@@ -37,8 +36,8 @@ consec_wet_pred<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTP
         interval <- 10
         
         if(diff > 0) {
-            bin <- matrix(0, ncol=5, nrow=interval)
-            dimnames(bin) <- list(NULL,c("bin_size","before","during","after","whole"))
+            bin <- matrix(0, ncol=6, nrow=interval)
+            dimnames(bin) <- list(NULL,c("bin_size","DJF","MAM","JJA","SON","whole"))
             
             bin[,"bin_size"] <- c(min_bot+0.1*diff,min_bot+0.2*diff,min_bot+0.3*diff,min_bot+0.4*diff,
                                   min_bot+0.5*diff,min_bot+0.6*diff,min_bot+0.7*diff,min_bot+0.8*diff,
@@ -48,25 +47,28 @@ consec_wet_pred<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTP
                        min_bot+0.5*diff,min_bot+0.6*diff,min_bot+0.7*diff,min_bot+0.8*diff,
                        min_bot+0.9*diff,max_top)
             
-            before_cut = cut(X[, "wet_before"], breaks, include.lowest=TRUE,right=TRUE)
-            during_cut = cut(X[, "wet_growing"], breaks, include.lowest=TRUE,right=TRUE)
-            after_cut = cut(X[, "wet_after"], breaks, include.lowest=TRUE,right=TRUE)
-
-            b_freq = table(before_cut)
-            d_freq = table(during_cut)
-            a_freq = table(after_cut)
-
-            bin[,"before"] <- b_freq
-            bin[,"during"] <- d_freq
-            bin[,"after"] <- a_freq
-
-            bin[,"whole"] = (bin[,"before"]+bin[,"during"]+bin[,"after"])
+            djf_cut = cut(X[, "dry_DJF"], breaks, include.lowest=TRUE,right=TRUE)
+            mam_cut = cut(X[, "dry_MAM"], breaks, include.lowest=TRUE,right=TRUE)
+            jja_cut = cut(X[, "dry_JJA"], breaks, include.lowest=TRUE,right=TRUE)
+            son_cut = cut(X[, "dry_SON"], breaks, include.lowest=TRUE,right=TRUE)
             
-            col_sum <- sum(table(X[, "wet_before"]))
-            whole_sum <- col_sum*3
+            djf_freq = table(djf_cut)
+            mam_freq = table(mam_cut)
+            jja_freq = table(jja_cut)
+            son_freq = table(son_cut)
+            
+            bin[,"DJF"] <- djf_freq
+            bin[,"MAM"] <- mam_freq
+            bin[,"JJA"] <- jja_freq
+            bin[,"SON"] <- son_freq
+            
+            bin[,"whole"] = (bin[,"DJF"]+bin[,"MAM"]+bin[,"JJA"]+bin[,"SON"])
+            
+            col_sum <- sum(table(X[, "dry_DJF"]))
+            whole_sum <- col_sum*4
             
             #uncertainty with respect to time H(X)
-            HofX <- -((col_sum/whole_sum)*log10(col_sum/whole_sum))*3
+            HofX <- -((col_sum/whole_sum)*log10(col_sum/whole_sum))*4
             
             #uncertainty with respect to state H(Y)
             V1 <- bin[,"whole"]/whole_sum
@@ -80,7 +82,7 @@ consec_wet_pred<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTP
             HofY <- -sum(V1*V2)
             
             #uncertainty with respect to interaction of time and state, H(XY)
-            M1 <- bin[1:interval,2:4]/whole_sum
+            M1 <- bin[1:interval,2:5]/whole_sum
             M2 <- log10(M1)
             for (i in 1:length(M2))
             {
@@ -93,7 +95,7 @@ consec_wet_pred<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTP
             #Conditional uncertainty with regard to state, with time given, HXofY
             HXofY <- HofXY - HofX
             s <- interval
-            t <- 3
+            t <- 4
             
             #predictability (P), constancy(C) and contingency (M)
             P <- 1-(HXofY/log10(s))
@@ -142,6 +144,6 @@ consec_wet_pred<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTP
             output[j,"P_freedom"] <- P_free
         }
     }
-    write.csv(output,paste0(destDir, "/Consec_wet_PCM.csv"),row.names=F)
+    write.csv(output,paste0(destDir, "/Consec_dry_PCM_hunter_gatherer.csv"),row.names=F)
     
 }

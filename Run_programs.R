@@ -176,3 +176,4 @@ consec_wet_pred_hunter_gatherer(sourceDir = "data/indices/CDS_hunter_gatherer", 
 
 ##############################################################################################################
 ### End
+rm(list=ls())

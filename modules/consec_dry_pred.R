@@ -19,6 +19,8 @@ consec_dry_pred<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTP
         inName <- file.path(sourceDir, DatFiles[j], fsep = .Platform$file.sep)
         
         X <- read.csv(inName)
+        is.na(X)<-sapply(X, is.infinite)
+        X[is.na(X)]<- 0
         
         years <- min(X$year)
         yeare <- max(X$year)
