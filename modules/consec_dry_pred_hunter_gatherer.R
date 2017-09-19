@@ -30,8 +30,14 @@ consec_dry_pred_hunter_gatherer<-function(sourceDir = DAILY.DATA.DIRECTORY, dest
         v.range <- c(X$dry_DJF, X$dry_MAM, 
                      X$dry_JJA, X$dry_SON)
         
-        max_top <- 1.0 # round_any(max(v.range), 0.1, f = ceiling)
-        min_bot <- 0.0 # round_any(min(v.range), 0.1, f = floor)
+        test <- max(v.range) - min(v.range)
+        
+        sep.value <- ifelse(test <= 0.01, 0.001, 
+                            ifelse(test > 0.01 & test <= 0.1, 0.01,
+                                   ifelse(test > 0.1 & test <= 1, 0.1)))
+        
+        max_top <- round_any(max(v.range), sep.value, f = ceiling)
+        min_bot <- round_any(min(v.range), sep.value, f = floor)
         diff <- max_top - min_bot
         interval <- 10
         
