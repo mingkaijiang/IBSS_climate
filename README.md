@@ -1,4 +1,4 @@
-# IBSS_climate
+# IBSS Climate
 
 This is the code repository for computing precipitation extremes and their associated predictability scores at the chosen ethnographic sites (SCCS) for the Interdisciplinary Behavioral and Social Science (IBSS) project, based on data from the GHCN daily precipitation dataset. 
 
