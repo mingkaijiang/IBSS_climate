@@ -1,6 +1,6 @@
 ##############################################################################################################
 ##Read daily prcp data, within function ConvertFiles
-ReadDailyPRCP <- function(filename)
+ReadDailyTMIN <- function(filename)
 {
     fname <- filename
     X <- readLines(fname)

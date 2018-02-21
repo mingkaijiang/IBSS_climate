@@ -3,7 +3,7 @@
 ##Read the input file and extract daily PRCP data
 ##Need to be in the correct directory
 
-ConvertFiles <- function(sourceDir = DAILY.FILES.DIRECTORY, 
+ConvertFiles_Temp <- function(sourceDir = DAILY.FILES.DIRECTORY, 
                          stations,
                          destDir = DAILY.DATA.DIRECTORY) 
 {
