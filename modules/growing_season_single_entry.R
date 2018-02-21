@@ -2,6 +2,11 @@
 growing_season_single_entry <- function(grDF) {
     
     # get sccs list
+  grDF <- as.data.frame(grDF)
+  colnames(grDF) <- c("SCCS_ID", "SCCS_Name", "Time.focus", "Longitude",
+                      "Latitude", "Plant.start", "Plant.start.date",
+                      "Plant.end", "Plant.end.date")
+  grDF$SCCS_ID <- as.factor(grDF$SCCS_ID)
     sccs.list <- unique(grDF$SCCS_ID)
     l <- length(sccs.list)
     
