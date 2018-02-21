@@ -18,8 +18,14 @@ corDF <- read.csv("data/weight_dis_ht.csv")
 ### Get GHCN station list
 gDF <- read.csv("data/ghcnd-stations.csv")
 
+### Get growing season information
+growDF <- read.csv("data/PlantSeasonality.csv")
+
+### Process growing season data to have single entry for each SCCS society
+growDF <- growing_season_single_entry(growDF)
+
 ### Obtain SCCS based GHCN stations that are closest to the SCCS point
-stationDF <- select_9_ghcn_stations(corDF, gDF)
+stationDF <- select_9_ghcn_stations(corDF, gDF, growDF)
 
 ### Obtain GHCN station list to process
 station.list <- c(stationDF$ghcn1, stationDF$ghcn2, stationDF$ghcn3,
