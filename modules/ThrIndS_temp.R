@@ -78,24 +78,27 @@ ThrIndS_temp <- function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPU
         years<-dd[1,1]
         yeare<-dd[dim(dd)[1],1]
         
-        if (leapyear(years)) 
+        if (leapyear(years)) {
             dddd<-dddl 
-        else 
+        } else {
             dddd<-ddd
+        }
+
         
         dddd[,"year"]<-years
         
-        for (year in years:yeare)
-        {                  
-            if (leapyear(year)) 
+        for (year in years:yeare) {                  
+            if (leapyear(year)) {
                 dddd1 <- dddl 
-            else 
+            } else {
                 dddd1 <- ddd
-            
+            }
+
             dddd1[,"year"]<-year
             
-            if (year!=years) 
+            if (year!=years) {
                 dddd<-rbind(dddd,dddd1) 
+            }
         }
         
         dddd<-as.data.frame(dddd)
@@ -162,10 +165,9 @@ ThrIndS_temp <- function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPU
         fd_aut<-rep(0,ys)
         fd_win<-rep(0,ys)
         
-        target<-as.data.frame(cbind(dp,fd_spr,fd_sum,fd_aut,Rfd_win))
+        target<-as.data.frame(cbind(dp,fd_spr,fd_sum,fd_aut,fd_win))
         
-        for (year in years:yeare)
-        {
+        for (year in years:yeare) {
             mid_spr<-dd[dd$year==year & dd$month >= 3 & dd$month <= 5,"tmin"]
             mid_spr<-mid_spr[is.na(mid_spr)==F]
             target[target$year==year,"fd_spr"]<-length(mid_spr[mid_spr<=0])
@@ -184,6 +186,6 @@ ThrIndS_temp <- function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPU
         }
         
   
-        write.table(target2,outName,append=F,quote=F,sep=",",na="-99.9",row.names=F)
+        write.table(target,outName,append=F,quote=F,sep=",",na="-99.9",row.names=F)
     }
 }
