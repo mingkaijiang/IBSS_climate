@@ -28,9 +28,7 @@ growDF <- growing_season_single_entry(growDF)
 stationDF <- select_9_ghcn_stations(corDF, gDF, growDF)
 
 ### Obtain GHCN station list to process
-station.list <- c(stationDF$ghcn1, stationDF$ghcn2, stationDF$ghcn3,
-                  stationDF$ghcn4, stationDF$ghcn5, stationDF$ghcn6,
-                  stationDF$ghcn7, stationDF$ghcn8, stationDF$ghcn9)
+station.list <- c(stationDF$ghcn1)
 
 ##############################################################################################################
 #### select on SCCS sites based on their information sheet

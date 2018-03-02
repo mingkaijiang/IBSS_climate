@@ -1,11 +1,11 @@
 ##############################################################################################################
-##Read daily prcp data, within function ConvertFiles
-ReadDailyTMIN <- function(filename)
+##Read daily t min data, within function ConvertFiles
+ReadDailyTMAX <- function(filename)
 {
     fname <- filename
     X <- readLines(fname)
     Elements <- substr(X, 18, 21)
-    dex <- grep("(^TMAX).", Elements)
+    dex <- grep("TMAX", Elements)
     X <- X[dex]
     Elements <- Elements[dex]
     Id <- substr(X, 1, 11)
