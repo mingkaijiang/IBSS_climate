@@ -87,7 +87,7 @@ YrRange10(sourceDir = "data/ghcnd_gap_filled")
 ### Step 7:
 ### Update stationDF2 to remove all removed stations from this list 
 ### and add the growing season information
-final_station_DF <-Final_station_list(sourceDir = "data/ghcnd_gap_filled", stationDF.upd)
+final_station_DF <-Final_station_list_4(sourceDir = "data/ghcnd_gap_filled", stationDF.upd)
 
 ##############################################################################################################
 #### Compute indices
