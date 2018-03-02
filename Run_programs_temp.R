@@ -25,10 +25,10 @@ growDF <- read.csv("data/PlantSeasonality.csv")
 growDF <- growing_season_single_entry(growDF)
 
 ### Obtain SCCS based GHCN stations that are closest to the SCCS point
-stationDF <- select_9_ghcn_stations(corDF, gDF, growDF)
+stationDF <- select_4_ghcn_stations(corDF, gDF, growDF)
 
 ### Obtain GHCN station list to process
-station.list <- c(stationDF$ghcn1)
+station.list <- c(stationDF$ghcn1,stationDF$ghcn2,stationDF$ghcn3,stationDF$ghcn4)
 
 ##############################################################################################################
 #### select on SCCS sites based on their information sheet
