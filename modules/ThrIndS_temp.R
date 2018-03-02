@@ -10,7 +10,7 @@ ThrIndS_temp <- function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPU
         outName <- file.path(destDir, DatFiles[thisFile], fsep = .Platform$file.sep)
         
         dd <- read.csv(inName)
-        colnames(dd)<-c("id","year","month","day","tmin")
+        colnames(dd)<-c("id","year","month","day","tmax")
         dd <- dd[,2:5]
         
         nama<-substr(inName,start=1,stop=(nchar(inName)-4))
@@ -22,8 +22,8 @@ ThrIndS_temp <- function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPU
         
         ddd<-matrix(NA,365,4)
         dddl<-matrix(NA,366,4)
-        dimnames(ddd)<-list(NULL,c("year","month","day","tmin"))
-        dimnames(dddl)<-list(NULL,c("year","month","day","tmin"))
+        dimnames(ddd)<-list(NULL,c("year","month","day","tmax"))
+        dimnames(dddl)<-list(NULL,c("year","month","day","tmax"))
         
         ddd[1:31,"month"]<-1
         ddd[1:31,"day"]<-c(1:31)
@@ -104,7 +104,7 @@ ThrIndS_temp <- function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPU
         dddd<-as.data.frame(dddd)
         dddd2<-merge(dddd,dd,by=c("year","month","day"),all.x=T)
         dddd2<-dddd2[,-(4)]
-        dimnames(dddd2)[[2]]<-c("year","month","day","tmin")
+        dimnames(dddd2)[[2]]<-c("year","month","day","tmax")
         tmporder<-dddd2[,"year"]*10000+dddd2[,"month"]*100+dddd2[,"day"]
         dd<-dddd2[order(tmporder),]
         
@@ -115,45 +115,45 @@ ThrIndS_temp <- function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPU
         
         endpoint <- endyear+1
         
-        dd$tmin[is.na(dd$tmin)] = median(dd$tmin, na.rm=T)
+        dd$tmax[is.na(dd$tmax)] = median(dd$tmax, na.rm=T)
         
-        tmintmp_spr<-dd[dd$year >= startyear 
+        tmaxtmp_spr<-dd[dd$year >= startyear 
                         & dd$year <= endyear 
                         & dd$month >= 3
                         & dd$month <= 5
-                        & dd$tmin>=1,"tmin"]
+                        & dd$tmax>=1,"tmax"]
         
-        tmintmp_spr<-tmintmp_spr[is.na(tmintmp_spr)==F]
+        tmaxtmp_spr<-tmaxtmp_spr[is.na(tmaxtmp_spr)==F]
         
-        tmintmp_sum<-dd[dd$year >= startyear 
+        tmaxtmp_sum<-dd[dd$year >= startyear 
                         & dd$year <= endyear 
                         & dd$month >= 6
                         & dd$month <= 8
-                        & dd$tmin>=1,"tmin"]
+                        & dd$tmax>=1,"tmax"]
         
-        tmintmp_sum<-tmintmp_sum[is.na(tmintmp_sum)==F]
+        tmaxtmp_sum<-tmaxtmp_sum[is.na(tmaxtmp_sum)==F]
         
-        tmintmp_aut<-dd[dd$year >= startyear 
+        tmaxtmp_aut<-dd[dd$year >= startyear 
                         & dd$year <= endyear 
                         & dd$month >= 9
                         & dd$month <= 11
-                        & dd$tmin>=1,"tmin"]
+                        & dd$tmax>=1,"tmax"]
         
-        tmintmp_aut<-tmintmp_aut[is.na(tmintmp_aut)==F]
+        tmaxtmp_aut<-tmaxtmp_aut[is.na(tmaxtmp_aut)==F]
         
         
-        tmintmp_win<-dd[dd$year >= startyear 
+        tmaxtmp_win<-dd[dd$year >= startyear 
                         & dd$year <= endyear 
                         & (dd$month == 12 | dd$month == 1 | dd$month == 2)
-                        & dd$tmin>=1,"tmin"]
+                        & dd$tmax>=1,"tmax"]
         
-        tmintmp_win<-tmintmp_win[is.na(tmintmp_win)==F]
+        tmaxtmp_win<-tmaxtmp_win[is.na(tmaxtmp_win)==F]
         
         
-        len_spr<-length(tmintmp_spr)
-        len_sum<-length(tmintmp_sum)
-        len_aut<-length(tmintmp_aut)
-        len_win<-length(tmintmp_win)
+        len_spr<-length(tmaxtmp_spr)
+        len_sum<-length(tmaxtmp_sum)
+        len_aut<-length(tmaxtmp_aut)
+        len_win<-length(tmaxtmp_win)
         
         
         ys<-yeare-years+1
@@ -168,19 +168,19 @@ ThrIndS_temp <- function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPU
         target<-as.data.frame(cbind(dp,fd_spr,fd_sum,fd_aut,fd_win))
         
         for (year in years:yeare) {
-            mid_spr<-dd[dd$year==year & dd$month >= 3 & dd$month <= 5,"tmin"]
+            mid_spr<-dd[dd$year==year & dd$month >= 3 & dd$month <= 5,"tmax"]
             mid_spr<-mid_spr[is.na(mid_spr)==F]
             target[target$year==year,"fd_spr"]<-length(mid_spr[mid_spr<=0])
             
-            mid_sum<-dd[dd$year==year & dd$month >= 6 & dd$month <= 8,"tmin"]
+            mid_sum<-dd[dd$year==year & dd$month >= 6 & dd$month <= 8,"tmax"]
             mid_sum<-mid_sum[is.na(mid_sum)==F]
             target[target$year==year,"fd_sum"]<-length(mid_sum[mid_sum<=0])
             
-            mid_aut<-dd[dd$year==year & dd$month >= 9 & dd$month <= 11,"tmin"]
+            mid_aut<-dd[dd$year==year & dd$month >= 9 & dd$month <= 11,"tmax"]
             mid_aut<-mid_aut[is.na(mid_aut)==F]
             target[target$year==year,"fd_aut"]<-length(mid_aut[mid_aut<=0])
             
-            mid_win<-dd[dd$year==year & (dd$month == 12 | dd$month == 1 | dd$month == 2),"tmin"]
+            mid_win<-dd[dd$year==year & (dd$month == 12 | dd$month == 1 | dd$month == 2),"tmax"]
             mid_win<-mid_win[is.na(mid_win)==F]
             target[target$year==year,"fd_win"]<-length(mid_win[mid_win<=0])
         }
