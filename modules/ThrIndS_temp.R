@@ -170,19 +170,19 @@ ThrIndS_temp <- function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPU
         for (year in years:yeare) {
             mid_spr<-dd[dd$year==year & dd$month >= 3 & dd$month <= 5,"tmin"]
             mid_spr<-mid_spr[is.na(mid_spr)==F]
-            target[target$year==year,"fd_spr"]<-length(mid_spr[mid_spr<=0])
+            target[target$year==year,"fd_spr"]<-length(mid_spr[mid_spr<=273.15])
             
             mid_sum<-dd[dd$year==year & dd$month >= 6 & dd$month <= 8,"tmin"]
             mid_sum<-mid_sum[is.na(mid_sum)==F]
-            target[target$year==year,"fd_sum"]<-length(mid_sum[mid_sum<=0])
+            target[target$year==year,"fd_sum"]<-length(mid_sum[mid_sum<=273.15])
             
             mid_aut<-dd[dd$year==year & dd$month >= 9 & dd$month <= 11,"tmin"]
             mid_aut<-mid_aut[is.na(mid_aut)==F]
-            target[target$year==year,"fd_aut"]<-length(mid_aut[mid_aut<=0])
+            target[target$year==year,"fd_aut"]<-length(mid_aut[mid_aut<=273.15])
             
             mid_win<-dd[dd$year==year & (dd$month == 12 | dd$month == 1 | dd$month == 2),"tmin"]
             mid_win<-mid_win[is.na(mid_win)==F]
-            target[target$year==year,"fd_win"]<-length(mid_win[mid_win<=0])
+            target[target$year==year,"fd_win"]<-length(mid_win[mid_win<=273.15])
         }
         
   

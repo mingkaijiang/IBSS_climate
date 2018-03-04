@@ -25,12 +25,10 @@ growDF <- read.csv("data/PlantSeasonality.csv")
 growDF <- growing_season_single_entry(growDF)
 
 ### Obtain SCCS based GHCN stations that are closest to the SCCS point
-stationDF <- select_9_ghcn_stations(corDF, gDF, growDF)
+stationDF <- select_4_ghcn_stations(corDF, gDF, growDF)
 
 ### Obtain GHCN station list to process
-station.list <- c(stationDF$ghcn1, stationDF$ghcn2, stationDF$ghcn3,
-                  stationDF$ghcn4, stationDF$ghcn5, stationDF$ghcn6,
-                  stationDF$ghcn7, stationDF$ghcn8, stationDF$ghcn9)
+station.list <- c(stationDF$ghcn1,stationDF$ghcn2,stationDF$ghcn3,stationDF$ghcn4)
 
 ##############################################################################################################
 #### select on SCCS sites based on their information sheet
@@ -64,11 +62,10 @@ stationDF.upd <- Update_station_list(station.list.upd, stationDF)
 ##                 dim(X) must hvae a postive length: two sites overlapping problem
 ##                lmCoef[j, i]: subscript out of bounds: 
 ##                error in modDF$date
-stationDF2 <- stationDF.upd[-c(23,30,38,53,55,77,80,84,85,       # 0 (non-NA) cases
-                               21,49,96,97,                  # dim(X) must have a positive length
-                               24,51,62,69,70,78),]                          # lmCoef[j, i]: subscript out of bounds
 
-#stationDF2 <- stationDF.upd[-c(1:85,96,97),]
+stationDF2 <- stationDF.upd[-c(8,14,23,34,53,55,59,61,64,
+                               65,76,78,79,82,84,89,90,98),]                          
+
 Gap_Fill(stationDF2, 
          sourceDir = "data/ghcnd_gap_filled", 
          destDir = "data/ghcnd_gap_filled")
@@ -90,7 +87,7 @@ YrRange10(sourceDir = "data/ghcnd_gap_filled")
 ### Step 7:
 ### Update stationDF2 to remove all removed stations from this list 
 ### and add the growing season information
-final_station_DF <-Final_station_list(sourceDir = "data/ghcnd_gap_filled", stationDF.upd)
+final_station_DF <-Final_station_list_4(sourceDir = "data/ghcnd_gap_filled", stationDF.upd)
 
 ##############################################################################################################
 #### Compute indices
