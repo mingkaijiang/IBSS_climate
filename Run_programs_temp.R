@@ -64,7 +64,7 @@ stationDF.upd <- Update_station_list(station.list.upd, stationDF)
 ##                error in modDF$date
 
 stationDF2 <- stationDF.upd[-c(8,14,23,34,53,55,59,61,64,
-                               65,76,78,79,82,84,89,90,98),]                          
+                               65,76,78,79,82,84,89,90,98),]                        
 
 Gap_Fill(stationDF2, 
          sourceDir = "data/ghcnd_gap_filled", 
