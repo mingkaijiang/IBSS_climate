@@ -7,6 +7,7 @@ ThrIndS_temp <- function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPU
     for (thisFile in 1:length(DatFiles)) 
     {
         inName <- file.path(sourceDir, DatFiles[thisFile], fsep = .Platform$file.sep)
+        print("inName = ",inName)
         outName <- file.path(destDir, DatFiles[thisFile], fsep = .Platform$file.sep)
         
         dd <- read.csv(inName)
@@ -166,6 +167,7 @@ ThrIndS_temp <- function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPU
           
           dp[(i-years+1),"tmin_spr"]<-mean(dd[dd$year == i & dd$month >= 3 & dd$month<= 5 & 
                                                   dd$tmin,"tmin"],na.rm=T)/10.0
+          if(inName == "CA001054920.csv" && i-years+1 == 1898) { print("tmin_spr = ",dd$tmin)}
           dp[(i-years+1),"tmin_sum"]<-mean(dd[dd$year == i & dd$month >= 6 & dd$month<= 8 & 
                                                   dd$tmin,"tmin"],na.rm=T)/10.0
           dp[(i-years+1),"tmin_aut"]<-mean(dd[dd$year == i & dd$month >= 9 & dd$month<= 11 & 
