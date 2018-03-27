@@ -1,7 +1,10 @@
 ##############################################################################################################
-ThrIndS_temp <- function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECTORY) 
+#ThrIndS_temp <- function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECTORY) 
+ThrIndS_temp
 {
-    dir.create(destDir, showWarnings = FALSE)
+  sourceDir = "data/ghcnd_gap_filled"
+  destDir = "data/indices/ThrIndS_temp"
+  dir.create(destDir, showWarnings = FALSE)
     DatFiles <- list.files(path = sourceDir, pattern = "\\.csv")
     
     for (thisFile in 1:length(DatFiles)) 
