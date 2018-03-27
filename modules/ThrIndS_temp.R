@@ -157,7 +157,22 @@ ThrIndS_temp <- function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPU
         
         
         ys<-yeare-years+1
-        dp<-matrix(0,ys,21)
+        dp<-matrix(0,ys,5)
+        dimnames(dp)<-list(NULL,c("year","tmin_spr","tmin_sum","tmin_aut","tmin_win"))
+        dp[,"year"]<-years:yeare
+        
+        for(i in years:yeare)
+        {
+          
+          dp[(i-years+1),"tmin_spr"]<-mean(dd[dd$year == i & dd$month >= 3 & dd$month<= 5 & 
+                                                  dd$tmin,"tmin"],na.rm=T)/10.0
+          dp[(i-years+1),"tmin_sum"]<-mean(dd[dd$year == i & dd$month >= 6 & dd$month<= 8 & 
+                                                  dd$tmin,"tmin"],na.rm=T)/10.0
+          dp[(i-years+1),"tmin_aut"]<-mean(dd[dd$year == i & dd$month >= 9 & dd$month<= 11 & 
+                                                  dd$tmin,"tmin"],na.rm=T)/10.0
+          dp[(i-years+1),"tmin_win"]<-mean(dd[dd$year == i & (dd$month == 12 | dd$month== 1 | dd$month==2) & 
+                                                  dd$tmin,"tmin"],na.rm=T)/10.0
+        }
         dp<-as.data.frame(dp)
         
         fd_spr<-rep(0,ys)
@@ -165,7 +180,9 @@ ThrIndS_temp <- function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPU
         fd_aut<-rep(0,ys)
         fd_win<-rep(0,ys)
         
+        
         target<-as.data.frame(cbind(dp,fd_spr,fd_sum,fd_aut,fd_win))
+
         
         for (year in years:yeare) {
             mid_spr<-dd[dd$year==year & dd$month >= 3 & dd$month <= 5,"tmin"]
@@ -182,7 +199,7 @@ ThrIndS_temp <- function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPU
             
             mid_win<-dd[dd$year==year & (dd$month == 12 | dd$month == 1 | dd$month == 2),"tmin"]
             mid_win<-mid_win[is.na(mid_win)==F]
-            target[target$year==year,"fd_win"]<-length(mid_win[mid_win/10.0<=0.0])
+
         }
         
   
