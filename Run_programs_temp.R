@@ -92,14 +92,17 @@ final_station_DF <-Final_station_list_4(sourceDir = "data/ghcnd_gap_filled", sta
 
 ### Step 1: 
 ### Calculate threshold based index fd at seasonal timestep
-#ThrIndS_temp(sourceDir = "data/ghcnd_gap_filled", destDir = "data/indices/ThrIndS_temp")
-ThrIndS_temp
+ThrIndS_temp(sourceDir = "data/ghcnd_gap_filled", destDir = "data/indices/ThrIndS_temp")
+
 
 ##############################################################################################################
 #### Calculate whole year range predictability
 
 ##Calculate fd predictability
 fd_pred(sourceDir = "data/indices/ThrIndS_temp", destDir = "data/predictability")
+
+##Calculate tmin predictability
+tmin_pred(sourceDir = "data/indices/ThrIndS_temp", destDir = "data/predictability")
 
 ##############################################################################################################
 ### End
