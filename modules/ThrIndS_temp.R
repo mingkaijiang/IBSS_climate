@@ -9,11 +9,12 @@ ThrIndS_temp <- function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPU
     
     options(max.print=1000000)
     
-  # dd <- read.csv("data/ghcnd_gap_filled/CA001054920.csv")
-  # str(dd)
-  #  colnames(dd)<-c("id","year","month","day","tmin")
-  # print(dd$tmin[dd$year == 1898])
-  #  print(dd$tmin[dd$year == 1898 & dd$month >= 3 & dd$month<= 5])
+   # dd <- read.csv("data/ghcnd_gap_filled/CA001054920.csv")
+   # str(dd)
+   # colnames(dd)<-c("id","year","month","day","tmin")
+   # print(dd$tmin[dd$year == 1898])
+   # print(dd$tmin[dd$year == 1898 & dd$month >= 3 & dd$month<= 5])
+   # print(dd$tmin[dd$year == 1898 & dd$month >= 9 & dd$month<= 11])
     
     for (thisFile in 1:length(DatFiles)) 
     {
@@ -178,7 +179,7 @@ ThrIndS_temp <- function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPU
           
           dp[(i-years+1),"tmin_spr"]<-mean(dd$tmin[dd$year == i & dd$month >= 3 & dd$month<= 5],na.rm=T)/10.0
          
-          if(inName == "data/ghcnd_gap_filled/CA001054920.csv" && i == 1898) { print(dd$tmin[dd$year == i & dd$month >= 3 & dd$month<= 5],na.rm=T)}
+          if(inName == "data/ghcnd_gap_filled/CA001054920.csv" && i == 1898) { print(dd$tmin[dd$year == i & dd$month >= 9 & dd$month<= 11],na.rm=T)}
           dp[(i-years+1),"tmin_sum"]<-mean(dd$tmin[dd$year == i & dd$month >= 6 & dd$month<= 8],na.rm=T)/10.0
           dp[(i-years+1),"tmin_aut"]<-mean(dd$tmin[dd$year == i & dd$month >= 9 & dd$month<= 11],na.rm=T)/10.0
           dp[(i-years+1),"tmin_win"]<-mean(dd$tmin[dd$year == i & (dd$month == 12 | dd$month== 1 | dd$month==2)],na.rm=T)/10.0
@@ -209,6 +210,7 @@ ThrIndS_temp <- function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPU
             
             mid_win<-dd[dd$year==year & (dd$month == 12 | dd$month == 1 | dd$month == 2),"tmin"]
             mid_win<-mid_win[is.na(mid_win)==F]
+            target[target$year==year,"fd_win"]<-length(mid_win[mid_win/10.0<=0.0])
 
         }
         
