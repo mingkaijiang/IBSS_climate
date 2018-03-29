@@ -3,7 +3,7 @@ ThrIndS_tmax <- function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPU
 
 {
   sourceDir = "data/ghcnd_gap_filled"
-  destDir = "data/indices/ThrIndS_temp"
+  destDir = "data/indices/ThrIndS_tmax"
   dir.create(destDir, showWarnings = FALSE)
   DatFiles <- list.files(path = sourceDir, pattern = "\\.csv")
     
