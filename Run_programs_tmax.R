@@ -51,7 +51,7 @@ station.list.upd <- Missing_check(station.list,
                                   destDir = "data/ghcnd_tmax_gap_filled_tmax")
 
 ## update stationDF
-stationDF.upd <- Update_station_list(station.list.upd, stationDF)
+stationDF.upd <- Update_station_list_4_stations(station.list.upd, stationDF)
 
 ### Step 4: 
 ### Gap filling 1. - use statistical correlation among 9 stations to gap fill all 9 stations
