@@ -13,13 +13,13 @@ rm(list=ls())
 source("R/prepare_R.R")
 
 ### Get SCCS coordinates and Station ID Files
-corDF <- read.csv("data/weight_dis_ht.csv")
+corDF <- read.csv("input/weight_dis_ht.csv")
 
 ### Get GHCN station list
-gDF <- read.csv("data/ghcnd-stations.csv")
+gDF <- read.csv("input/ghcnd-stations.csv")
 
 ### Get growing season information
-growDF <- read.csv("data/PlantSeasonality.csv")
+growDF <- read.csv("input/PlantSeasonality.csv")
 
 ### Process growing season data to have single entry for each SCCS society
 growDF <- growing_season_single_entry(growDF)
@@ -64,7 +64,7 @@ stationDF.upd <- Update_station_list(station.list.upd, stationDF)
 ##                 dim(X) must hvae a postive length: two sites overlapping problem
 ##                lmCoef[j, i]: subscript out of bounds: 
 ##                error in modDF$date
-stationDF2 <- stationDF.upd[-c(23,30,38,53,55,77,80,84,85,       # 0 (non-NA) cases
+stationDF2 <- stationDF.upd[-c(23,25,30,38,53,55,77,80,84,85,       # 0 (non-NA) cases
                                21,49,96,97,                  # dim(X) must have a positive length
                                24,51,62,69,70,78),]                          # lmCoef[j, i]: subscript out of bounds
 
