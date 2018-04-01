@@ -56,5 +56,7 @@ vignettes/*.pdf
 /data/Indices/CDS_hunter_gatherer/*.csv
 /data/Indices/ThrIndS_temp/*.csv
 
+/data/*.csv
+
 # R project
 *.Rproj

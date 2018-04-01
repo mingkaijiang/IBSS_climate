@@ -1,8 +1,20 @@
 ##############################################################################################################
 ThrIndS_temp <- function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECTORY) 
+
 {
-    dir.create(destDir, showWarnings = FALSE)
-    DatFiles <- list.files(path = sourceDir, pattern = "\\.csv")
+  sourceDir = "data/ghcnd_gap_filled"
+  destDir = "data/indices/ThrIndS_temp"
+  dir.create(destDir, showWarnings = FALSE)
+  DatFiles <- list.files(path = sourceDir, pattern = "\\.csv")
+    
+    options(max.print=1000000)
+    
+   # dd <- read.csv("data/ghcnd_gap_filled/CA001054920.csv")
+   # str(dd)
+   # colnames(dd)<-c("id","year","month","day","tmin")
+   # print(dd$tmin[dd$year == 1898])
+   # print(dd$tmin[dd$year == 1898 & dd$month >= 3 & dd$month<= 5])
+   # print(dd$tmin[dd$year == 1898 & dd$month >= 9 & dd$month<= 11])
     
     for (thisFile in 1:length(DatFiles)) 
     {
@@ -120,32 +132,32 @@ ThrIndS_temp <- function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPU
         tmintmp_spr<-dd[dd$year >= startyear 
                         & dd$year <= endyear 
                         & dd$month >= 3
-                        & dd$month <= 5
-                        & dd$tmin>=1,"tmin"]
+                        & dd$month <= 5, "tmin"]
+#                        & dd$tmin>=1,"tmin"]
         
         tmintmp_spr<-tmintmp_spr[is.na(tmintmp_spr)==F]
         
         tmintmp_sum<-dd[dd$year >= startyear 
                         & dd$year <= endyear 
                         & dd$month >= 6
-                        & dd$month <= 8
-                        & dd$tmin>=1,"tmin"]
+                        & dd$month <= 8, "tmin" ]
+#                        & dd$tmin>=1,"tmin"]
         
         tmintmp_sum<-tmintmp_sum[is.na(tmintmp_sum)==F]
         
         tmintmp_aut<-dd[dd$year >= startyear 
                         & dd$year <= endyear 
                         & dd$month >= 9
-                        & dd$month <= 11
-                        & dd$tmin>=1,"tmin"]
+                        & dd$month <= 11, "tmin" ]
+#                        & dd$tmin>=1,"tmin"]
         
         tmintmp_aut<-tmintmp_aut[is.na(tmintmp_aut)==F]
         
         
         tmintmp_win<-dd[dd$year >= startyear 
                         & dd$year <= endyear 
-                        & (dd$month == 12 | dd$month == 1 | dd$month == 2)
-                        & dd$tmin>=1,"tmin"]
+                        & (dd$month == 12 | dd$month == 1 | dd$month == 2), "tmin" ]
+#                        & dd$tmin>=1,"tmin"]
         
         tmintmp_win<-tmintmp_win[is.na(tmintmp_win)==F]
         
@@ -157,7 +169,21 @@ ThrIndS_temp <- function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPU
         
         
         ys<-yeare-years+1
-        dp<-matrix(0,ys,21)
+        dp<-matrix(0,ys,5)
+        dimnames(dp)<-list(NULL,c("year","tmin_spr","tmin_sum","tmin_aut","tmin_win"))
+        dp[,"year"]<-years:yeare
+        
+        
+        for(i in years:yeare)
+        {
+          
+          dp[(i-years+1),"tmin_spr"]<-mean(dd$tmin[dd$year == i & dd$month >= 3 & dd$month<= 5],na.rm=T)/10.0
+         
+          if(inName == "data/ghcnd_gap_filled/CA001054920.csv" && i == 1898) { print(dd$tmin[dd$year == i & dd$month >= 9 & dd$month<= 11],na.rm=T)}
+          dp[(i-years+1),"tmin_sum"]<-mean(dd$tmin[dd$year == i & dd$month >= 6 & dd$month<= 8],na.rm=T)/10.0
+          dp[(i-years+1),"tmin_aut"]<-mean(dd$tmin[dd$year == i & dd$month >= 9 & dd$month<= 11],na.rm=T)/10.0
+          dp[(i-years+1),"tmin_win"]<-mean(dd$tmin[dd$year == i & (dd$month == 12 | dd$month== 1 | dd$month==2)],na.rm=T)/10.0
+        }
         dp<-as.data.frame(dp)
         
         fd_spr<-rep(0,ys)
@@ -165,24 +191,27 @@ ThrIndS_temp <- function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPU
         fd_aut<-rep(0,ys)
         fd_win<-rep(0,ys)
         
+        
         target<-as.data.frame(cbind(dp,fd_spr,fd_sum,fd_aut,fd_win))
+
         
         for (year in years:yeare) {
             mid_spr<-dd[dd$year==year & dd$month >= 3 & dd$month <= 5,"tmin"]
             mid_spr<-mid_spr[is.na(mid_spr)==F]
-            target[target$year==year,"fd_spr"]<-length(mid_spr[mid_spr<=273.15])
+            target[target$year==year,"fd_spr"]<-length(mid_spr[mid_spr/10.0<=0.0])
             
             mid_sum<-dd[dd$year==year & dd$month >= 6 & dd$month <= 8,"tmin"]
             mid_sum<-mid_sum[is.na(mid_sum)==F]
-            target[target$year==year,"fd_sum"]<-length(mid_sum[mid_sum<=273.15])
+            target[target$year==year,"fd_sum"]<-length(mid_sum[mid_sum/10.0<=0.0])
             
             mid_aut<-dd[dd$year==year & dd$month >= 9 & dd$month <= 11,"tmin"]
             mid_aut<-mid_aut[is.na(mid_aut)==F]
-            target[target$year==year,"fd_aut"]<-length(mid_aut[mid_aut<=273.15])
+            target[target$year==year,"fd_aut"]<-length(mid_aut[mid_aut/10.0<=0.0])
             
             mid_win<-dd[dd$year==year & (dd$month == 12 | dd$month == 1 | dd$month == 2),"tmin"]
             mid_win<-mid_win[is.na(mid_win)==F]
-            target[target$year==year,"fd_win"]<-length(mid_win[mid_win<=273.15])
+            target[target$year==year,"fd_win"]<-length(mid_win[mid_win/10.0<=0.0])
+
         }
         
   
