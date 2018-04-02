@@ -46,7 +46,7 @@ vignettes/*.pdf
 /data/Indices/rx5s/*.csv
 /data/Indices/ThrIndS/*.csv
 /data/Indices/SDIIS/*.csv
-/data/predictability/*.csv
+/data/predictability/*.csvx
 /data/ghcnd_gap_filled/*.csv
 /data/ghcnd_selected_copy/*.csv
 /data/ghcnd_gap_filled_2/*.csv
@@ -56,7 +56,7 @@ vignettes/*.pdf
 /data/Indices/CDS_hunter_gatherer/*.csv
 /data/Indices/ThrIndS_temp/*.csv
 
-/data/*.csv
+/data/**/*.csv
 
 # R project
 *.Rproj

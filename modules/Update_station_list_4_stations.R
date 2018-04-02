@@ -1,5 +1,5 @@
 ##############################################################################################################
-Update_station_list <- function(station.list.input, sDF) {
+Update_station_list_4_stations <- function(station.list.input, sDF) {
     t1 <- matrix(ncol=4, nrow=nrow(sDF), station.list.input[,2])
     t1 <- as.data.frame(t1,stringsAsFactors=F)
     colnames(t1) <- c("s1", "s2", "s3", "s4")

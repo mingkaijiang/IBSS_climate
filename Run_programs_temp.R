@@ -61,8 +61,8 @@ stationDF.upd <- Update_station_list_4_stations(station.list.upd, stationDF)
 ## problem sites: 0 (non-NA) cases: non-missing data do not overlap across all sites
 ##                 dim(X) must hvae a postive length: two sites overlapping problem
 
-stationDF2 <- stationDF.upd[-c(14,22,23,34,53,55,59,64,66,
-                               76,78,79,82,84,91,104),]
+stationDF2 <- stationDF.upd[-c(8,14,22,23,34,53,55,58,59,61,64,65,66,
+                               76,78,79,82,84,89,90,91,104),]
 
 Gap_Fill(stationDF2, 
          sourceDir = "data/ghcnd_gap_filled_tmin", 
