@@ -64,11 +64,10 @@ stationDF.upd <- Update_station_list(station.list.upd, stationDF)
 ##                 dim(X) must hvae a postive length: two sites overlapping problem
 ##                lmCoef[j, i]: subscript out of bounds: 
 ##                error in modDF$date
-stationDF2 <- stationDF.upd[-c(23,25,30,38,53,55,65,77,80,84,85,129,       # 0 (non-NA) cases
-                               21,49,96,97,                  # dim(X) must have a positive length
+stationDF2 <- stationDF.upd[-c(23,25,30,38,53,55,65,77,80,84,85,      # 0 (non-NA) cases
+                               21,49,50,52,96,97,                       # dim(X) must have a positive length
                                24,51,62,69,70,78),]                          # lmCoef[j, i]: subscript out of bounds
-statiionDF2 <- stationDF.upd[-c(1:129)]
-#stationDF2 <- stationDF.upd[-c(1:85,96,97),]
+
 Gap_Fill(stationDF2, 
          sourceDir = "data/ghcnd_gap_filled", 
          destDir = "data/ghcnd_gap_filled")
