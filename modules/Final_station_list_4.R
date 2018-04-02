@@ -1,7 +1,7 @@
 ##############################################################################################################
 ## Update the station DF with by incorporating all data processing steps
 ## i.e. removing stations from the original list
-Final_station_list_4<-function(sourceDir = DAILY.DATA.DIRECTORY, sDF)
+Final_station_list_4<-function(sourceDir = DAILY.DATA.DIRECTORY, sDF, outname)
 {
     DatFiles <- list.files(path = sourceDir, pattern = "\\.csv")
     
