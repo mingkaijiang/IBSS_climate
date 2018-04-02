@@ -1,7 +1,8 @@
 ##############################################################################################################
 ## Update the station DF with by incorporating all data processing steps
 ## i.e. removing stations from the original list
-Final_station_list<-function(sourceDir = DAILY.DATA.DIRECTORY, sDF)
+Final_station_list<-function(sourceDir = DAILY.DATA.DIRECTORY, sDF,
+                             outname)
 {
     DatFiles <- list.files(path = sourceDir, pattern = "\\.csv")
     
@@ -107,7 +108,7 @@ Final_station_list<-function(sourceDir = DAILY.DATA.DIRECTORY, sDF)
     
     outDF <- Update_station_list(st.df, sDF)
     
-    write.csv(outDF, "data/sccs_ghcn_station_list_final.csv")
+    write.csv(outDF, paste0("data/sccs_ghcn_station_list_final_", outname, ".csv"))
     
     return(outDF)
 }

@@ -85,7 +85,8 @@ YrRange10(sourceDir = "data/ghcnd_tmax_gap_filled_tmax")
 ### Step 7:
 ### Update stationDF2 to remove all removed stations from this list 
 ### and add the growing season information
-final_station_DF <-Final_station_list_4(sourceDir = "data/ghcnd_tmax_gap_filled_tmax", stationDF.upd)
+final_station_DF <-Final_station_list_4(sourceDir = "data/ghcnd_tmax_gap_filled_tmax", stationDF.upd,
+                                        outname="tmax")
 
 ##############################################################################################################
 #### Compute indices
