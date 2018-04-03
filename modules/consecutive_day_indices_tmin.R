@@ -1,6 +1,6 @@
 ##############################################################################################################
 ## Compute consecutive dry and wet days based on growing season information
-consecutive_day_indices<-function(sDF,
+consecutive_day_indices_tmin<-function(sDF,
                                   sourceDir = DAILY.DATA.DIRECTORY, 
                                   destDir = DAILY.OUTPUT.DIRECTORY) {
     ## This function calcualtes consecutive day and wet days indices for each GHCN station
@@ -85,7 +85,7 @@ consecutive_day_indices<-function(sDF,
             
             # compute consecutive days indices
             ifelse(ghcn.l == 0, print(paste0("No GHCN station for SCCS ", i)), 
-                   compute_consecutive_indices_1(s.doy, e.doy, ghcn.list, i, sourceDir, destDir))
+                   compute_consecutive_indices_1_tmin(s.doy, e.doy, ghcn.list, i, sourceDir, destDir))
             
         } else if (is.na(sDF[sDF$sccs_id == i, "plant3_start"])) {
             print(paste0("Two growing seasons for sccs id", i))
@@ -107,7 +107,7 @@ consecutive_day_indices<-function(sDF,
             
             # compute consecutive days indices
             ifelse(ghcn.l == 0, print(paste0("No GHCN station for SCCS ", i)), 
-                   compute_consecutive_indices_2(s1.doy, e1.doy, s2.doy, e2.doy,
+                   compute_consecutive_indices_2_tmin(s1.doy, e1.doy, s2.doy, e2.doy,
                                                  ghcn.list, i, sourceDir, destDir))
             
         } else if (is.na(sDF[sDF$sccs_id == i, "plant4_start"])) {
@@ -133,7 +133,7 @@ consecutive_day_indices<-function(sDF,
 
             # compute consecutive days indices
             ifelse(ghcn.l == 0, print(paste0("No GHCN station for SCCS ", i)), 
-                   compute_consecutive_indices_3(s1.doy, e1.doy, s2.doy, e2.doy, s3.doy, e3.doy,
+                   compute_consecutive_indices_3_tmin(s1.doy, e1.doy, s2.doy, e2.doy, s3.doy, e3.doy,
                                                  ghcn.list, i, sourceDir, destDir))
         } else {
             print(paste0("Four growing seasons for sccs id", i))
@@ -159,7 +159,7 @@ consecutive_day_indices<-function(sDF,
             
             # compute consecutive days indices
             ifelse(ghcn.l == 0, print(paste0("No GHCN station for SCCS ", i)), 
-                   compute_consecutive_indices_4(s1.doy, e1.doy, s2.doy, e2.doy, 
+                   compute_consecutive_indices_4_tmin(s1.doy, e1.doy, s2.doy, e2.doy, 
                                                  s3.doy, e3.doy, s4.doy, e4.doy,
                                                  ghcn.list, i, sourceDir, destDir))
         }
