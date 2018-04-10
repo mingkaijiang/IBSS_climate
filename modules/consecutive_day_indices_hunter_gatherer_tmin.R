@@ -15,8 +15,14 @@ consecutive_day_indices_hunter_gatherer_tmin<-function(sDF,
     ## In addition, there are multiple crops for each SCCS site
     ## So the final naming criteria follows: GHCN station ID _ SCCS ID _ Plant 1/2/3/4
     ## For hunter and gatherer societies only
-    
+  
     # prepare file list
+  
+    sourceDir = "data/ghcnd_gap_filled_tmin"
+    
+    destDir = "data/indices/CSDI_hunter_gatherer"
+   
+   
     dir.create(destDir, showWarnings = FALSE)
 
     # get sccs id information

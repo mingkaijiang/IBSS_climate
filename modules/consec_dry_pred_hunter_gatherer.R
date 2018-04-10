@@ -2,6 +2,10 @@
 ##Calculate consecutive dry days predictability based on whole temporal range
 consec_dry_pred_hunter_gatherer<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECTORY)
 {
+  
+    sourceDir = "data/indices/CSDI_hunter_gatherer"
+    destDir = "data/predictability"
+    
     dir.create(destDir, showWarnings = FALSE)
     DatFiles <- list.files(path = sourceDir, pattern = "\\.csv")
     
@@ -27,14 +31,14 @@ consec_dry_pred_hunter_gatherer<-function(sourceDir = DAILY.DATA.DIRECTORY, dest
         yearr <- yeare-years
         
         # site specific data range
-        v.range <- c(X$dry_DJF, X$dry_MAM, 
+        v.range <- c(X$dry_djf, X$dry_MAM, 
                      X$dry_JJA, X$dry_SON)
         
         test <- max(v.range) - min(v.range)
         
         sep.value <- ifelse(test <= 0.01, 0.001, 
                             ifelse(test > 0.01 & test <= 0.1, 0.01,
-                                   ifelse(test > 0.1 & test <= 1, 0.1)))
+                                   ifelse(test > 0.1 & test <= 1, 0.1,1.0)))
         
         max_top <- round_any(max(v.range), sep.value, f = ceiling)
         min_bot <- round_any(min(v.range), sep.value, f = floor)
@@ -43,7 +47,7 @@ consec_dry_pred_hunter_gatherer<-function(sourceDir = DAILY.DATA.DIRECTORY, dest
         
         if(diff > 0) {
             bin <- matrix(0, ncol=6, nrow=interval)
-            dimnames(bin) <- list(NULL,c("bin_size","DJF","MAM","JJA","SON","whole"))
+            dimnames(bin) <- list(NULL,c("bin_size","djf","mam","jja","son","whole"))
             
             bin[,"bin_size"] <- c(min_bot+0.1*diff,min_bot+0.2*diff,min_bot+0.3*diff,min_bot+0.4*diff,
                                   min_bot+0.5*diff,min_bot+0.6*diff,min_bot+0.7*diff,min_bot+0.8*diff,
@@ -53,7 +57,7 @@ consec_dry_pred_hunter_gatherer<-function(sourceDir = DAILY.DATA.DIRECTORY, dest
                        min_bot+0.5*diff,min_bot+0.6*diff,min_bot+0.7*diff,min_bot+0.8*diff,
                        min_bot+0.9*diff,max_top)
             
-            djf_cut = cut(X[, "dry_DJF"], breaks, include.lowest=TRUE,right=TRUE)
+            djf_cut = cut(X[, "dry_djf"], breaks, include.lowest=TRUE,right=TRUE)
             mam_cut = cut(X[, "dry_MAM"], breaks, include.lowest=TRUE,right=TRUE)
             jja_cut = cut(X[, "dry_JJA"], breaks, include.lowest=TRUE,right=TRUE)
             son_cut = cut(X[, "dry_SON"], breaks, include.lowest=TRUE,right=TRUE)
@@ -63,14 +67,14 @@ consec_dry_pred_hunter_gatherer<-function(sourceDir = DAILY.DATA.DIRECTORY, dest
             jja_freq = table(jja_cut)
             son_freq = table(son_cut)
             
-            bin[,"DJF"] <- djf_freq
+            bin[,"djf"] <- djf_freq
             bin[,"MAM"] <- mam_freq
             bin[,"JJA"] <- jja_freq
             bin[,"SON"] <- son_freq
             
-            bin[,"whole"] = (bin[,"DJF"]+bin[,"MAM"]+bin[,"JJA"]+bin[,"SON"])
+            bin[,"whole"] = (bin[,"djf"]+bin[,"MAM"]+bin[,"JJA"]+bin[,"SON"])
             
-            col_sum <- sum(table(X[, "dry_DJF"]))
+            col_sum <- sum(table(X[, "dry_djf"]))
             whole_sum <- col_sum*4
             
             #uncertainty with respect to time H(X)
@@ -150,6 +154,6 @@ consec_dry_pred_hunter_gatherer<-function(sourceDir = DAILY.DATA.DIRECTORY, dest
             output[j,"P_freedom"] <- P_free
         }
     }
-    write.csv(output,paste0(destDir, "/Consec_dry_PCM_hunter_gatherer.csv"),row.names=F)
+    write.csv(output,paste0(destDir, "/Consec_csdi_PCM_hunter_gatherer.csv"),row.names=F)
     
 }

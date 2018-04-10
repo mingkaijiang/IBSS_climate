@@ -34,7 +34,7 @@ compute_consecutive_indices_3_tmin <- function(s1.date, e1.date, s2.date, e2.dat
         
         # read in file and prepare the df
         dd <- read.csv(inName)
-        colnames(dd)<-c("id","year","month","day","prcp")
+        colnames(dd)<-c("id","year","month","day","tmin")
         dd$doy <- yday(dd$id)
 
         # check if the location is in southern hemisphere
@@ -42,10 +42,8 @@ compute_consecutive_indices_3_tmin <- function(s1.date, e1.date, s2.date, e2.dat
             # growing season starts before the ending date within a year
             
             # prepare output df
-            outDF <- data.frame(unique(dd$year), NA, NA, NA, 
-                                NA, NA, NA)
-            colnames(outDF) <- c("year", "cold_before", "cold_growing", "cold_after",
-                                 "wet_before", "wet_growing", "wet_after")
+            outDF <- data.frame(unique(dd$year), NA, NA, NA)
+            colnames(outDF) <- c("year", "cold_before", "cold_growing", "cold_after")
             
             # growing period
             g.period <- e1.date - s1.date + 1
@@ -59,28 +57,27 @@ compute_consecutive_indices_3_tmin <- function(s1.date, e1.date, s2.date, e2.dat
                 during_g <- subset(dd[dd$year == j,], doy >= s1.date & doy <= e1.date)
                 after_g <- subset(dd[dd$year == j,],  doy > e1.date)
                 
-                tmin10before<-percentile(length(before_g$tmin),before_g$tmin,0.1)
-                tmin10during<-percentile(length(during_g$tmin),during_g$tmin,0.1)
-                tmin10after<-percentile(length(after_g$tmin),after_g$tmin,0.1)
+                tmin10before<-percentile(length(before_g$tmin),before_g$tmin,0.1)/10.0
+                tmin10during<-percentile(length(during_g$tmin),during_g$tmin,0.1)/10.0
+                tmin10after<-percentile(length(after_g$tmin),after_g$tmin,0.1)/10.0
+                
                 
                 # consecutive cold days in the three periods
-                cold_before <- rle(before_g$tmin - tmin10before)
-                cold_during <- rle(during_g$tmin - tmin10during)
-                cold_after <- rle(after_g$tmin - tmin10after)
+                cold_before <- rle(ifelse((before_g$tmin/10.0 - tmin10before) < 0.0, 0, 1))
+                cold_during <- rle(ifelse((during_g$tmin/10.0 - tmin10during) < 0.0, 0, 1))
+                cold_after <- rle(ifelse((after_g$tmin/10.0 - tmin10after) < 0.0, 0, 1))
                 
-                outDF[outDF$year == j, "cold_before"] <- max(cold_before$lengths[cold_before$values<0]) / b.period
-                outDF[outDF$year == j, "cold_growing"] <- max(cold_during$lengths[cold_during$values<0]) / g.period
-                outDF[outDF$year == j, "cold_after"] <- max(cold_after$lengths[cold_after$values<0]) / a.period
+                outDF[outDF$year == j, "cold_before"] <- max(cold_before$lengths[cold_before$values==0])
+                outDF[outDF$year == j, "cold_growing"] <- max(cold_during$lengths[cold_during$values==0])
+                outDF[outDF$year == j, "cold_after"] <- max(cold_after$lengths[cold_after$values==0])
                 
             }
         } else {
             # southern hemisphere, need to take one year out (1st year)
             
             # prepare output df
-            outDF <- data.frame(unique(dd$year), NA, NA, NA, 
-                                NA, NA, NA)
-            colnames(outDF) <- c("year", "cold_before", "cold_growing", "cold_after",
-                                 "wet_before", "wet_growing", "wet_after")
+            outDF <- data.frame(unique(dd$year), NA, NA, NA)
+            colnames(outDF) <- c("year", "cold_before", "cold_growing", "cold_after")
             
             outDF <- outDF[-1,]
             
@@ -98,18 +95,19 @@ compute_consecutive_indices_3_tmin <- function(s1.date, e1.date, s2.date, e2.dat
                 during_g <- rbind(d1, d2)
                 after_g <- subset(dd[dd$year == j,],  doy > e1.date & doy < 181)
                 
-                tmin10before<-percentile(length(before_g$tmin),before_g$tmin,0.1)
-                tmin10during<-percentile(length(during_g$tmin),during_g$tmin,0.1)
-                tmin10after<-percentile(length(after_g$tmin),after_g$tmin,0.1)
+                tmin10before<-percentile(length(before_g$tmin),before_g$tmin,0.1)/10.0
+                tmin10during<-percentile(length(during_g$tmin),during_g$tmin,0.1)/10.0
+                tmin10after<-percentile(length(after_g$tmin),after_g$tmin,0.1)/10.0
+                
                 
                 # consecutive cold days in the three periods
-                cold_before <- rle(before_g$tmin - tmin10before)
-                cold_during <- rle(during_g$tmin - tmin10during)
-                cold_after <- rle(after_g$tmin - tmin10after)
+                cold_before <- rle(ifelse((before_g$tmin/10.0 - tmin10before) < 0.0, 0, 1))
+                cold_during <- rle(ifelse((during_g$tmin/10.0 - tmin10during) < 0.0, 0, 1))
+                cold_after <- rle(ifelse((after_g$tmin/10.0 - tmin10after) < 0.0, 0, 1))
                 
-                outDF[outDF$year == j, "cold_before"] <- max(cold_before$lengths[cold_before$values<0]) / b.period
-                outDF[outDF$year == j, "cold_growing"] <- max(cold_during$lengths[cold_during$values<0]) / g.period
-                outDF[outDF$year == j, "cold_after"] <- max(cold_after$lengths[cold_after$values<0]) / a.period
+                outDF[outDF$year == j, "cold_before"] <- max(cold_before$lengths[cold_before$values==0])
+                outDF[outDF$year == j, "cold_growing"] <- max(cold_during$lengths[cold_during$values==0])
+                outDF[outDF$year == j, "cold_after"] <- max(cold_after$lengths[cold_after$values==0])
                 
             }
         }
@@ -126,10 +124,8 @@ compute_consecutive_indices_3_tmin <- function(s1.date, e1.date, s2.date, e2.dat
             # growing season starts before the ending date within a year
             
             # prepare output df
-            outDF <- data.frame(unique(dd$year), NA, NA, NA, 
-                                NA, NA, NA)
-            colnames(outDF) <- c("year", "cold_before", "cold_growing", "cold_after",
-                                 "wet_before", "wet_growing", "wet_after")
+            outDF <- data.frame(unique(dd$year), NA, NA, NA)
+            colnames(outDF) <- c("year", "cold_before", "cold_growing", "cold_after")
             
             # growing period
             g.period <- e2.date - s2.date + 1
@@ -143,27 +139,26 @@ compute_consecutive_indices_3_tmin <- function(s1.date, e1.date, s2.date, e2.dat
                 during_g <- subset(dd[dd$year == j,], doy >= s2.date & doy <= e2.date)
                 after_g <- subset(dd[dd$year == j,],  doy > e2.date)
                 
-                tmin10before<-percentile(length(before_g$tmin),before_g$tmin,0.1)
-                tmin10during<-percentile(length(during_g$tmin),during_g$tmin,0.1)
-                tmin10after<-percentile(length(after_g$tmin),after_g$tmin,0.1)
+                tmin10before<-percentile(length(before_g$tmin),before_g$tmin,0.1)/10.0
+                tmin10during<-percentile(length(during_g$tmin),during_g$tmin,0.1)/10.0
+                tmin10after<-percentile(length(after_g$tmin),after_g$tmin,0.1)/10.0
+                
                 
                 # consecutive cold days in the three periods
-                cold_before <- rle(before_g$tmin - tmin10before)
-                cold_during <- rle(during_g$tmin - tmin10during)
-                cold_after <- rle(after_g$tmin - tmin10after)
+                cold_before <- rle(ifelse((before_g$tmin/10.0 - tmin10before) < 0.0, 0, 1))
+                cold_during <- rle(ifelse((during_g$tmin/10.0 - tmin10during) < 0.0, 0, 1))
+                cold_after <- rle(ifelse((after_g$tmin/10.0 - tmin10after) < 0.0, 0, 1))
                 
-                outDF[outDF$year == j, "cold_before"] <- max(cold_before$lengths[cold_before$values<0]) / b.period
-                outDF[outDF$year == j, "cold_growing"] <- max(cold_during$lengths[cold_during$values<0]) / g.period
-                outDF[outDF$year == j, "cold_after"] <- max(cold_after$lengths[cold_after$values<0]) / a.period
+                outDF[outDF$year == j, "cold_before"] <- max(cold_before$lengths[cold_before$values==0])
+                outDF[outDF$year == j, "cold_growing"] <- max(cold_during$lengths[cold_during$values==0])
+                outDF[outDF$year == j, "cold_after"] <- max(cold_after$lengths[cold_after$values==0])
             }
         } else {
             # southern hemisphere, need to take one year out (1st year)
             
             # prepare output df
-            outDF <- data.frame(unique(dd$year), NA, NA, NA, 
-                                NA, NA, NA)
-            colnames(outDF) <- c("year", "cold_before", "cold_growing", "cold_after",
-                                 "wet_before", "wet_growing", "wet_after")
+            outDF <- data.frame(unique(dd$year), NA, NA, NA)
+            colnames(outDF) <- c("year", "cold_before", "cold_growing", "cold_after")
             
             outDF <- outDF[-1,]
             
@@ -181,18 +176,19 @@ compute_consecutive_indices_3_tmin <- function(s1.date, e1.date, s2.date, e2.dat
                 during_g <- rbind(d1, d2)
                 after_g <- subset(dd[dd$year == j,],  doy > e2.date & doy < 181)
                 
-                tmin10before<-percentile(length(before_g$tmin),before_g$tmin,0.1)
-                tmin10during<-percentile(length(during_g$tmin),during_g$tmin,0.1)
-                tmin10after<-percentile(length(after_g$tmin),after_g$tmin,0.1)
+                tmin10before<-percentile(length(before_g$tmin),before_g$tmin,0.1)/10.0
+                tmin10during<-percentile(length(during_g$tmin),during_g$tmin,0.1)/10.0
+                tmin10after<-percentile(length(after_g$tmin),after_g$tmin,0.1)/10.0
+                
                 
                 # consecutive cold days in the three periods
-                cold_before <- rle(before_g$tmin - tmin10before)
-                cold_during <- rle(during_g$tmin - tmin10during)
-                cold_after <- rle(after_g$tmin - tmin10after)
+                cold_before <- rle(ifelse((before_g$tmin/10.0 - tmin10before) < 0.0, 0, 1))
+                cold_during <- rle(ifelse((during_g$tmin/10.0 - tmin10during) < 0.0, 0, 1))
+                cold_after <- rle(ifelse((after_g$tmin/10.0 - tmin10after) < 0.0, 0, 1))
                 
-                outDF[outDF$year == j, "cold_before"] <- max(cold_before$lengths[cold_before$values<0]) / b.period
-                outDF[outDF$year == j, "cold_growing"] <- max(cold_during$lengths[cold_during$values<0]) / g.period
-                outDF[outDF$year == j, "cold_after"] <- max(cold_after$lengths[cold_after$values<0]) / a.period
+                outDF[outDF$year == j, "cold_before"] <- max(cold_before$lengths[cold_before$values==0])
+                outDF[outDF$year == j, "cold_growing"] <- max(cold_during$lengths[cold_during$values==0])
+                outDF[outDF$year == j, "cold_after"] <- max(cold_after$lengths[cold_after$values==0])
                 
             }
         }
@@ -209,10 +205,8 @@ compute_consecutive_indices_3_tmin <- function(s1.date, e1.date, s2.date, e2.dat
             # growing season starts before the ending date within a year
             
             # prepare output df
-            outDF <- data.frame(unique(dd$year), NA, NA, NA, 
-                                NA, NA, NA)
-            colnames(outDF) <- c("year", "cold_before", "cold_growing", "cold_after",
-                                 "wet_before", "wet_growing", "wet_after")
+            outDF <- data.frame(unique(dd$year), NA, NA, NA)
+            colnames(outDF) <- c("year", "cold_before", "cold_growing", "cold_after")
             
             # growing period
             g.period <- e3.date - s3.date + 1
@@ -226,28 +220,27 @@ compute_consecutive_indices_3_tmin <- function(s1.date, e1.date, s2.date, e2.dat
                 during_g <- subset(dd[dd$year == j,], doy >= s3.date & doy <= e3.date)
                 after_g <- subset(dd[dd$year == j,],  doy > e3.date)
                 
-                tmin10before<-percentile(length(before_g$tmin),before_g$tmin,0.1)
-                tmin10during<-percentile(length(during_g$tmin),during_g$tmin,0.1)
-                tmin10after<-percentile(length(after_g$tmin),after_g$tmin,0.1)
+                tmin10before<-percentile(length(before_g$tmin),before_g$tmin,0.1)/10.0
+                tmin10during<-percentile(length(during_g$tmin),during_g$tmin,0.1)/10.0
+                tmin10after<-percentile(length(after_g$tmin),after_g$tmin,0.1)/10.0
+                
                 
                 # consecutive cold days in the three periods
-                cold_before <- rle(before_g$tmin - tmin10before)
-                cold_during <- rle(during_g$tmin - tmin10during)
-                cold_after <- rle(after_g$tmin - tmin10after)
+                cold_before <- rle(ifelse((before_g$tmin/10.0 - tmin10before) < 0.0, 0, 1))
+                cold_during <- rle(ifelse((during_g$tmin/10.0 - tmin10during) < 0.0, 0, 1))
+                cold_after <- rle(ifelse((after_g$tmin/10.0 - tmin10after) < 0.0, 0, 1))
                 
-                outDF[outDF$year == j, "cold_before"] <- max(cold_before$lengths[cold_before$values<0]) / b.period
-                outDF[outDF$year == j, "cold_growing"] <- max(cold_during$lengths[cold_during$values<0]) / g.period
-                outDF[outDF$year == j, "cold_after"] <- max(cold_after$lengths[cold_after$values<0]) / a.period
+                outDF[outDF$year == j, "cold_before"] <- max(cold_before$lengths[cold_before$values==0])
+                outDF[outDF$year == j, "cold_growing"] <- max(cold_during$lengths[cold_during$values==0])
+                outDF[outDF$year == j, "cold_after"] <- max(cold_after$lengths[cold_after$values==0])
                 
             }
         } else {
             # southern hemisphere, need to take one year out (1st year)
             
             # prepare output df
-            outDF <- data.frame(unique(dd$year), NA, NA, NA, 
-                                NA, NA, NA)
-            colnames(outDF) <- c("year", "cold_before", "cold_growing", "cold_after",
-                                 "wet_before", "wet_growing", "wet_after")
+            outDF <- data.frame(unique(dd$year), NA, NA, NA)
+            colnames(outDF) <- c("year", "cold_before", "cold_growing", "cold_after")
             
             outDF <- outDF[-1,]
             
@@ -265,18 +258,19 @@ compute_consecutive_indices_3_tmin <- function(s1.date, e1.date, s2.date, e2.dat
                 during_g <- rbind(d1, d2)
                 after_g <- subset(dd[dd$year == j,],  doy > e3.date & doy < 181)
                 
-                tmin10before<-percentile(length(before_g$tmin),before_g$tmin,0.1)
-                tmin10during<-percentile(length(during_g$tmin),during_g$tmin,0.1)
-                tmin10after<-percentile(length(after_g$tmin),after_g$tmin,0.1)
+                tmin10before<-percentile(length(before_g$tmin),before_g$tmin,0.1)/10.0
+                tmin10during<-percentile(length(during_g$tmin),during_g$tmin,0.1)/10.0
+                tmin10after<-percentile(length(after_g$tmin),after_g$tmin,0.1)/10.0
+                
                 
                 # consecutive cold days in the three periods
-                cold_before <- rle(before_g$tmin - tmin10before)
-                cold_during <- rle(during_g$tmin - tmin10during)
-                cold_after <- rle(after_g$tmin - tmin10after)
+                cold_before <- rle(ifelse((before_g$tmin/10.0 - tmin10before) < 0.0, 0, 1))
+                cold_during <- rle(ifelse((during_g$tmin/10.0 - tmin10during) < 0.0, 0, 1))
+                cold_after <- rle(ifelse((after_g$tmin/10.0 - tmin10after) < 0.0, 0, 1))
                 
-                outDF[outDF$year == j, "cold_before"] <- max(cold_before$lengths[cold_before$values<0]) / b.period
-                outDF[outDF$year == j, "cold_growing"] <- max(cold_during$lengths[cold_during$values<0]) / g.period
-                outDF[outDF$year == j, "cold_after"] <- max(cold_after$lengths[cold_after$values<0]) / a.period
+                outDF[outDF$year == j, "cold_before"] <- max(cold_before$lengths[cold_before$values==0])
+                outDF[outDF$year == j, "cold_growing"] <- max(cold_during$lengths[cold_during$values==0])
+                outDF[outDF$year == j, "cold_after"] <- max(cold_after$lengths[cold_after$values==0])
                 
             }
         }

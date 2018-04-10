@@ -1,9 +1,9 @@
 ##############################################################################################################
-##Calculate consecutive dry days predictability based on whole temporal range
-consec_dry_pred<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECTORY)
+##Calculate consecutive cold days predictability based on whole temporal range
+consec_cold_pred_hunter_gatherer<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECTORY)
 {
   
-    sourceDir = "data/indices/CSDI"
+    sourceDir = "data/indices/CSDI_hunter_gatherer"
     destDir = "data/predictability"
     
     dir.create(destDir, showWarnings = FALSE)
@@ -26,32 +26,28 @@ consec_dry_pred<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTP
         is.na(X)<-sapply(X, is.infinite)
         X[is.na(X)]<- 0
         
-        
         years <- min(X$year)
         yeare <- max(X$year)
         yearr <- yeare-years
         
-        
         # site specific data range
-        v.range <- c(X$dry_before, X$dry_growing, 
-                     X$dry_after)
+        v.range <- c(X$cold_djf, X$cold_mam, 
+                     X$cold_jja, X$cold_son)
         
         test <- max(v.range) - min(v.range)
         
         sep.value <- ifelse(test <= 0.01, 0.001, 
                             ifelse(test > 0.01 & test <= 0.1, 0.01,
-                                   ifelse(test > 0.1 & test <= 1, 0.1)))
+                                   ifelse(test > 0.1 & test <= 1, 0.1, 1.0)))
         
         max_top <- round_any(max(v.range), sep.value, f = ceiling)
         min_bot <- round_any(min(v.range), sep.value, f = floor)
         diff <- max_top - min_bot
         interval <- 10
         
-        # print(c(diff, max_top,min_bot, sep.value))
-        
         if(diff > 0) {
-            bin <- matrix(0, ncol=5, nrow=interval)
-            dimnames(bin) <- list(NULL,c("bin_size","before","during","after","whole"))
+            bin <- matrix(0, ncol=6, nrow=interval)
+            dimnames(bin) <- list(NULL,c("bin_size","djf","mam","jja","son","whole"))
             
             bin[,"bin_size"] <- c(min_bot+0.1*diff,min_bot+0.2*diff,min_bot+0.3*diff,min_bot+0.4*diff,
                                   min_bot+0.5*diff,min_bot+0.6*diff,min_bot+0.7*diff,min_bot+0.8*diff,
@@ -61,25 +57,28 @@ consec_dry_pred<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTP
                        min_bot+0.5*diff,min_bot+0.6*diff,min_bot+0.7*diff,min_bot+0.8*diff,
                        min_bot+0.9*diff,max_top)
             
-            before_cut = cut(X[, "dry_before"], breaks, include.lowest=TRUE,right=TRUE)
-            during_cut = cut(X[, "dry_growing"], breaks, include.lowest=TRUE,right=TRUE)
-            after_cut = cut(X[, "dry_after"], breaks, include.lowest=TRUE,right=TRUE)
-
-            b_freq = table(before_cut)
-            d_freq = table(during_cut)
-            a_freq = table(after_cut)
-
-            bin[,"before"] <- b_freq
-            bin[,"during"] <- d_freq
-            bin[,"after"] <- a_freq
-
-            bin[,"whole"] = (bin[,"before"]+bin[,"during"]+bin[,"after"])
+            djf_cut = cut(X[, "cold_djf"], breaks, include.lowest=TRUE,right=TRUE)
+            mam_cut = cut(X[, "cold_mam"], breaks, include.lowest=TRUE,right=TRUE)
+            jja_cut = cut(X[, "cold_jja"], breaks, include.lowest=TRUE,right=TRUE)
+            son_cut = cut(X[, "cold_son"], breaks, include.lowest=TRUE,right=TRUE)
             
-            col_sum <- sum(table(X[, "dry_before"]))
-            whole_sum <- col_sum*3
+            djf_freq = table(djf_cut)
+            mam_freq = table(mam_cut)
+            jja_freq = table(jja_cut)
+            son_freq = table(son_cut)
+            
+            bin[,"djf"] <- djf_freq
+            bin[,"mam"] <- mam_freq
+            bin[,"jja"] <- jja_freq
+            bin[,"son"] <- son_freq
+            
+            bin[,"whole"] = (bin[,"djf"]+bin[,"mam"]+bin[,"jja"]+bin[,"son"])
+            
+            col_sum <- sum(table(X[, "cold_djf"]))
+            whole_sum <- col_sum*4
             
             #uncertainty with respect to time H(X)
-            HofX <- -((col_sum/whole_sum)*log10(col_sum/whole_sum))*3
+            HofX <- -((col_sum/whole_sum)*log10(col_sum/whole_sum))*4
             
             #uncertainty with respect to state H(Y)
             V1 <- bin[,"whole"]/whole_sum
@@ -93,7 +92,7 @@ consec_dry_pred<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTP
             HofY <- -sum(V1*V2)
             
             #uncertainty with respect to interaction of time and state, H(XY)
-            M1 <- bin[1:interval,2:4]/whole_sum
+            M1 <- bin[1:interval,2:5]/whole_sum
             M2 <- log10(M1)
             for (i in 1:length(M2))
             {
@@ -106,7 +105,7 @@ consec_dry_pred<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTP
             #Conditional uncertainty with regard to state, with time given, HXofY
             HXofY <- HofXY - HofX
             s <- interval
-            t <- 3
+            t <- 4
             
             #predictability (P), constancy(C) and contingency (M)
             P <- 1-(HXofY/log10(s))
@@ -153,9 +152,8 @@ consec_dry_pred<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTP
             output[j,"M_freedom"] <- M_free
             output[j,"GP"] <- GP
             output[j,"P_freedom"] <- P_free
-            
         }
     }
-    write.csv(output,paste0(destDir, "/Consec_csdi_PCM.csv"),row.names=F)
+    write.csv(output,paste0(destDir, "/Consec_csdi_PCM_hunter_gatherer.csv"),row.names=F)
     
 }

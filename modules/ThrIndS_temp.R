@@ -2,7 +2,7 @@
 ThrIndS_temp <- function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECTORY) 
 
 {
-  sourceDir = "data/ghcnd_gap_filled"
+  sourceDir = "data/ghcnd_gap_filled_tmin"
   destDir = "data/indices/ThrIndS_temp"
   dir.create(destDir, showWarnings = FALSE)
   DatFiles <- list.files(path = sourceDir, pattern = "\\.csv")
@@ -179,7 +179,7 @@ ThrIndS_temp <- function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPU
           
           dp[(i-years+1),"tmin_spr"]<-mean(dd$tmin[dd$year == i & dd$month >= 3 & dd$month<= 5],na.rm=T)/10.0
          
-          if(inName == "data/ghcnd_gap_filled/CA001054920.csv" && i == 1898) { print(dd$tmin[dd$year == i & dd$month >= 9 & dd$month<= 11],na.rm=T)}
+          if(inName == "data/ghcnd_gap_filled_tmin/CA001054920.csv" && i == 1898) { print(dd$tmin[dd$year == i & dd$month >= 9 & dd$month<= 11],na.rm=T)}
           dp[(i-years+1),"tmin_sum"]<-mean(dd$tmin[dd$year == i & dd$month >= 6 & dd$month<= 8],na.rm=T)/10.0
           dp[(i-years+1),"tmin_aut"]<-mean(dd$tmin[dd$year == i & dd$month >= 9 & dd$month<= 11],na.rm=T)/10.0
           dp[(i-years+1),"tmin_win"]<-mean(dd$tmin[dd$year == i & (dd$month == 12 | dd$month== 1 | dd$month==2)],na.rm=T)/10.0

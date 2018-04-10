@@ -98,11 +98,11 @@ ThrIndS_temp(sourceDir = "data/ghcnd_gap_filled_tmin", destDir = "data/indices/T
 ### Step 2: 
 ### Calculate consecutive days indices
 consecutive_day_indices_tmin(final_station_DF, 
-                        sourceDir = "data/ghcnd_gap_filled", destDir = "data/indices/CSDI")
+                        sourceDir = "data/ghcnd_gap_filled_tmin", destDir = "data/indices/CSDI")
 
 ### Calculate consecutive days indices for hunter/gatherer societies, i.e. sites without any plant grow information
 consecutive_day_indices_hunter_gatherer_tmin(final_station_DF, 
-                                        sourceDir = "data/ghcnd_gap_filled", destDir = "data/indices/CSDI_hunter_gatherer")
+                                        sourceDir = "data/ghcnd_gap_filled_tmin", destDir = "data/indices/CSDI_hunter_gatherer")
 
 
 ##############################################################################################################
@@ -115,10 +115,10 @@ fd_pred(sourceDir = "data/indices/ThrIndS_temp", destDir = "data/predictability"
 tmin_pred(sourceDir = "data/indices/ThrIndS_temp", destDir = "data/predictability")
 
 ## Calculate CSDI consecutive predictability
-consec_dry_pred(sourceDir = "data/indices/CSDI", destDir = "data/predictability")
+consec_cold_pred(sourceDir = "data/indices/CSDI", destDir = "data/predictability")
 
 ## Calculate CSDI consecutive predictability for hunter and gatherer societies
-consec_dry_pred_hunter_gatherer(sourceDir = "data/indices/CSDI_hunter_gatherer", destDir = "data/predictability")
+consec_cold_pred_hunter_gatherer(sourceDir = "data/indices/CSDI_hunter_gatherer", destDir = "data/predictability")
 
 ##############################################################################################################
 ### End
