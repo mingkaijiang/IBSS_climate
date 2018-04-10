@@ -17,7 +17,7 @@ consecutive_day_indices_tmin<-function(sDF,
     
     # prepare file list
   
-    sourceDir = "data/ghcnd_gap_filled"
+    sourceDir = "data/ghcnd_gap_filled_tmin"
     destDir = "data/indices/CSDI"
     
     dir.create(destDir, showWarnings = FALSE)

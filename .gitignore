@@ -40,23 +40,36 @@ vignettes/*.pdf
 /data/ghcnd_all/ghcnd_all/*.dly
 /data/cpc/*.nc
 /data/ghcnd_selected/*.csv
+/data/ghcnd_selected_tmin/*.csv
 /data/ghcnd_coef_var/*.csv
 /data/Indices/*.csv
 /data/Indices/rx1s/*.csv
 /data/Indices/rx5s/*.csv
+/data/Indices/ThrIndS_temp/*.csv
+/data/Indices/ThrIndS_tmax/*.csv
+/data/Indices/CSDI/*.csv
+/data/Indices/CSDI_hunter_gatherer/*.csv
 /data/Indices/ThrIndS/*.csv
 /data/Indices/SDIIS/*.csv
 /data/predictability/*.csvx
+/data/predictability_tmax/*.csv
 /data/ghcnd_gap_filled/*.csv
+/data/ghcnd_gap_filled_tmin/*.csv
+/data/ghcnd_tmax_gap_filled_tmax/*.csv
 /data/ghcnd_selected_copy/*.csv
+/data/ghcnd_tmax_selected_tmax/*.csv
 /data/ghcnd_gap_filled_2/*.csv
 /data/restructured/*.csv
+/data/restructured_tmin/*.csv
+/data/restructured_tmax/*.csv
 /data/cpc_selected/*.csv
 /data/Indices/CDS/*.csv
 /data/Indices/CDS_hunter_gatherer/*.csv
 /data/Indices/ThrIndS_temp/*.csv
+/data/indices/*.csv
 
 /data/**/*.csv
+/data/indices/**/*.csv
 
 # R project
 *.Rproj
