@@ -78,20 +78,21 @@ ThrIndS<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIREC
         years<-dd[1,1]
         yeare<-dd[dim(dd)[1],1]
         
-        if (leapyear(years)) 
+        if (leapyear(years)) {
             dddd<-dddl 
-        else 
+        } else {
             dddd<-ddd
-        
+        }
+
         dddd[,"year"]<-years
         
-        for (year in years:yeare)
-        {                  
-            if (leapyear(year)) 
+        for (year in years:yeare) {                  
+            if (leapyear(year)) {
                 dddd1 <- dddl 
-            else 
+            } else {
                 dddd1 <- ddd
-            
+            }
+
             dddd1[,"year"]<-year
             
             if (year!=years) 
@@ -146,11 +147,16 @@ ThrIndS<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIREC
         
         prcptmp_win<-prcptmp_win[is.na(prcptmp_win)==F]
         
+        prcptmp_ann <- dd[dd$year >= startyear & dd$year <= endyear,"prcp"]
+        
+        prcptmp_ann<-prcptmp_ann[is.na(prcptmp_ann)==F]
+        
         
         len_spr<-length(prcptmp_spr)
         len_sum<-length(prcptmp_sum)
         len_aut<-length(prcptmp_aut)
         len_win<-length(prcptmp_win)
+        len_ann<-length(prcptmp_ann)
         
         prcp95spr<-percentile(len_spr,prcptmp_spr,0.95)
         prcp99spr<-percentile(len_spr,prcptmp_spr,0.99)
@@ -160,6 +166,8 @@ ThrIndS<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIREC
         prcp99aut<-percentile(len_aut,prcptmp_aut,0.99)
         prcp95win<-percentile(len_win,prcptmp_win,0.95)
         prcp99win<-percentile(len_win,prcptmp_win,0.99)
+        prcp95ann<-percentile(len_ann,prcptmp_ann,0.95)
+        prcp99ann<-percentile(len_ann,prcptmp_ann,0.99)
         
         prcp05spr<-percentile(len_spr,prcptmp_spr,0.05)
         prcp01spr<-percentile(len_spr,prcptmp_spr,0.01)
@@ -169,15 +177,18 @@ ThrIndS<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIREC
         prcp01aut<-percentile(len_aut,prcptmp_aut,0.01)
         prcp05win<-percentile(len_win,prcptmp_win,0.05)
         prcp01win<-percentile(len_win,prcptmp_win,0.01)
+        prcp05ann<-percentile(len_win,prcptmp_ann,0.05)
+        prcp01ann<-percentile(len_win,prcptmp_ann,0.01)
         
         ys<-yeare-years+1
         
-        dp<-matrix(0,ys,21)
+        dp<-matrix(0,ys,26)
         dimnames(dp)<-list(NULL,c("year","r95p_spr","r95p_sum","r95p_aut","r95p_win",
                                   "r99p_spr","r99p_sum","r99p_aut","r99p_win",
                                   "r05p_spr","r05p_sum","r05p_aut","r05p_win",
                                   "r01p_spr","r01p_sum","r01p_aut","r01p_win",
-                                  "prcptot_spr","prcptot_sum","prcptot_aut","prcptot_win"))
+                                  "prcptot_spr","prcptot_sum","prcptot_aut","prcptot_win", 
+                                  "r95p_ann", "r99p_ann", "r05p_ann", "r01p_ann", "prcptot_ann"))
         dp[,"year"]<-years:yeare
         for(i in years:yeare)
         {
@@ -189,6 +200,8 @@ ThrIndS<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIREC
                                                    dd$prcp > prcp95aut,"prcp"],na.rm=T)
             dp[(i-years+1),"r95p_win"]<-sum(dd[dd$year == i & (dd$month == 12 | dd$month == 1 | dd$month==2) & 
                                                    dd$prcp > prcp95win,"prcp"],na.rm=T)
+            dp[(i-years+1),"r95p_ann"]<-sum(dd[dd$year == i & 
+                                                   dd$prcp > prcp95ann,"prcp"],na.rm=T)
             
             dp[(i-years+1),"r99p_spr"]<-sum(dd[dd$year == i & dd$month >= 3 & dd$month <= 5 &
                                                    dd$prcp > prcp99spr,"prcp"],na.rm=T)
@@ -198,6 +211,8 @@ ThrIndS<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIREC
                                                    dd$prcp > prcp99aut,"prcp"],na.rm=T)
             dp[(i-years+1),"r99p_win"]<-sum(dd[dd$year == i & (dd$month == 12 | dd$month == 1 | dd$month==2) &
                                                    dd$prcp > prcp99win,"prcp"],na.rm=T)
+            dp[(i-years+1),"r99p_ann"]<-sum(dd[dd$year == i & 
+                                                   dd$prcp > prcp99ann,"prcp"],na.rm=T)
             
             dp[(i-years+1),"r05p_spr"]<-sum(dd[dd$year == i & dd$month >= 3 & dd$month<= 5 & 
                                                    dd$prcp <= prcp05spr,"prcp"],na.rm=T)
@@ -207,6 +222,8 @@ ThrIndS<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIREC
                                                    dd$prcp <= prcp05aut,"prcp"],na.rm=T)
             dp[(i-years+1),"r05p_win"]<-sum(dd[dd$year == i & (dd$month == 12 | dd$month == 1 | dd$month==2) & 
                                                    dd$prcp <= prcp05win,"prcp"],na.rm=T)
+            dp[(i-years+1),"r05p_ann"]<-sum(dd[dd$year == i & 
+                                                   dd$prcp <= prcp05ann,"prcp"],na.rm=T)
             
             dp[(i-years+1),"r01p_spr"]<-sum(dd[dd$year == i & dd$month >= 3 & dd$month<= 5 & 
                                                    dd$prcp <= prcp01spr,"prcp"],na.rm=T)
@@ -216,6 +233,8 @@ ThrIndS<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIREC
                                                    dd$prcp <= prcp01aut,"prcp"],na.rm=T)
             dp[(i-years+1),"r01p_win"]<-sum(dd[dd$year == i & (dd$month == 12 | dd$month == 1 | dd$month==2) & 
                                                    dd$prcp <= prcp01win,"prcp"],na.rm=T)
+            dp[(i-years+1),"r01p_ann"]<-sum(dd[dd$year == i & 
+                                                   dd$prcp <= prcp01ann,"prcp"],na.rm=T)
             
             dp[(i-years+1),"prcptot_spr"]<-sum(dd[dd$year == i & dd$month >= 3 & dd$month<= 5 & 
                                                       dd$prcp >= 1,"prcp"],na.rm=T)
@@ -225,6 +244,8 @@ ThrIndS<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIREC
                                                       dd$prcp >= 1,"prcp"],na.rm=T)
             dp[(i-years+1),"prcptot_win"]<-sum(dd[dd$year == i & (dd$month == 12 | dd$month== 1 | dd$month==2) & 
                                                       dd$prcp >= 1,"prcp"],na.rm=T)
+            dp[(i-years+1),"prcptot_ann"]<-sum(dd[dd$year == i & 
+                                                   dd$prcp >= 1,"prcp"],na.rm=T)
         }
         
         dp<-as.data.frame(dp)
@@ -233,8 +254,9 @@ ThrIndS<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIREC
         R20_sum<-rep(0,ys)
         R20_aut<-rep(0,ys)
         R20_win<-rep(0,ys)
+        R20_ann<-rep(0,ys)
         
-        target<-as.data.frame(cbind(dp,R20_spr,R20_sum,R20_aut,R20_win))
+        target<-as.data.frame(cbind(dp,R20_spr,R20_sum,R20_aut,R20_win,R20_ann))
         
         for (year in years:yeare)
         {
@@ -253,14 +275,19 @@ ThrIndS<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIREC
             mid_win<-dd[dd$year==year & (dd$month == 12 | dd$month == 1 | dd$month == 2),"prcp"]
             mid_win<-mid_win[is.na(mid_win)==F]
             target[target$year==year,"R20_win"]<-length(mid_win[mid_win>=20])
+            
+            mid_ann<-dd[dd$year==year,"prcp"]
+            mid_ann<-mid_ann[is.na(mid_ann)==F]
+            target[target$year==year,"R20_ann"]<-length(mid_ann[mid_ann>=20])
         }
         
         R10_spr<-rep(0,ys)
         R10_sum<-rep(0,ys)
         R10_aut<-rep(0,ys)
         R10_win<-rep(0,ys)
+        R10_ann<-rep(0,ys)
         
-        target2<-as.data.frame(cbind(target,R10_spr,R10_sum,R10_aut,R10_win))
+        target2<-as.data.frame(cbind(target,R10_spr,R10_sum,R10_aut,R10_win,R10_ann))
         
         for (year in years:yeare)
         {
@@ -279,6 +306,10 @@ ThrIndS<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIREC
             mid_win<-dd[dd$year==year & (dd$month == 12 | dd$month == 1 | dd$month == 2),"prcp"]
             mid_win<-mid_win[is.na(mid_win)==F]
             target2[target2$year==year,"R10_win"]<-length(mid_win[mid_win>=10])
+            
+            mid_ann<-dd[dd$year==year,"prcp"]
+            mid_ann<-mid_ann[is.na(mid_ann)==F]
+            target2[target2$year==year,"R10_ann"]<-length(mid_ann[mid_ann>=10])
         }
         write.table(target2,outName,append=F,quote=F,sep=",",na="-99.9",row.names=F)
     }

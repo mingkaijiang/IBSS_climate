@@ -1,7 +1,6 @@
 ##############################################################################################################
 ##Calculate prcp/#of wet days over each season
-SDIIS<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECTORY)
-{
+SDIIS<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECTORY) {
     dir.create(destDir, showWarnings = FALSE)
     DatFiles <- list.files(path = sourceDir, pattern = "\\.csv")
     
@@ -78,24 +77,27 @@ SDIIS<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECTO
         years<-dd[1,1]
         yeare<-dd[dim(dd)[1],1]
         
-        if (leapyear(years)) 
+        if (leapyear(years)) {
             dddd<-dddl 
-        else 
+        } else {
             dddd<-ddd
-        
+        }
+
         dddd[,"year"]<-years
         
         for (year in years:yeare)
         {                  
-            if (leapyear(year)) 
+            if (leapyear(year)) {
                 dddd1 <- dddl 
-            else 
+            } else {
                 dddd1 <- ddd
-            
+            }
+
             dddd1[,"year"]<-year
             
-            if (year!=years) 
+            if (year!=years) {
                 dddd<-rbind(dddd,dddd1) 
+            }
         }
         
         dddd<-as.data.frame(dddd)
@@ -115,13 +117,12 @@ SDIIS<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECTO
         dd$prcp[is.na(dd$prcp)] = median(dd$prcp, na.rm=T)
         
         ys=yeare-years+1
-        b<-matrix(0,ncol=5,nrow=ys)
-        dimnames(b)<-list(NULL,c("year","sdii_spr","sdii_sum","sdii_aut","sdii_win"))
+        b<-matrix(0,ncol=6,nrow=ys)
+        dimnames(b)<-list(NULL,c("year","sdii_spr","sdii_sum","sdii_aut","sdii_win", "sdii_ann"))
         b[,"year"]<-c(years:yeare)
         b<-as.data.frame(b)
         year=years
-        for (i in 1:ys)
-        {
+        for (i in 1:ys) {
             mid_spr<-dd[dd$year==year & dd$month >= 3 & dd$month <= 5,"prcp"]
             mid_spr<-mid_spr[mid_spr>=1]
             b[i,"sdii_spr"]<- ifelse(is.na(mean(mid_spr,na.rm=T)), 0, mean(mid_spr,na.rm=T))
@@ -137,6 +138,10 @@ SDIIS<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECTO
             mid_win<-dd[dd$year==year & (dd$month ==12 | dd$month == 1 | dd$month == 2),"prcp"]
             mid_win<-mid_win[mid_win>=1]
             b[i,"sdii_win"]<-ifelse(is.na(mean(mid_win,na.rm=T)), 0, mean(mid_win,na.rm=T))
+            
+            mid_ann<-dd[dd$year==year,"prcp"]
+            mid_ann<-mid_ann[mid_ann>=1]
+            b[i,"sdii_ann"]<-ifelse(is.na(mean(mid_ann,na.rm=T)), 0, mean(mid_ann,na.rm=T))
             
             year=year+1  
         }
