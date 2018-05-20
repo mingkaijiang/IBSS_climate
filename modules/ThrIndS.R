@@ -95,8 +95,10 @@ ThrIndS<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIREC
 
             dddd1[,"year"]<-year
             
-            if (year!=years) 
+            if (year!=years) {
                 dddd<-rbind(dddd,dddd1) 
+                
+            }
         }
         
         dddd<-as.data.frame(dddd)
@@ -190,8 +192,8 @@ ThrIndS<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIREC
                                   "prcptot_spr","prcptot_sum","prcptot_aut","prcptot_win", 
                                   "r95p_ann", "r99p_ann", "r05p_ann", "r01p_ann", "prcptot_ann"))
         dp[,"year"]<-years:yeare
-        for(i in years:yeare)
-        {
+        
+        for(i in years:yeare) {
             dp[(i-years+1),"r95p_spr"]<-sum(dd[dd$year == i & dd$month >= 3 & dd$month<= 5 & 
                                                    dd$prcp > prcp95spr,"prcp"],na.rm=T)
             dp[(i-years+1),"r95p_sum"]<-sum(dd[dd$year == i & dd$month >= 6 & dd$month<= 8 & 

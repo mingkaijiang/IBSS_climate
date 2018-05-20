@@ -124,6 +124,9 @@ consecutive_day_indices(final_station_DF,
 consecutive_day_indices_hunter_gatherer(final_station_DF, 
                                         sourceDir = "data/ghcnd_gap_filled", destDir = "data/indices/CDS_hunter_gatherer")
 
+### Calculate annual consecutive day indices, regardless of the societies
+consecutive_day_indices_annual(sourceDir = "data/ghcnd_gap_filled", destDir = "data/indices/annual_consecutive")
+
 ##############################################################################################################
 #### Calculate whole year range predictability
 
