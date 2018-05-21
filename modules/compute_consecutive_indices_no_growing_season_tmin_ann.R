@@ -1,7 +1,7 @@
 ## Actual computation of consecutive day indices
 ## based on no growing season for each SCCS society
 
-compute_consecutive_indices_no_growing_season_tmin <- function(wea.station, sccs.id, source, dest) {
+compute_consecutive_indices_no_growing_season_tmin_ann <- function(wea.station, sccs.id, source, dest) {
     # s.date: starting doy for plant 1
     # e.date: end doy for plant 1
     # wea.station: weather station id list
@@ -28,7 +28,7 @@ compute_consecutive_indices_no_growing_season_tmin <- function(wea.station, sccs
         dd$doy <- yday(dd$id)
 
         # prepare output df
-         outDF <- data.frame(unique(dd$year), NA, NA, NA, NA)
+         outDF <- data.frame(unique(dd$year), NA, NA, NA, NA, NA)
          colnames(outDF) <- c("year", "cold_djf", "cold_mam", "cold_jja", "cold_son","cold_ann")
          outDF <- outDF[-1,]
 
