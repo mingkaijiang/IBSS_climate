@@ -18,18 +18,17 @@ CSDI_annual <- function(sourceDir, destDir) {
         
         dd <- read.csv(inName)
         
-        outDF <- data.frame(unique(dd$Year), NA, NA)
+        outDF <- data.frame(unique(dd$Year), NA)
         colnames(outDF) <- c("Year", "consecutive_days")
         
         for (j in dd$Year) {
             myDF <- dd[dd$Year == j, ]
-            ann <- rle(myDF$value)
             p <- length(myDF$value)
-            t <- percentile(length(myDF$value),myDF$value,0.1)/10.0
-            outDF[outDF$Year == j, "consecutive_days"] <- max(ann$lengths[ann$values>t]) / p
+            t <- percentile(p,myDF$value,0.1)
+            myDF2 <- myDF$value > t
+            ann <- rle(myDF2)
+            outDF[outDF$Year == j, "consecutive_days"] <- max(ann$lengths[which(ann$values == "TRUE")]) / p
         }
-        
-        
         
         outDF$consecutive_days[is.infinite(outDF$consecutive_days)] <- 0
 
