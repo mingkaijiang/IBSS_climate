@@ -178,5 +178,14 @@ consec_dry_pred_hunter_gatherer(sourceDir = "data/indices/CDS_hunter_gatherer", 
 consec_wet_pred_hunter_gatherer(sourceDir = "data/indices/CDS_hunter_gatherer", destDir = "data/predictability")
 
 ##############################################################################################################
+### Calculate predictability of PE and PDSI, based on Rui's data
+PDSI_pred(sourceDir = "data/PE_PDSI", destDir = "data/PE_PDSI_predictability")
+
+TH_pred(sourceDir = "data/PE_PDSI", destDir = "data/PE_PDSI_predictability")
+
+PM_pred(sourceDir = "data/PE_PDSI", destDir = "data/PE_PDSI_predictability")
+
+
+##############################################################################################################
 ### End
 rm(list=ls())
