@@ -194,60 +194,60 @@ ThrIndS<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIREC
         dp[,"year"]<-years:yeare
         
         for(i in years:yeare) {
-            dp[(i-years+1),"r95p_spr"]<-sum(dd[dd$year == i & dd$month >= 3 & dd$month<= 5 & 
-                                                   dd$prcp > prcp95spr,"prcp"],na.rm=T)
-            dp[(i-years+1),"r95p_sum"]<-sum(dd[dd$year == i & dd$month >= 6 & dd$month<= 8 & 
-                                                   dd$prcp > prcp95sum,"prcp"],na.rm=T)
-            dp[(i-years+1),"r95p_aut"]<-sum(dd[dd$year == i & dd$month >= 9 & dd$month<= 11 & 
-                                                   dd$prcp > prcp95aut,"prcp"],na.rm=T)
-            dp[(i-years+1),"r95p_win"]<-sum(dd[dd$year == i & (dd$month == 12 | dd$month == 1 | dd$month==2) & 
-                                                   dd$prcp > prcp95win,"prcp"],na.rm=T)
-            dp[(i-years+1),"r95p_ann"]<-sum(dd[dd$year == i & 
-                                                   dd$prcp > prcp95ann,"prcp"],na.rm=T)
+            dp[(i-years+1),"r95p_spr"]<-length(dd[dd$year == i & dd$month >= 3 & dd$month<= 5 & 
+                                                   dd$prcp > prcp95spr,"prcp"])
+            dp[(i-years+1),"r95p_sum"]<-length(dd[dd$year == i & dd$month >= 6 & dd$month<= 8 & 
+                                                   dd$prcp > prcp95sum,"prcp"])
+            dp[(i-years+1),"r95p_aut"]<-length(dd[dd$year == i & dd$month >= 9 & dd$month<= 11 & 
+                                                   dd$prcp > prcp95aut,"prcp"])
+            dp[(i-years+1),"r95p_win"]<-length(dd[dd$year == i & (dd$month == 12 | dd$month == 1 | dd$month==2) & 
+                                                   dd$prcp > prcp95win,"prcp"])
+            dp[(i-years+1),"r95p_ann"]<-length(dd[dd$year == i & 
+                                                   dd$prcp > prcp95ann,"prcp"])
             
-            dp[(i-years+1),"r99p_spr"]<-sum(dd[dd$year == i & dd$month >= 3 & dd$month <= 5 &
-                                                   dd$prcp > prcp99spr,"prcp"],na.rm=T)
-            dp[(i-years+1),"r99p_sum"]<-sum(dd[dd$year == i & dd$month >= 6 & dd$month <= 8 &
-                                                   dd$prcp > prcp99sum,"prcp"],na.rm=T)
-            dp[(i-years+1),"r99p_aut"]<-sum(dd[dd$year == i & dd$month >= 9 & dd$month <= 11 &
-                                                   dd$prcp > prcp99aut,"prcp"],na.rm=T)
-            dp[(i-years+1),"r99p_win"]<-sum(dd[dd$year == i & (dd$month == 12 | dd$month == 1 | dd$month==2) &
-                                                   dd$prcp > prcp99win,"prcp"],na.rm=T)
-            dp[(i-years+1),"r99p_ann"]<-sum(dd[dd$year == i & 
-                                                   dd$prcp > prcp99ann,"prcp"],na.rm=T)
+            dp[(i-years+1),"r99p_spr"]<-length(dd[dd$year == i & dd$month >= 3 & dd$month <= 5 &
+                                                   dd$prcp > prcp99spr,"prcp"])
+            dp[(i-years+1),"r99p_sum"]<-length(dd[dd$year == i & dd$month >= 6 & dd$month <= 8 &
+                                                   dd$prcp > prcp99sum,"prcp"])
+            dp[(i-years+1),"r99p_aut"]<-length(dd[dd$year == i & dd$month >= 9 & dd$month <= 11 &
+                                                   dd$prcp > prcp99aut,"prcp"])
+            dp[(i-years+1),"r99p_win"]<-length(dd[dd$year == i & (dd$month == 12 | dd$month == 1 | dd$month==2) &
+                                                   dd$prcp > prcp99win,"prcp"])
+            dp[(i-years+1),"r99p_ann"]<-length(dd[dd$year == i & 
+                                                   dd$prcp > prcp99ann,"prcp"])
             
-            dp[(i-years+1),"r05p_spr"]<-sum(dd[dd$year == i & dd$month >= 3 & dd$month<= 5 & 
-                                                   dd$prcp <= prcp05spr,"prcp"],na.rm=T)
-            dp[(i-years+1),"r05p_sum"]<-sum(dd[dd$year == i & dd$month >= 6 & dd$month<= 8 & 
-                                                   dd$prcp <= prcp05sum,"prcp"],na.rm=T)
-            dp[(i-years+1),"r05p_aut"]<-sum(dd[dd$year == i & dd$month >= 9 & dd$month<= 11 & 
-                                                   dd$prcp <= prcp05aut,"prcp"],na.rm=T)
-            dp[(i-years+1),"r05p_win"]<-sum(dd[dd$year == i & (dd$month == 12 | dd$month == 1 | dd$month==2) & 
-                                                   dd$prcp <= prcp05win,"prcp"],na.rm=T)
-            dp[(i-years+1),"r05p_ann"]<-sum(dd[dd$year == i & 
-                                                   dd$prcp <= prcp05ann,"prcp"],na.rm=T)
+            dp[(i-years+1),"r05p_spr"]<-length(dd[dd$year == i & dd$month >= 3 & dd$month<= 5 & 
+                                                   dd$prcp <= prcp05spr,"prcp"])
+            dp[(i-years+1),"r05p_sum"]<-length(dd[dd$year == i & dd$month >= 6 & dd$month<= 8 & 
+                                                   dd$prcp <= prcp05sum,"prcp"])
+            dp[(i-years+1),"r05p_aut"]<-length(dd[dd$year == i & dd$month >= 9 & dd$month<= 11 & 
+                                                   dd$prcp <= prcp05aut,"prcp"])
+            dp[(i-years+1),"r05p_win"]<-length(dd[dd$year == i & (dd$month == 12 | dd$month == 1 | dd$month==2) & 
+                                                   dd$prcp <= prcp05win,"prcp"])
+            dp[(i-years+1),"r05p_ann"]<-length(dd[dd$year == i & 
+                                                   dd$prcp <= prcp05ann,"prcp"])
             
-            dp[(i-years+1),"r01p_spr"]<-sum(dd[dd$year == i & dd$month >= 3 & dd$month<= 5 & 
-                                                   dd$prcp <= prcp01spr,"prcp"],na.rm=T)
-            dp[(i-years+1),"r01p_sum"]<-sum(dd[dd$year == i & dd$month >= 6 & dd$month<= 8 & 
-                                                   dd$prcp <= prcp01sum,"prcp"],na.rm=T)
-            dp[(i-years+1),"r01p_aut"]<-sum(dd[dd$year == i & dd$month >= 9 & dd$month<= 11 & 
-                                                   dd$prcp <= prcp01aut,"prcp"],na.rm=T)
-            dp[(i-years+1),"r01p_win"]<-sum(dd[dd$year == i & (dd$month == 12 | dd$month == 1 | dd$month==2) & 
-                                                   dd$prcp <= prcp01win,"prcp"],na.rm=T)
-            dp[(i-years+1),"r01p_ann"]<-sum(dd[dd$year == i & 
-                                                   dd$prcp <= prcp01ann,"prcp"],na.rm=T)
+            dp[(i-years+1),"r01p_spr"]<-length(dd[dd$year == i & dd$month >= 3 & dd$month<= 5 & 
+                                                   dd$prcp <= prcp01spr,"prcp"])
+            dp[(i-years+1),"r01p_sum"]<-length(dd[dd$year == i & dd$month >= 6 & dd$month<= 8 & 
+                                                   dd$prcp <= prcp01sum,"prcp"])
+            dp[(i-years+1),"r01p_aut"]<-length(dd[dd$year == i & dd$month >= 9 & dd$month<= 11 & 
+                                                   dd$prcp <= prcp01aut,"prcp"])
+            dp[(i-years+1),"r01p_win"]<-length(dd[dd$year == i & (dd$month == 12 | dd$month == 1 | dd$month==2) & 
+                                                   dd$prcp <= prcp01win,"prcp"])
+            dp[(i-years+1),"r01p_ann"]<-length(dd[dd$year == i & 
+                                                   dd$prcp <= prcp01ann,"prcp"])
             
-            dp[(i-years+1),"prcptot_spr"]<-sum(dd[dd$year == i & dd$month >= 3 & dd$month<= 5 & 
-                                                      dd$prcp >= 1,"prcp"],na.rm=T)
-            dp[(i-years+1),"prcptot_sum"]<-sum(dd[dd$year == i & dd$month >= 6 & dd$month<= 8 & 
-                                                      dd$prcp >= 1,"prcp"],na.rm=T)
-            dp[(i-years+1),"prcptot_aut"]<-sum(dd[dd$year == i & dd$month >= 9 & dd$month<= 11 & 
-                                                      dd$prcp >= 1,"prcp"],na.rm=T)
-            dp[(i-years+1),"prcptot_win"]<-sum(dd[dd$year == i & (dd$month == 12 | dd$month== 1 | dd$month==2) & 
-                                                      dd$prcp >= 1,"prcp"],na.rm=T)
-            dp[(i-years+1),"prcptot_ann"]<-sum(dd[dd$year == i & 
-                                                   dd$prcp >= 1,"prcp"],na.rm=T)
+            dp[(i-years+1),"prcptot_spr"]<-length(dd[dd$year == i & dd$month >= 3 & dd$month<= 5 & 
+                                                      dd$prcp >= 1,"prcp"])
+            dp[(i-years+1),"prcptot_sum"]<-length(dd[dd$year == i & dd$month >= 6 & dd$month<= 8 & 
+                                                      dd$prcp >= 1,"prcp"])
+            dp[(i-years+1),"prcptot_aut"]<-length(dd[dd$year == i & dd$month >= 9 & dd$month<= 11 & 
+                                                      dd$prcp >= 1,"prcp"])
+            dp[(i-years+1),"prcptot_win"]<-length(dd[dd$year == i & (dd$month == 12 | dd$month== 1 | dd$month==2) & 
+                                                      dd$prcp >= 1,"prcp"])
+            dp[(i-years+1),"prcptot_ann"]<-length(dd[dd$year == i & 
+                                                   dd$prcp >= 1,"prcp"])
         }
         
         dp<-as.data.frame(dp)
