@@ -160,27 +160,27 @@ ThrIndS<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIREC
         len_win<-length(prcptmp_win)
         len_ann<-length(prcptmp_ann)
         
-        prcp95spr<-percentile(len_spr,prcptmp_spr,0.95)
-        prcp99spr<-percentile(len_spr,prcptmp_spr,0.99)
-        prcp95sum<-percentile(len_sum,prcptmp_sum,0.95)
-        prcp99sum<-percentile(len_sum,prcptmp_sum,0.99)
-        prcp95aut<-percentile(len_aut,prcptmp_aut,0.95)
-        prcp99aut<-percentile(len_aut,prcptmp_aut,0.99)
-        prcp95win<-percentile(len_win,prcptmp_win,0.95)
-        prcp99win<-percentile(len_win,prcptmp_win,0.99)
-        prcp95ann<-percentile(len_ann,prcptmp_ann,0.95)
-        prcp99ann<-percentile(len_ann,prcptmp_ann,0.99)
+        prcp95spr<-quantile(prcptmp_spr,0.95)
+        prcp99spr<-quantile(prcptmp_spr,0.99)
+        prcp95sum<-quantile(prcptmp_sum,0.95)
+        prcp99sum<-quantile(prcptmp_sum,0.99)
+        prcp95aut<-quantile(prcptmp_aut,0.95)
+        prcp99aut<-quantile(prcptmp_aut,0.99)
+        prcp95win<-quantile(prcptmp_win,0.95)
+        prcp99win<-quantile(prcptmp_win,0.99)
+        prcp95ann<-quantile(prcptmp_ann,0.95)
+        prcp99ann<-quantile(prcptmp_ann,0.99)
         
-        prcp05spr<-percentile(len_spr,prcptmp_spr,0.05)
-        prcp01spr<-percentile(len_spr,prcptmp_spr,0.01)
-        prcp05sum<-percentile(len_sum,prcptmp_sum,0.05)
-        prcp01sum<-percentile(len_sum,prcptmp_sum,0.01)
-        prcp05aut<-percentile(len_aut,prcptmp_aut,0.05)
-        prcp01aut<-percentile(len_aut,prcptmp_aut,0.01)
-        prcp05win<-percentile(len_win,prcptmp_win,0.05)
-        prcp01win<-percentile(len_win,prcptmp_win,0.01)
-        prcp05ann<-percentile(len_win,prcptmp_ann,0.05)
-        prcp01ann<-percentile(len_win,prcptmp_ann,0.01)
+        prcp05spr<-quantile(prcptmp_spr,0.05)
+        prcp01spr<-quantile(prcptmp_spr,0.01)
+        prcp05sum<-quantile(prcptmp_sum,0.05)
+        prcp01sum<-quantile(prcptmp_sum,0.01)
+        prcp05aut<-quantile(prcptmp_aut,0.05)
+        prcp01aut<-quantile(prcptmp_aut,0.01)
+        prcp05win<-quantile(prcptmp_win,0.05)
+        prcp01win<-quantile(prcptmp_win,0.01)
+        prcp05ann<-quantile(prcptmp_ann,0.05)
+        prcp01ann<-quantile(prcptmp_ann,0.01)
         
         ys<-yeare-years+1
         
@@ -208,7 +208,7 @@ ThrIndS<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIREC
             dp[(i-years+1),"r99p_spr"]<-length(dd[dd$year == i & dd$month >= 3 & dd$month <= 5 &
                                                    dd$prcp > prcp99spr,"prcp"])
             dp[(i-years+1),"r99p_sum"]<-length(dd[dd$year == i & dd$month >= 6 & dd$month <= 8 &
-                                                   dd$prcp > prcp99sum,"prcp"])
+                                                      dd$prcp > prcp99sum,"prcp"])
             dp[(i-years+1),"r99p_aut"]<-length(dd[dd$year == i & dd$month >= 9 & dd$month <= 11 &
                                                    dd$prcp > prcp99aut,"prcp"])
             dp[(i-years+1),"r99p_win"]<-length(dd[dd$year == i & (dd$month == 12 | dd$month == 1 | dd$month==2) &

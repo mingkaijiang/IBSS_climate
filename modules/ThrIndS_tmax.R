@@ -177,12 +177,12 @@ ThrIndS_tmax <- function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPU
         for(i in years:yeare)
         {
           
-          dp[(i-years+1),"tmax_spr"]<-mean(dd$tmax[dd$year == i & dd$month >= 3 & dd$month<= 5],na.rm=T)/10.0
+          dp[(i-years+1),"tmax_spr"]<-max(dd$tmax[dd$year == i & dd$month >= 3 & dd$month<= 5],na.rm=T)/10.0
          
           if(inName == "data/ghcnd_gap_filled/CA001054920.csv" && i == 1898) { print(dd$tmax[dd$year == i & dd$month >= 9 & dd$month<= 11],na.rm=T)}
-          dp[(i-years+1),"tmax_sum"]<-mean(dd$tmax[dd$year == i & dd$month >= 6 & dd$month<= 8],na.rm=T)/10.0
-          dp[(i-years+1),"tmax_aut"]<-mean(dd$tmax[dd$year == i & dd$month >= 9 & dd$month<= 11],na.rm=T)/10.0
-          dp[(i-years+1),"tmax_win"]<-mean(dd$tmax[dd$year == i & (dd$month == 12 | dd$month== 1 | dd$month==2)],na.rm=T)/10.0
+          dp[(i-years+1),"tmax_sum"]<-max(dd$tmax[dd$year == i & dd$month >= 6 & dd$month<= 8],na.rm=T)/10.0
+          dp[(i-years+1),"tmax_aut"]<-max(dd$tmax[dd$year == i & dd$month >= 9 & dd$month<= 11],na.rm=T)/10.0
+          dp[(i-years+1),"tmax_win"]<-max(dd$tmax[dd$year == i & (dd$month == 12 | dd$month== 1 | dd$month==2)],na.rm=T)/10.0
         }
         dp<-as.data.frame(dp)
         

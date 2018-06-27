@@ -125,8 +125,8 @@ ThrInd<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECT
         prcptmp<-prcptmp[is.na(prcptmp)==F]
         
         len<-length(prcptmp)
-        prcp95<-percentile(len,prcptmp,0.95)
-        prcp99<-percentile(len,prcptmp,0.99)
+        prcp95<-quantile(prcptmp,0.95)
+        prcp99<-quantile(prcptmp,0.99)
         
         ys<-yeare-years+1
         
@@ -135,9 +135,9 @@ ThrInd<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECT
         dp[,"year"]<-years:yeare
         for(i in years:yeare)
         {
-            dp[(i-years+1),"r95p"]<-sum(dd[dd$year==i&dd$prcp>prcp95,"prcp"],na.rm=T)
-            dp[(i-years+1),"r99p"]<-sum(dd[dd$year==i&dd$prcp>prcp99,"prcp"],na.rm=T)
-            dp[(i-years+1),"prcptot"]<-sum(dd[dd$year==i&dd$prcp>=1,"prcp"],na.rm=T)
+            dp[(i-years+1),"r95p"]<-length(dd[dd$year==i&dd$prcp>prcp95,"prcp"])
+            dp[(i-years+1),"r99p"]<-length(dd[dd$year==i&dd$prcp>prcp99,"prcp"])
+            dp[(i-years+1),"prcptot"]<-length(dd[dd$year==i&dd$prcp>=1,"prcp"])
         }
         dp<-as.data.frame(dp)
         R20<-rep(0,ys)
