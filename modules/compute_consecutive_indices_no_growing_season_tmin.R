@@ -42,11 +42,11 @@ compute_consecutive_indices_no_growing_season_tmin <- function(wea.station, sccs
             jja <- subset(dd[dd$year == j,], month >= 6 & month <= 8)
             son <- subset(dd[dd$year == j,], month >= 9 & month <= 11)
             
-            tmin10djf<-percentile(length(djf$tmin),djf$tmin,0.1)/10.0
-            tmin10mam<-percentile(length(mam$tmin),mam$tmin,0.1)/10.0
-            tmin10jja<-percentile(length(jja$tmin),jja$tmin,0.1)/10.0
-            tmin10son<-percentile(length(son$tmin),son$tmin,0.1)/10.0
-            
+            tmin10djf<-quantile(djf$tmin,0.1)/10.0
+            tmin10mam<-quantile(mam$tmin,0.1)/10.0
+            tmin10jja<-quantile(jja$tmin,0.1)/10.0
+            tmin10son<-quantile(son$tmin,0.1)/10.0
+
             if(inName == "data/ghcnd_gap_filled/NG000061017.csv" && j == 1940) {print(tmin10mam)}
             if(inName == "data/ghcnd_gap_filled/NG000061017.csv" && j == 1940) {print(mam$tmin/10.0 - tmin10mam)}
             

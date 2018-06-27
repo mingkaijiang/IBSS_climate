@@ -47,9 +47,9 @@ compute_consecutive_indices_1_tmin <- function(s.date, e.date, wea.station, sccs
                 during_g <- subset(dd[dd$year == j,], doy >= s.date & doy <= e.date)
                 after_g <- subset(dd[dd$year == j,],  doy > e.date)
                 
-                tmin10before<-percentile(length(before_g$tmin),before_g$tmin,0.1)/10.0
-                tmin10during<-percentile(length(during_g$tmin),during_g$tmin,0.1)/10.0
-                tmin10after<-percentile(length(after_g$tmin),after_g$tmin,0.1)/10.0
+                tmin10before<-quantile(before_g$tmin,0.1)/10.0
+                tmin10during<-quantile(during_g$tmin,0.1)/10.0
+                tmin10after<-quantile(after_g$tmin,0.1)/10.0
                 
                 
                 # consecutive cold days in the three periods
@@ -85,9 +85,9 @@ compute_consecutive_indices_1_tmin <- function(s.date, e.date, wea.station, sccs
                 during_g <- rbind(d1, d2)
                 after_g <- subset(dd[dd$year == j,],  doy > e.date & doy < 181)
                 
-                tmin10before<-percentile(length(before_g$tmin),before_g$tmin,0.1)/10.0
-                tmin10during<-percentile(length(during_g$tmin),during_g$tmin,0.1)/10.0
-                tmin10after<-percentile(length(after_g$tmin),after_g$tmin,0.1)/10.0
+                tmin10before<-quantile(before_g$tmin,0.1)/10.0
+                tmin10during<-quantile(during_g$tmin,0.1)/10.0
+                tmin10after<-quantile(after_g$tmin,0.1)/10.0
                 
                 
                 # consecutive cold days in the three periods
