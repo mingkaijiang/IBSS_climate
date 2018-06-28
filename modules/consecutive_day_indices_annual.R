@@ -7,6 +7,9 @@ consecutive_day_indices_annual <- function(sourceDir, destDir) {
     # wea.station: weather station id list
     # sccs.id: sccs id
     # dest: dest directory
+  
+  sourceDir = "data/ghcnd_gap_filled"
+  destDir = "data/indices/CDS"
     
     DatFiles <- list.files(path = sourceDir, pattern = "\\.csv")
     dir.create(destDir, showWarnings = FALSE)

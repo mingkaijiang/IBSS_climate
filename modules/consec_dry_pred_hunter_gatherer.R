@@ -3,7 +3,7 @@
 consec_dry_pred_hunter_gatherer<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECTORY)
 {
   
-    sourceDir = "data/indices/CSDI_hunter_gatherer"
+    sourceDir = "data/indices/CDS_hunter_gatherer"
     destDir = "data/predictability"
     
     dir.create(destDir, showWarnings = FALSE)
