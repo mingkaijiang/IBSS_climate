@@ -1,9 +1,5 @@
 ##############################################################################################################
-ThrIndS_tmax_ann <- function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECTORY) 
-
-{
-  sourceDir = "data/ghcnd_tmax_gap_filled_tmax"
-  destDir = "data/indices/ThrIndS_tmax"
+ThrIndS_tmax_ann <- function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECTORY) {
   dir.create(destDir, showWarnings = FALSE)
   DatFiles <- list.files(path = sourceDir, pattern = "\\.csv")
     

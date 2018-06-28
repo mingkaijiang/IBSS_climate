@@ -2,10 +2,6 @@
 ##Calculate consecutive dry days predictability based on whole temporal range
 consec_dry_pred_hunter_gatherer<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECTORY)
 {
-  
-    sourceDir = "data/indices/CDS_hunter_gatherer"
-    destDir = "data/predictability"
-    
     dir.create(destDir, showWarnings = FALSE)
     DatFiles <- list.files(path = sourceDir, pattern = "\\.csv")
     

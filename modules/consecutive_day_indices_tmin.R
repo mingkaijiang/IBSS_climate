@@ -16,10 +16,6 @@ consecutive_day_indices_tmin<-function(sDF,
     ## So the final naming criteria follows: GHCN station ID _ SCCS ID _ Plant 1/2/3/4
     
     # prepare file list
-  
-    sourceDir = "data/ghcnd_gap_filled_tmin"
-    destDir = "data/indices/CSDI"
-    
     dir.create(destDir, showWarnings = FALSE)
 
     # get sccs id information

@@ -17,12 +17,6 @@ consecutive_day_indices_hunter_gatherer_tmin<-function(sDF,
     ## For hunter and gatherer societies only
   
     # prepare file list
-  
-    sourceDir = "data/ghcnd_gap_filled_tmin"
-    
-    destDir = "data/indices/CSDI_hunter_gatherer"
-   
-   
     dir.create(destDir, showWarnings = FALSE)
 
     # get sccs id information

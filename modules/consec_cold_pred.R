@@ -2,10 +2,6 @@
 ##Calculate consecutive cold days predictability based on whole temporal range
 consec_cold_pred<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECTORY)
 {
-  
-    sourceDir = "data/indices/CSDI"
-    destDir = "data/predictability"
-    
     dir.create(destDir, showWarnings = FALSE)
     DatFiles <- list.files(path = sourceDir, pattern = "\\.csv")
     

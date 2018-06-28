@@ -2,9 +2,6 @@
 ##Calculate consecutive dry days predictability based on whole temporal range
 consec_dry_pred<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECTORY)
 {
-  
-    sourceDir = "data/indices/CDS"
-    destDir = "data/predictability"
     
     dir.create(destDir, showWarnings = FALSE)
     DatFiles <- list.files(path = sourceDir, pattern = "\\.csv")
