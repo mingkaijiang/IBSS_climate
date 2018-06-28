@@ -156,6 +156,6 @@ consec_dry_pred<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTP
             
         }
     }
-    write.csv(output,paste0(destDir, "/Consec_csdi_PCM.csv"),row.names=F)
+    write.csv(output,paste0(destDir, "/Consec_dry_PCM.csv"),row.names=F)
     
 }

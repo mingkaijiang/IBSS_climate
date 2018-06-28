@@ -117,7 +117,7 @@ SDIIS(sourceDir = "data/ghcnd_gap_filled", destDir = "data/indices/SDIIS")
 
 ### Step 6: 
 ### Calculate consecutive days indices
-consecutive_day_indices_annual(sourceDir = "data/ghcnd_gap_filled", destDir = "data/indices/CDS")
+consecutive_day_indices(sourceDir = "data/ghcnd_gap_filled", destDir = "data/indices/CDS")
 
 ### Calculate consecutive days indices for hunter/gatherer societies, i.e. sites without any plant grow information
 consecutive_day_indices_hunter_gatherer(final_station_DF, 
