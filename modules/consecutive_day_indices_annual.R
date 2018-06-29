@@ -23,6 +23,8 @@ consecutive_day_indices_annual <- function(sourceDir, destDir) {
         
         for (j in dd$Year) {
             myDF <- dd[dd$Year == j, ]
+            index <- myDF$value > 0
+            myDF$value[index] <- 1
             ann <- rle(myDF$value)
             p <- length(myDF$value)
             outDF[outDF$Year == j, "consecutive_wet"] <- max(ann$lengths[ann$values>0]) / p
