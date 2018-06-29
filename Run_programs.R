@@ -109,7 +109,7 @@ RX5S(sourceDir = "data/ghcnd_gap_filled", destDir = "data/indices/rx5s")
 
 ### Step 4: 
 ### Calculate threshold based indices, R10, R20, R95P, R99P,PRCPTOT at seasonal timestep
-ThrIndS(sourceDir = "data/ghcnd_gap_filled", destDir = "data/indices/ThrIndS")
+ThrIndS_sum(sourceDir = "data/ghcnd_gap_filled", destDir = "data/indices/ThrIndS")
 
 ### Step 5:
 ### Calculate prcp/# of wet days over each season and save into corresponding directory
