@@ -238,15 +238,15 @@ ThrIndS<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIREC
             dp[(i-years+1),"r01p_ann"]<-length(dd[dd$year == i & 
                                                    dd$prcp <= prcp01ann,"prcp"])
             
-            dp[(i-years+1),"prcptot_spr"]<-length(dd[dd$year == i & dd$month >= 3 & dd$month<= 5 & 
+            dp[(i-years+1),"prcptot_spr"]<-sum(dd[dd$year == i & dd$month >= 3 & dd$month<= 5 & 
                                                       dd$prcp >= 1,"prcp"])
-            dp[(i-years+1),"prcptot_sum"]<-length(dd[dd$year == i & dd$month >= 6 & dd$month<= 8 & 
+            dp[(i-years+1),"prcptot_sum"]<-sum(dd[dd$year == i & dd$month >= 6 & dd$month<= 8 & 
                                                       dd$prcp >= 1,"prcp"])
-            dp[(i-years+1),"prcptot_aut"]<-length(dd[dd$year == i & dd$month >= 9 & dd$month<= 11 & 
+            dp[(i-years+1),"prcptot_aut"]<-sum(dd[dd$year == i & dd$month >= 9 & dd$month<= 11 & 
                                                       dd$prcp >= 1,"prcp"])
-            dp[(i-years+1),"prcptot_win"]<-length(dd[dd$year == i & (dd$month == 12 | dd$month== 1 | dd$month==2) & 
+            dp[(i-years+1),"prcptot_win"]<-sum(dd[dd$year == i & (dd$month == 12 | dd$month== 1 | dd$month==2) & 
                                                       dd$prcp >= 1,"prcp"])
-            dp[(i-years+1),"prcptot_ann"]<-length(dd[dd$year == i & 
+            dp[(i-years+1),"prcptot_ann"]<-sum(dd[dd$year == i & 
                                                    dd$prcp >= 1,"prcp"])
         }
         
