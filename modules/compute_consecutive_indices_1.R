@@ -49,6 +49,11 @@ compute_consecutive_indices_1 <- function(s.date, e.date, wea.station, sccs.id, 
                 during_g <- subset(dd[dd$year == j,], doy >= s.date & doy <= e.date)
                 after_g <- subset(dd[dd$year == j,],  doy > e.date)
 
+                # change prcp dzta to 0 and 1
+                before_g$prcp[before_g$prcp > 0] <- 1.0
+                during_g$prcp[during_g$prcp > 0] <- 1.0
+                after_g$prcp[after_g$prcp > 0] <- 1.0
+                
                 # consecutive dry days in the three periods
                 dry_before <- rle(before_g$prcp)
                 dry_during <- rle(during_g$prcp)
@@ -93,6 +98,11 @@ compute_consecutive_indices_1 <- function(s.date, e.date, wea.station, sccs.id, 
                 during_g <- rbind(d1, d2)
                 after_g <- subset(dd[dd$year == j,],  doy > e.date & doy < 181)
 
+                # change prcp dzta to 0 and 1
+                before_g$prcp[before_g$prcp > 0] <- 1.0
+                during_g$prcp[during_g$prcp > 0] <- 1.0
+                after_g$prcp[after_g$prcp > 0] <- 1.0
+                
                 # consecutive dry days in the three periods
                 dry_before <- rle(before_g$prcp)
                 dry_during <- rle(during_g$prcp)

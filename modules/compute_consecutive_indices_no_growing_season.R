@@ -44,6 +44,12 @@ compute_consecutive_indices_no_growing_season <- function(wea.station, sccs.id, 
             jja <- subset(dd[dd$year == j,], month >= 6 & month <= 8)
             son <- subset(dd[dd$year == j,], month >= 9 & month <= 11)
             
+            # change prcp dzta to 0 and 1
+            djf$prcp[djf$prcp > 0] <- 1.0
+            mam$prcp[mam$prcp > 0] <- 1.0
+            jja$prcp[jja$prcp > 0] <- 1.0
+            son$prcp[son$prcp > 0] <- 1.0
+            
             # consecutive dry days in the three periods
             dry_djf <- rle(djf$prcp)
             dry_mam <- rle(mam$prcp)
