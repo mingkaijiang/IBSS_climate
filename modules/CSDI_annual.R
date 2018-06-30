@@ -21,7 +21,7 @@ CSDI_annual <- function(sourceDir, destDir) {
         outDF <- data.frame(unique(dd$Year), NA)
         colnames(outDF) <- c("Year", "consecutive_days")
         
-        t <- quantile(myDF$value,0.1)
+        t <- quantile(dd$value,0.1)
         
         for (j in dd$Year) {
             myDF <- dd[dd$Year == j, ]
