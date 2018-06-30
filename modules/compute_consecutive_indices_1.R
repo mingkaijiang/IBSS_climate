@@ -33,7 +33,7 @@ compute_consecutive_indices_1 <- function(s.date, e.date, wea.station, sccs.id, 
             
             # prepare output df
             outDF <- data.frame(unique(dd$year), NA, NA, NA, 
-                                NA, NA, NA, NA, NA)
+                                NA, NA, NA)
             colnames(outDF) <- c("year", "dry_before", "dry_growing", "dry_after",
                                  "wet_before", "wet_growing", "wet_after")
             
