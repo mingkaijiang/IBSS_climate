@@ -27,7 +27,7 @@ consec_dry_pred_hunter_gatherer<-function(sourceDir = DAILY.DATA.DIRECTORY, dest
         yearr <- yeare-years
         
         # site specific data range
-        v.range <- c(X$dry_djf, X$dry_MAM, 
+        v.range <- c(X$dry_DJF, X$dry_MAM, 
                      X$dry_JJA, X$dry_SON)
         
         test <- max(v.range) - min(v.range)
@@ -53,7 +53,7 @@ consec_dry_pred_hunter_gatherer<-function(sourceDir = DAILY.DATA.DIRECTORY, dest
                        min_bot+0.5*diff,min_bot+0.6*diff,min_bot+0.7*diff,min_bot+0.8*diff,
                        min_bot+0.9*diff,max_top)
             
-            djf_cut = cut(X[, "dry_djf"], breaks, include.lowest=TRUE,right=TRUE)
+            djf_cut = cut(X[, "dry_DJF"], breaks, include.lowest=TRUE,right=TRUE)
             mam_cut = cut(X[, "dry_MAM"], breaks, include.lowest=TRUE,right=TRUE)
             jja_cut = cut(X[, "dry_JJA"], breaks, include.lowest=TRUE,right=TRUE)
             son_cut = cut(X[, "dry_SON"], breaks, include.lowest=TRUE,right=TRUE)
@@ -63,14 +63,14 @@ consec_dry_pred_hunter_gatherer<-function(sourceDir = DAILY.DATA.DIRECTORY, dest
             jja_freq = table(jja_cut)
             son_freq = table(son_cut)
             
-            bin[,"djf"] <- djf_freq
+            bin[,"DJF"] <- djf_freq
             bin[,"MAM"] <- mam_freq
             bin[,"JJA"] <- jja_freq
             bin[,"SON"] <- son_freq
             
-            bin[,"whole"] = (bin[,"djf"]+bin[,"MAM"]+bin[,"JJA"]+bin[,"SON"])
+            bin[,"whole"] = (bin[,"DJF"]+bin[,"MAM"]+bin[,"JJA"]+bin[,"SON"])
             
-            col_sum <- sum(table(X[, "dry_djf"]))
+            col_sum <- sum(table(X[, "dry_DJF"]))
             whole_sum <- col_sum*4
             
             #uncertainty with respect to time H(X)

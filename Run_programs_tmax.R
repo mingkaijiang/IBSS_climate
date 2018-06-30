@@ -93,7 +93,7 @@ final_station_DF <-Final_station_list_4(sourceDir = "data/ghcnd_tmax_gap_filled_
 
 ### Step 1: 
 ### Calculate threshold based index fd at seasonal timestep
-ThrIndS_tmax(sourceDir = "data/ghcnd_tmax_gap_filled_tmax", destDir = "data/indices/ThrIndS_tmax")
+ThrIndS_tmax_ann(sourceDir = "data/ghcnd_tmax_gap_filled_tmax", destDir = "data/indices/ThrIndS_tmax")
 
 
 ##############################################################################################################
@@ -101,7 +101,7 @@ ThrIndS_tmax(sourceDir = "data/ghcnd_tmax_gap_filled_tmax", destDir = "data/indi
 
 
 ##Calculate tmax predictability
-tmax_pred(sourceDir = "data/indices/ThrIndS_tmax", destDir = "data/predictability_tmax")
+tmax_pred(sourceDir = "data/indices/ThrIndS_tmax", destDir = "data/predictability")
 
 ##############################################################################################################
 ### End

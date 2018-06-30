@@ -93,7 +93,7 @@ final_station_DF <-Final_station_list_4(sourceDir = "data/ghcnd_gap_filled_tmin"
 
 ### Step 1: 
 ### Calculate threshold based index fd at seasonal timestep
-ThrIndS_temp(sourceDir = "data/ghcnd_gap_filled_tmin", destDir = "data/indices/ThrIndS_temp")
+ThrIndS_temp_ann(sourceDir = "data/ghcnd_gap_filled_tmin", destDir = "data/indices/ThrIndS_temp")
 
 ### Step 2: 
 ### Calculate consecutive days indices
@@ -105,7 +105,7 @@ consecutive_day_indices_hunter_gatherer_tmin(final_station_DF,
                                         sourceDir = "data/ghcnd_gap_filled_tmin", destDir = "data/indices/CSDI_hunter_gatherer")
 
 ### Calculate annual consecutive day indices, regardless of the societies
-CSDI_annual(sourceDir = "data/ghcnd_gap_filled", destDir = "data/indices/annual_consecutive_tmin")
+CSDI_annual(sourceDir = "data/ghcnd_gap_filled_tmin", destDir = "data/indices/annual_consecutive_tmin")
 
 ##############################################################################################################
 #### Calculate whole year range predictability

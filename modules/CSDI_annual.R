@@ -21,11 +21,12 @@ CSDI_annual <- function(sourceDir, destDir) {
         outDF <- data.frame(unique(dd$Year), NA)
         colnames(outDF) <- c("Year", "consecutive_days")
         
+        t <- quantile(dd$value,0.1)
+        
         for (j in dd$Year) {
             myDF <- dd[dd$Year == j, ]
             p <- length(myDF$value)
-            t <- quantile(myDF$value,0.1)
-            myDF2 <- myDF$value > t
+            myDF2 <- myDF$value < t
             ann <- rle(myDF2)
             outDF[outDF$Year == j, "consecutive_days"] <- max(ann$lengths[which(ann$values == "TRUE")]) / p
         }
