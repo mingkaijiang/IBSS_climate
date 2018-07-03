@@ -150,6 +150,6 @@ consec_dry_pred_hunter_gatherer<-function(sourceDir = DAILY.DATA.DIRECTORY, dest
             output[j,"P_freedom"] <- P_free
         }
     }
-    write.csv(output,paste0(destDir, "/Consec_csdi_PCM_hunter_gatherer.csv"),row.names=F)
+    write.csv(output,paste0(destDir, "/Consec_dry_PCM_hunter_gatherer.csv"),row.names=F)
     
 }
