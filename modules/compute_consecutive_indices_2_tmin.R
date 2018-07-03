@@ -65,7 +65,7 @@ compute_consecutive_indices_2_tmin <- function(s1.date, e1.date, s2.date, e2.dat
                 
                 outDF[outDF$year == j, "cold_before"] <- max(cold_before$lengths[cold_before$values==0]) /b.period
                 outDF[outDF$year == j, "cold_growing"] <- max(cold_during$lengths[cold_during$values==0])/ g.period
-                outDF[outDF$year == j, "cold_after"] <- max(cold_after$lengths[cold_after$values==0]) a.period
+                outDF[outDF$year == j, "cold_after"] <- max(cold_after$lengths[cold_after$values==0])/ a.period
 
             }
         } else {
@@ -187,7 +187,7 @@ compute_consecutive_indices_2_tmin <- function(s1.date, e1.date, s2.date, e2.dat
                 cold_after <- rle(ifelse((after_g$tmin/10.0 - tmin10after) < 0.0, 0, 1))
                 
                 outDF[outDF$year == j, "cold_before"] <- max(cold_before$lengths[cold_before$values==0]) / b.period
-                outDF[outDF$year == j, "cold_growing"] <- max(cold_during$lengths[cold_during$values==0]) g.period
+                outDF[outDF$year == j, "cold_growing"] <- max(cold_during$lengths[cold_during$values==0]) / g.period
                 outDF[outDF$year == j, "cold_after"] <- max(cold_after$lengths[cold_after$values==0]) /a.period
                 
             }
