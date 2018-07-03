@@ -40,6 +40,10 @@ compute_consecutive_indices_1_tmin <- function(s.date, e.date, wea.station, sccs
             b.period <- s.date - 0
             a.period <- 366 - e.date + 1
             
+            tmin10before<-quantile(before_g$tmin,0.1)/10.0
+            tmin10during<-quantile(during_g$tmin,0.1)/10.0
+            tmin10after<-quantile(after_g$tmin,0.1)/10.0
+            
             # count # days 
             for (j in outDF$year) {
                 # extract the three periods
@@ -47,9 +51,6 @@ compute_consecutive_indices_1_tmin <- function(s.date, e.date, wea.station, sccs
                 during_g <- subset(dd[dd$year == j,], doy >= s.date & doy <= e.date)
                 after_g <- subset(dd[dd$year == j,],  doy > e.date)
                 
-                tmin10before<-quantile(before_g$tmin,0.1)/10.0
-                tmin10during<-quantile(during_g$tmin,0.1)/10.0
-                tmin10after<-quantile(after_g$tmin,0.1)/10.0
                 
                 
                 # consecutive cold days in the three periods
@@ -57,9 +58,9 @@ compute_consecutive_indices_1_tmin <- function(s.date, e.date, wea.station, sccs
                 cold_during <- rle(ifelse((during_g$tmin/10.0 - tmin10during) < 0.0, 0, 1))
                 cold_after <- rle(ifelse((after_g$tmin/10.0 - tmin10after) < 0.0, 0, 1))
                 
-                outDF[outDF$year == j, "cold_before"] <- max(cold_before$lengths[cold_before$values==0])
-                outDF[outDF$year == j, "cold_growing"] <- max(cold_during$lengths[cold_during$values==0])
-                outDF[outDF$year == j, "cold_after"] <- max(cold_after$lengths[cold_after$values==0])
+                outDF[outDF$year == j, "cold_before"] <- max(cold_before$lengths[cold_before$values==0]) / b.period
+                outDF[outDF$year == j, "cold_growing"] <- max(cold_during$lengths[cold_during$values==0]) / g.period
+                outDF[outDF$year == j, "cold_after"] <- max(cold_after$lengths[cold_after$values==0]) / a.period
                 
             }
         } else {
@@ -76,6 +77,10 @@ compute_consecutive_indices_1_tmin <- function(s.date, e.date, wea.station, sccs
             b.period <- s.date - 181 
             a.period <- 181 - e.date
             
+            tmin10before<-quantile(before_g$tmin,0.1)/10.0
+            tmin10during<-quantile(during_g$tmin,0.1)/10.0
+            tmin10after<-quantile(after_g$tmin,0.1)/10.0
+            
             # count # days 
             for (j in outDF$year) {
                 # extract the three periods
@@ -85,19 +90,16 @@ compute_consecutive_indices_1_tmin <- function(s.date, e.date, wea.station, sccs
                 during_g <- rbind(d1, d2)
                 after_g <- subset(dd[dd$year == j,],  doy > e.date & doy < 181)
                 
-                tmin10before<-quantile(before_g$tmin,0.1)/10.0
-                tmin10during<-quantile(during_g$tmin,0.1)/10.0
-                tmin10after<-quantile(after_g$tmin,0.1)/10.0
-                
+ 
                 
                 # consecutive cold days in the three periods
                 cold_before <- rle(ifelse((before_g$tmin/10.0 - tmin10before) < 0.0, 0, 1))
                 cold_during <- rle(ifelse((during_g$tmin/10.0 - tmin10during) < 0.0, 0, 1))
                 cold_after <- rle(ifelse((after_g$tmin/10.0 - tmin10after) < 0.0, 0, 1))
                 
-                outDF[outDF$year == j, "cold_before"] <- max(cold_before$lengths[cold_before$values==0])
-                outDF[outDF$year == j, "cold_growing"] <- max(cold_during$lengths[cold_during$values==0])
-                outDF[outDF$year == j, "cold_after"] <- max(cold_after$lengths[cold_after$values==0])
+                outDF[outDF$year == j, "cold_before"] <- max(cold_before$lengths[cold_before$values==0]) / b.period
+                outDF[outDF$year == j, "cold_growing"] <- max(cold_during$lengths[cold_during$values==0]) / g.period
+                outDF[outDF$year == j, "cold_after"] <- max(cold_after$lengths[cold_after$values==0]) / a.period
                 
 
             }

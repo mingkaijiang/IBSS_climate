@@ -31,6 +31,11 @@ compute_consecutive_indices_no_growing_season_tmin <- function(wea.station, sccs
          outDF <- data.frame(unique(dd$year), NA, NA, NA, NA)
          colnames(outDF) <- c("year", "cold_djf", "cold_mam", "cold_jja", "cold_son")
          outDF <- outDF[-1,]
+         
+         tmin10djf<-quantile(djf$tmin,0.1)/10.0
+         tmin10mam<-quantile(mam$tmin,0.1)/10.0
+         tmin10jja<-quantile(jja$tmin,0.1)/10.0
+         tmin10son<-quantile(son$tmin,0.1)/10.0
 
         # count # days 
         for (j in outDF$year) {
@@ -42,10 +47,6 @@ compute_consecutive_indices_no_growing_season_tmin <- function(wea.station, sccs
             jja <- subset(dd[dd$year == j,], month >= 6 & month <= 8)
             son <- subset(dd[dd$year == j,], month >= 9 & month <= 11)
             
-            tmin10djf<-quantile(djf$tmin,0.1)/10.0
-            tmin10mam<-quantile(mam$tmin,0.1)/10.0
-            tmin10jja<-quantile(jja$tmin,0.1)/10.0
-            tmin10son<-quantile(son$tmin,0.1)/10.0
 
             if(inName == "data/ghcnd_gap_filled/NG000061017.csv" && j == 1940) {print(tmin10mam)}
             if(inName == "data/ghcnd_gap_filled/NG000061017.csv" && j == 1940) {print(mam$tmin/10.0 - tmin10mam)}
@@ -65,10 +66,10 @@ compute_consecutive_indices_no_growing_season_tmin <- function(wea.station, sccs
             
             if(inName == "data/ghcnd_gap_filled/NG000061017.csv" && j == 1940) { print(cold_mam)}
             
-            outDF[outDF$year == j, "cold_djf"] <- max(cold_djf$lengths[cold_djf$values==0])
-            outDF[outDF$year == j, "cold_mam"] <- max(cold_mam$lengths[cold_mam$values==0])
-            outDF[outDF$year == j, "cold_jja"] <- max(cold_jja$lengths[cold_jja$value==0])
-            outDF[outDF$year == j, "cold_son"] <- max(cold_son$lengths[cold_son$values==0])
+            outDF[outDF$year == j, "cold_djf"] <- max(cold_djf$lengths[cold_djf$values==0]) / 91.0
+            outDF[outDF$year == j, "cold_mam"] <- max(cold_mam$lengths[cold_mam$values==0]) / 92.0
+            outDF[outDF$year == j, "cold_jja"] <- max(cold_jja$lengths[cold_jja$value==0]) / 92.0
+            outDF[outDF$year == j, "cold_son"] <- max(cold_son$lengths[cold_son$values==0]) / 91.0
             
             if(inName == "data/ghcnd_gap_filled/NG000061017.csv" && j == 1940) { print(outDF[outDF$year == j, "cold_mam"])}
             if(inName == "data/ghcnd_gap_filled/NG000061017.csv" && j == 1940) { print(cold_mam$values)}

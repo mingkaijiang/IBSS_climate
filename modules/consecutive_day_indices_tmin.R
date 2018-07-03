@@ -155,7 +155,7 @@ consecutive_day_indices_tmin<-function(sDF,
             
             # compute consecutive days indices
             ifelse(ghcn.l == 0, print(paste0("No GHCN station for SCCS ", i)), 
-                   compute_consecutive_indices_no_growing_season_tmin_ann(s1.doy, e1.doy, s2.doy, e2.doy, 
+                   compute_consecutive_indices_4_tmin(s1.doy, e1.doy, s2.doy, e2.doy, 
                                                  s3.doy, e3.doy, s4.doy, e4.doy,
                                                  ghcn.list, i, sourceDir, destDir))
         }
