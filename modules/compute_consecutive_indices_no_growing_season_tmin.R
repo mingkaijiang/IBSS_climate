@@ -32,6 +32,13 @@ compute_consecutive_indices_no_growing_season_tmin <- function(wea.station, sccs
          colnames(outDF) <- c("year", "cold_djf", "cold_mam", "cold_jja", "cold_son")
          outDF <- outDF[-1,]
          
+         d1 <- subset(dd, month == 12)
+         d2 <- subset(dd, month >= 1 & month <= 2)
+         djf <- rbind(d1, d2)
+         mam <- subset(dd, month >= 3 & month <= 5)
+         jja <- subset(dd, month >= 6 & month <= 8)
+         son <- subset(dd, month >= 9 & month <= 11)
+         
          tmin10djf<-quantile(djf$tmin,0.1)/10.0
          tmin10mam<-quantile(mam$tmin,0.1)/10.0
          tmin10jja<-quantile(jja$tmin,0.1)/10.0

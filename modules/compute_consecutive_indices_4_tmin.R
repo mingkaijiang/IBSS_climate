@@ -55,6 +55,10 @@ compute_consecutive_indices_4_tmin <- function(s1.date, e1.date, s2.date, e2.dat
             b.period <- s1.date - 0
             a.period <- 366 - e1.date + 1
             
+            before_g <- subset(dd, doy < s1.date)
+            during_g <- subset(dd, doy >= s1.date & doy <= e1.date)
+            after_g <- subset(dd,  doy > e1.date)
+            
             tmin10before<-quantile(before_g$tmin,0.1)/10.0
             tmin10during<-quantile(during_g$tmin,0.1)/10.0
             tmin10after<-quantile(after_g$tmin,0.1)/10.0
@@ -90,6 +94,12 @@ compute_consecutive_indices_4_tmin <- function(s1.date, e1.date, s2.date, e2.dat
             g.period <- 366 - s1.date + e1.date
             b.period <- s1.date - 181 
             a.period <- 181 - e1.date
+            
+            before_g <- subset(dd, doy < s1.date & doy >= 181)
+            d1 <- subset(dd, doy >= s1.date)
+            d2 <- subset(dd, doy <= e1.date)
+            during_g <- rbind(d1, d2)
+            after_g <- subset(dd,  doy > e1.date & doy < 181)
             
             tmin10before<-quantile(before_g$tmin,0.1)/10.0
             tmin10during<-quantile(during_g$tmin,0.1)/10.0
@@ -137,6 +147,10 @@ compute_consecutive_indices_4_tmin <- function(s1.date, e1.date, s2.date, e2.dat
             b.period <- s2.date - 0
             a.period <- 366 - e2.date + 1
             
+            before_g <- subset(dd, doy < s2.date)
+            during_g <- subset(dd, doy >= s2.date & doy <= e2.date)
+            after_g <- subset(dd,  doy > e2.date)
+            
             tmin10before<-quantile(before_g$tmin,0.1)/10.0
             tmin10during<-quantile(during_g$tmin,0.1)/10.0
             tmin10after<-quantile(after_g$tmin,0.1)/10.0
@@ -173,6 +187,12 @@ compute_consecutive_indices_4_tmin <- function(s1.date, e1.date, s2.date, e2.dat
             g.period <- 366 - s2.date + e2.date
             b.period <- s2.date - 181 
             a.period <- 181 - e2.date
+            
+            before_g <- subset(dd, doy < s2.date & doy >= 181)
+            d1 <- subset(dd, doy >= s2.date)
+            d2 <- subset(dd, doy <= e2.date)
+            during_g <- rbind(d1, d2)
+            after_g <- subset(dd,  doy > e2.date & doy < 181)
             
             tmin10before<-quantile(before_g$tmin,0.1)/10.0
             tmin10during<-quantile(during_g$tmin,0.1)/10.0
@@ -221,6 +241,10 @@ compute_consecutive_indices_4_tmin <- function(s1.date, e1.date, s2.date, e2.dat
             b.period <- s3.date - 0
             a.period <- 366 - e3.date + 1
             
+            before_g <- subset(dd, doy < s3.date)
+            during_g <- subset(dd, doy >= s3.date & doy <= e3.date)
+            after_g <- subset(dd,  doy > e3.date)
+            
             tmin10before<-quantile(before_g$tmin,0.1)/10.0
             tmin10during<-quantile(during_g$tmin,0.1)/10.0
             tmin10after<-quantile(after_g$tmin,0.1)/10.0
@@ -256,6 +280,12 @@ compute_consecutive_indices_4_tmin <- function(s1.date, e1.date, s2.date, e2.dat
             g.period <- 366 - s3.date + e3.date
             b.period <- s3.date - 181 
             a.period <- 181 - e3.date
+            
+            before_g <- subset(dd, doy < s3.date & doy >= 181)
+            d1 <- subset(dd, doy >= s3.date)
+            d2 <- subset(dd, doy <= e3.date)
+            during_g <- rbind(d1, d2)
+            after_g <- subset(dd,  doy > e3.date & doy < 181)
             
             tmin10before<-quantile(before_g$tmin,0.1)/10.0
             tmin10during<-quantile(during_g$tmin,0.1)/10.0
@@ -305,6 +335,10 @@ compute_consecutive_indices_4_tmin <- function(s1.date, e1.date, s2.date, e2.dat
             b.period <- s4.date - 0
             a.period <- 366 - e4.date + 1
             
+            before_g <- subset(dd, doy < s4.date)
+            during_g <- subset(dd, doy >= s4.date & doy <= e4.date)
+            after_g <- subset(dd,  doy > e4.date)
+            
             tmin10before<-quantile(before_g$tmin,0.1)/10.0
             tmin10during<-quantile(during_g$tmin,0.1)/10.0
             tmin10after<-quantile(after_g$tmin,0.1)/10.0
@@ -341,6 +375,12 @@ compute_consecutive_indices_4_tmin <- function(s1.date, e1.date, s2.date, e2.dat
             g.period <- 366 - s4.date + e4.date
             b.period <- s4.date - 181 
             a.period <- 181 - e4.date
+            
+            before_g <- subset(dd, doy < s4.date & doy >= 181)
+            d1 <- subset(dd, doy >= s4.date)
+            d2 <- subset(dd, doy <= e4.date)
+            during_g <- rbind(d1, d2)
+            after_g <- subset(dd,  doy > e4.date & doy < 181)
             
             tmin10before<-quantile(before_g$tmin,0.1)/10.0
             tmin10during<-quantile(during_g$tmin,0.1)/10.0

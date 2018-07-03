@@ -40,6 +40,10 @@ compute_consecutive_indices_1_tmin <- function(s.date, e.date, wea.station, sccs
             b.period <- s.date - 0
             a.period <- 366 - e.date + 1
             
+            before_g <- subset(dd, doy < s.date)
+            during_g <- subset(dd, doy >= s.date & doy <= e.date)
+            after_g <- subset(dd,  doy > e.date)
+            
             tmin10before<-quantile(before_g$tmin,0.1)/10.0
             tmin10during<-quantile(during_g$tmin,0.1)/10.0
             tmin10after<-quantile(after_g$tmin,0.1)/10.0
@@ -76,6 +80,12 @@ compute_consecutive_indices_1_tmin <- function(s.date, e.date, wea.station, sccs
             g.period <- 366 - s.date + e.date
             b.period <- s.date - 181 
             a.period <- 181 - e.date
+            
+            before_g <- subset(dd, doy < s.date & doy >= 181)
+            d1 <- subset(dd, doy >= s.date)
+            d2 <- subset(dd, doy <= e.date)
+            during_g <- rbind(d1, d2)
+            after_g <- subset(dd,  doy > e.date & doy < 181)
             
             tmin10before<-quantile(before_g$tmin,0.1)/10.0
             tmin10during<-quantile(during_g$tmin,0.1)/10.0
