@@ -154,9 +154,13 @@ ThrIndS_sum<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.D
         
         prcptmp_win<-prcptmp_win[is.na(prcptmp_win)==F]
         
-        prcptmp_ann <- dd[dd$year >= startyear & dd$year <= endyear,"prcp"]
+        prcptmp_ann<-dd[dd$year >= startyear 
+                        & dd$year <= endyear 
+                        & dd$prcp>=1,"prcp"]
         
         prcptmp_ann<-prcptmp_ann[is.na(prcptmp_ann)==F]
+        
+        
         
         
         len_spr<-length(prcptmp_spr)
