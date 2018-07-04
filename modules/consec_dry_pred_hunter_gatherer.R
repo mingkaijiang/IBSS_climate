@@ -43,7 +43,7 @@ consec_dry_pred_hunter_gatherer<-function(sourceDir = DAILY.DATA.DIRECTORY, dest
         
         if(diff > 0) {
             bin <- matrix(0, ncol=6, nrow=interval)
-            dimnames(bin) <- list(NULL,c("bin_size","djf","mam","jja","son","whole"))
+            dimnames(bin) <- list(NULL,c("bin_size","DJF","MAM","JJA","SON","whole"))
             
             bin[,"bin_size"] <- c(min_bot+0.1*diff,min_bot+0.2*diff,min_bot+0.3*diff,min_bot+0.4*diff,
                                   min_bot+0.5*diff,min_bot+0.6*diff,min_bot+0.7*diff,min_bot+0.8*diff,
