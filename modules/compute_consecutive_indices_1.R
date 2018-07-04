@@ -1,6 +1,5 @@
 ## Actual computation of consecutive day indices
 ## based on 1 growing season for each SCCS society
-
 compute_consecutive_indices_1 <- function(s.date, e.date, wea.station, sccs.id, source, dest) {
     # s.date: starting doy for plant 1
     # e.date: end doy for plant 1

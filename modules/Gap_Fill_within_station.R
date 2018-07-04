@@ -9,12 +9,12 @@ Gap_Fill_within_station <- function(station.list.input,
     station.list <- station.list[!is.na(station.list)]
     
     # remove one station
-    r <- station.list[490]
+    r <- station.list[489]
     rm.station <- paste0(sourceDir, "/", r, ".csv")
     if (file.exists(rm.station)) file.remove(rm.station)
     
     # rmove the station from the station list
-    station.list <- station.list[-490]
+    station.list <- station.list[-489]
     
     targList <- paste0(station.list,".csv")
     

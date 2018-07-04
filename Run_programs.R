@@ -61,7 +61,7 @@ stationDF.upd <- Update_station_list(station.list.upd, stationDF)
 
 ## the following sites are problematic, so excluded in the first run
 ## problem sites: 0 (non-NA) cases: non-missing data do not overlap across all sites
-##                 dim(X) must hvae a postive length: two sites overlapping problem
+##                 dim(X) must have a postive length: two sites overlapping problem
 ##                lmCoef[j, i]: subscript out of bounds: 
 ##                error in modDF$date
 stationDF2 <- stationDF.upd[-c(23,25,30,38,53,55,65,77,80,84,85,      # 0 (non-NA) cases
