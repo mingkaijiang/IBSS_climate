@@ -81,7 +81,7 @@ stationDF.upd <- Update_station_list_5_stations(station.list.input=station.list.
 #         destDir = "data/ghcnd_gap_filled")
 
 
-stationDF2 <- stationDF.upd#[-c(17,18),]
+stationDF2 <- stationDF.upd[-c(19, 24, 32, 42, 51, 59, 60, 64, 66, 67),]
 Gap_Fill_5_stations(stationDF2, 
                     sourceDir = "data/ghcnd_gap_filled", 
                     destDir = "data/ghcnd_gap_filled")
@@ -90,9 +90,13 @@ Gap_Fill_5_stations(stationDF2,
 ### Step 5:
 ### Gap filling 2. - use same period in other years to fill big chunk of missing data
 ###                - and the remaining unfilled sites
-Gap_Fill_within_station(station.list.upd, 
-                        sourceDir = "data/ghcnd_gap_filled",
-                        destDir = "data/ghcnd_gap_filled")
+#Gap_Fill_within_station(station.list.upd, 
+#                        sourceDir = "data/ghcnd_gap_filled",
+#                        destDir = "data/ghcnd_gap_filled")
+
+Gap_Fill_within_station_5_stations(station.list.input=station.list.upd, 
+                                   sourceDir = "data/ghcnd_gap_filled",
+                                   destDir = "data/ghcnd_gap_filled")
 
 ### Step 6:
 ### Check year range quality - only include data with > 10 yrs of data
@@ -103,8 +107,8 @@ YrRange10(sourceDir = "data/ghcnd_gap_filled")
 ### Step 7:
 ### Update stationDF2 to remove all removed stations from this list 
 ### and add the growing season information
-final_station_DF <-Final_station_list(sourceDir = "data/ghcnd_gap_filled", stationDF.upd,
-                                      outname="prcp")
+#final_station_DF <-Final_station_list(sourceDir = "data/ghcnd_gap_filled", stationDF.upd,
+#                                      outname="prcp")
 
 ##############################################################################################################
 #### Compute indices

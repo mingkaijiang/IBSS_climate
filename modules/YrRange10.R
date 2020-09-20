@@ -22,6 +22,6 @@ YrRange10<-function(sourceDir = DAILY.DATA.DIRECTORY)
         
     }
     
-    #write.csv(sDF, "data/sccs_ghcn_station_list_final.csv",
-    #          col.names=T, row.names=F, sep=",")
+    write.csv(sDF, "data/sccs_ghcn_station_list_final.csv",
+              row.names=F)
 }
