@@ -149,8 +149,12 @@ consecutive_day_indices_5_stations(sDF=final_station_DF,
                                    sourceDir = "data/ghcnd_gap_filled", destDir = "data/indices/CDS")
 
 ### Calculate consecutive days indices for hunter/gatherer societies, i.e. sites without any plant grow information
-consecutive_day_indices_hunter_gatherer(final_station_DF, 
+#consecutive_day_indices_hunter_gatherer(final_station_DF, 
+#                                        sourceDir = "data/ghcnd_gap_filled", destDir = "data/indices/CDS_hunter_gatherer")
+
+consecutive_day_indices_hunter_gatherer_5_stations(final_station_DF, 
                                         sourceDir = "data/ghcnd_gap_filled", destDir = "data/indices/CDS_hunter_gatherer")
+
 
 ### Calculate annual consecutive day indices, regardless of the societies
 consecutive_day_indices_annual(sourceDir = "data/ghcnd_gap_filled", destDir = "data/indices/annual_consecutive")
