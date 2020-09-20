@@ -109,7 +109,9 @@ YrRange10(sourceDir = "data/ghcnd_gap_filled")
 ### and add the growing season information
 #final_station_DF <-Final_station_list(sourceDir = "data/ghcnd_gap_filled", stationDF.upd,
 #                                      outname="prcp")
-final_station_DF <- read.csv("data/sccs_ghcn_station_list_final.csv")
+
+final_station_DF <-Final_station_list_5_stations(sourceDir = "data/ghcnd_gap_filled", sDF=stationDF.upd,
+                                                 outname="prcp")
 
 ### plot SCCS site and GHCN stations
 make_site_overview_map()
@@ -142,6 +144,7 @@ SDIIS(sourceDir = "data/ghcnd_gap_filled", destDir = "data/indices/SDIIS")
 #consecutive_day_indices(final_station_DF, 
 #                        sourceDir = "data/ghcnd_gap_filled", destDir = "data/indices/CDS")
 
+### stopped here, checking results
 consecutive_day_indices_5_stations(sDF=final_station_DF, 
                                    sourceDir = "data/ghcnd_gap_filled", destDir = "data/indices/CDS")
 
