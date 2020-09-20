@@ -46,12 +46,12 @@ Missing_check<-function(station.list.input,
             reality <- nrow(d2)
             miss_percent <- (target - reality) / target
             
-            #if (miss_percent <= 0.5)
-            #{  
+            if (miss_percent <= 0.95)
+            {  
                 print(paste0(thisFile, "------", station.list.input[thisFile]))
                 write.csv(out, outName, row.names=F)
                 station.list.output[thisFile, "station"] <- station.list.input[thisFile]
-            #}
+            }
         }
     }
     

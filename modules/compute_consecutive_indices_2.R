@@ -1,7 +1,8 @@
 ## Actual computation of consecutive day indices
 ## based on 2 crops for each SCCS society
 
-compute_consecutive_indices_2 <- function(s1.date, e1.date, s2.date, e2.date, wea.station, sccs.id, source, dest) {
+compute_consecutive_indices_2 <- function(s1.date, e1.date, s2.date, e2.date, 
+                                          wea.station, sccs.id, source, dest) {
     # s1.date: starting doy for plant 1
     # e1.date: end doy for plant 1
     # s2.date
@@ -9,8 +10,6 @@ compute_consecutive_indices_2 <- function(s1.date, e1.date, s2.date, e2.date, we
     # wea.station: weather station id list
     # sccs.id: sccs id
     # dest: dest directory
-    
-    require(lubridate)
     
     in.list <- paste0(wea.station, ".csv")
     out.list1 <- paste0(wea.station, "_sccs", sccs.id, "_plant1.csv")
