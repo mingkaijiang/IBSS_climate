@@ -57,8 +57,11 @@ station.list.upd <- Missing_check(station.list,
                                   destDir = "data/ghcnd_gap_filled")
 
 ## update stationDF
-stationDF.upd <- Update_station_list(station.list.input=station.list.upd, 
-                                     sDF=stationDF)
+#stationDF.upd <- Update_station_list(station.list.input=station.list.upd, 
+#                                     sDF=stationDF)
+
+stationDF.upd <- Update_station_list_5_stations(station.list.input=station.list.upd, 
+                                                sDF=stationDF)
 
 ### Step 4: 
 ### Gap filling 1. - use statistical correlation among 9 stations to gap fill all 9 stations
@@ -69,13 +72,19 @@ stationDF.upd <- Update_station_list(station.list.input=station.list.upd,
 ##                 dim(X) must have a postive length: two sites overlapping problem
 ##                lmCoef[j, i]: subscript out of bounds: 
 ##                error in modDF$date
-stationDF2 <- stationDF.upd[-c(23,25,30,38,53,55,65,77,80,84,85,      # 0 (non-NA) cases
-                               21,49,50,52,96,97,                       # dim(X) must have a positive length
-                               24,51,62,69,70,78),]                          # lmCoef[j, i]: subscript out of bounds
+#stationDF2 <- stationDF.upd[-c(23,25,30,38,53,55,65,77,80,84,85,      # 0 (non-NA) cases
+#                               21,49,50,52,96,97,                       # dim(X) must have a positive length
+#                               24,51,62,69,70,78),]                          # lmCoef[j, i]: subscript out of bounds
 
-Gap_Fill(stationDF2, 
-         sourceDir = "data/ghcnd_gap_filled", 
-         destDir = "data/ghcnd_gap_filled")
+#Gap_Fill(stationDF2, 
+#         sourceDir = "data/ghcnd_gap_filled", 
+#         destDir = "data/ghcnd_gap_filled")
+
+
+stationDF2 <- stationDF.upd#[-c(17,18),]
+Gap_Fill_5_stations(stationDF2, 
+                    sourceDir = "data/ghcnd_gap_filled", 
+                    destDir = "data/ghcnd_gap_filled")
 
 # Fill all remaining stations using data within the station
 ### Step 5:
