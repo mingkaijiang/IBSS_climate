@@ -2,9 +2,6 @@
 ThrIndS_sum<-function(sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECTORY) 
 {
   
-    sourceDir = "data/ghcnd_gap_filled" 
-    destDir = "data/indices/ThrIndS"
-    
     
     dir.create(destDir, showWarnings = FALSE)
     DatFiles <- list.files(path = sourceDir, pattern = "\\.csv")

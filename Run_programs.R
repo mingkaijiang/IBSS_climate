@@ -110,6 +110,9 @@ YrRange10(sourceDir = "data/ghcnd_gap_filled")
 #final_station_DF <-Final_station_list(sourceDir = "data/ghcnd_gap_filled", stationDF.upd,
 #                                      outname="prcp")
 
+### plot SCCS site and GHCN stations
+make_site_overview_map()
+
 ##############################################################################################################
 #### Compute indices
 
