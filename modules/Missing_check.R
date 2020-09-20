@@ -1,8 +1,9 @@
 ##############################################################################################################
-## Filter data for Year range > 10 for long-term trend analysis 
-## Also check for missing data issue, missing data should not be > 50%
-Missing_check<-function(station.list.input, sourceDir = DAILY.DATA.DIRECTORY, destDir = DAILY.OUTPUT.DIRECTORY)
-{
+## Check for missing data issue, missing data should not be > 50%
+Missing_check<-function(station.list.input, 
+                        sourceDir = DAILY.DATA.DIRECTORY,
+                        destDir = DAILY.OUTPUT.DIRECTORY) {
+  
     DatFiles <- paste0(station.list.input,".csv")
     dir.create(destDir, showWarnings = FALSE)
     
@@ -45,12 +46,12 @@ Missing_check<-function(station.list.input, sourceDir = DAILY.DATA.DIRECTORY, de
             reality <- nrow(d2)
             miss_percent <- (target - reality) / target
             
-            if (miss_percent <= 0.5)
-            {  
+            #if (miss_percent <= 0.5)
+            #{  
                 print(paste0(thisFile, "------", station.list.input[thisFile]))
                 write.csv(out, outName, row.names=F)
                 station.list.output[thisFile, "station"] <- station.list.input[thisFile]
-            }
+            #}
         }
     }
     

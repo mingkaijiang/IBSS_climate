@@ -25,12 +25,16 @@ growDF <- read.csv("input/PlantSeasonality.csv")
 growDF <- growing_season_single_entry(growDF)
 
 ### Obtain SCCS based GHCN stations that are closest to the SCCS point
-stationDF <- select_9_ghcn_stations(corDF, gDF, growDF)
+#stationDF <- select_9_ghcn_stations(corDF, gDF, growDF)
+stationDF <- select_5_ghcn_stations(corDF, gDF, growDF)
 
 ### Obtain GHCN station list to process
+#station.list <- c(stationDF$ghcn1, stationDF$ghcn2, stationDF$ghcn3,
+#                  stationDF$ghcn4, stationDF$ghcn5, stationDF$ghcn6,
+#                  stationDF$ghcn7, stationDF$ghcn8, stationDF$ghcn9)
+
 station.list <- c(stationDF$ghcn1, stationDF$ghcn2, stationDF$ghcn3,
-                  stationDF$ghcn4, stationDF$ghcn5, stationDF$ghcn6,
-                  stationDF$ghcn7, stationDF$ghcn8, stationDF$ghcn9)
+                  stationDF$ghcn4, stationDF$ghcn5)
 
 ##############################################################################################################
 #### select on SCCS sites based on their information sheet
@@ -53,7 +57,8 @@ station.list.upd <- Missing_check(station.list,
                                   destDir = "data/ghcnd_gap_filled")
 
 ## update stationDF
-stationDF.upd <- Update_station_list(station.list.upd, stationDF)
+stationDF.upd <- Update_station_list(station.list.input=station.list.upd, 
+                                     sDF=stationDF)
 
 ### Step 4: 
 ### Gap filling 1. - use statistical correlation among 9 stations to gap fill all 9 stations

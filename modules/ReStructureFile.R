@@ -6,8 +6,8 @@
 ##Remove "Day." from all data entries
 
 ReStructureFile <- function (sourceDir = DAILY.DATA.DIRECTORY, 
-                             destDir = DAILY.INPUT.DIRECTORY)
-{
+                             destDir = DAILY.INPUT.DIRECTORY) {
+  
     DatFiles <- list.files(path = sourceDir, pattern = "\\.csv")
     dir.create(destDir, showWarnings = FALSE)
     
@@ -23,6 +23,7 @@ ReStructureFile <- function (sourceDir = DAILY.DATA.DIRECTORY,
         if (nrow(X) > 0) {
             melted <- melt(X, id.var = c("Id", "Elements", "Year", "Month"), 
                            variable_name = "Day")
+            colnames(melted) <- c("ID", "Elements", "Year", "Month", "Day", "value")
             data_upd <- melted[!(melted$Month=="2" & melted$Day== "Day30"),]
             data_upd <- data_upd[!(data_upd$Month=="2" & data_upd$Day== "Day31"),]
             data_upd <- data_upd[!(data_upd$Month=="4" & data_upd$Day== "Day31"),]
