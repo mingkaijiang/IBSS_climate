@@ -114,7 +114,7 @@ final_station_DF <-Final_station_list_5_stations(sourceDir = "data/ghcnd_gap_fil
                                                  outname="prcp")
 
 ### plot SCCS site and GHCN stations
-make_site_overview_map()
+make_site_overview_map(sDF = final_station_DF)
 
 ##############################################################################################################
 #### Compute indices
