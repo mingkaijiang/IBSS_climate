@@ -25,10 +25,10 @@ growDF <- read.csv("input/PlantSeasonality.csv")
 growDF <- growing_season_single_entry(growDF)
 
 ### Obtain SCCS based GHCN stations that are closest to the SCCS point
-stationDF <- select_4_ghcn_stations(corDF, gDF, growDF)
+stationDF <- select_5_ghcn_stations(corDF, gDF, growDF)
 
 ### Obtain GHCN station list to process
-station.list <- c(stationDF$ghcn1,stationDF$ghcn2,stationDF$ghcn3,stationDF$ghcn4)
+station.list <- c(stationDF$ghcn1,stationDF$ghcn2,stationDF$ghcn3,stationDF$ghcn4,stationDF$ghcn5)
 
 ##############################################################################################################
 #### select on SCCS sites based on their information sheet
@@ -51,7 +51,7 @@ station.list.upd <- Missing_check(station.list,
                                   destDir = "data/ghcnd_gap_filled_tmax")
 
 ## update stationDF
-stationDF.upd <- Update_station_list_4_stations(station.list.upd, stationDF)
+stationDF.upd <- Update_station_list_5_stations(station.list.upd, stationDF)
 
 ### Step 4: 
 ### Gap filling 1. - use statistical correlation among 9 stations to gap fill all 9 stations
@@ -61,18 +61,17 @@ stationDF.upd <- Update_station_list_4_stations(station.list.upd, stationDF)
 ## problem sites: 0 (non-NA) cases: non-missing data do not overlap across all sites
 ##                 dim(X) must hvae a postive length: two sites overlapping problem
 
-stationDF2 <- stationDF.upd[-c(8,14,22,23,34,53,55,58,59,61,64,65,66,
-                               76,78,79,82,84,89,90,91,104),]
+stationDF2 <- stationDF.upd[-c(14,21,27,28,29,42,51,56,58,64,66,71,72,76),]
 
-Gap_Fill(stationDF2, 
-         sourceDir = "data/ghcnd_gap_filled_tmax", 
-         destDir = "data/ghcnd_gap_filled_tmax")
+Gap_Fill_5_stations(stationDF2, 
+                    sourceDir = "data/ghcnd_gap_filled_tmax", 
+                    destDir = "data/ghcnd_gap_filled_tmax")
 
 # Fill all remaining stations using data within the station
 ### Step 5:
 ### Gap filling 2. - use same period in other years to fill big chunk of missing data
 ###                - and the remaining unfilled sites
-Gap_Fill_within_station(station.list.upd, 
+Gap_Fill_within_station_5_stations(station.list.upd, 
                         sourceDir = "data/ghcnd_gap_filled_tmax",
                         destDir = "data/ghcnd_gap_filled_tmax")
 
@@ -85,7 +84,7 @@ YrRange10(sourceDir = "data/ghcnd_gap_filled_tmax")
 ### Step 7:
 ### Update stationDF2 to remove all removed stations from this list 
 ### and add the growing season information
-final_station_DF <-Final_station_list_4(sourceDir = "data/ghcnd_gap_filled_tmax", stationDF.upd,
+final_station_DF <-Final_station_list_5_stations(sourceDir = "data/ghcnd_gap_filled_tmax", stationDF.upd,
                                         outname="tmax")
 
 ##############################################################################################################
@@ -105,7 +104,7 @@ consecutive_day_indices_hunter_gatherer_tmax(final_station_DF,
                                         sourceDir = "data/ghcnd_gap_filled_tmax", destDir = "data/indices/WSDI_hunter_gatherer")
 
 ### Calculate annual consecutive day indices, regardless of the societies
-WSDI_annual(sourceDir = "data/ghcnd_gap_filled_tmax", destDir = "data/indices/annual_consecutive_tmax")
+CSDI_annual(sourceDir = "data/ghcnd_gap_filled_tmax", destDir = "data/indices/annual_consecutive_tmax")
 
 ##############################################################################################################
 #### Calculate whole year range predictability
