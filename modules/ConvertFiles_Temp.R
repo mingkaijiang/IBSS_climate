@@ -5,9 +5,9 @@
 
 ConvertFiles_Temp <- function(sourceDir = DAILY.FILES.DIRECTORY, 
                          stations,
-                         destDir = DAILY.DATA.DIRECTORY) 
-{
-    files <- paste0(stations, ".dly")
+                         destDir = DAILY.DATA.DIRECTORY) {
+    
+  files <- paste0(stations, ".dly")
     if (!file.exists(destDir)) 
         dir.create(destDir)
     for (thisFile in 1:length(files)) 

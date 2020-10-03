@@ -25,18 +25,19 @@ growDF <- read.csv("input/PlantSeasonality.csv")
 growDF <- growing_season_single_entry(growDF)
 
 ### Obtain SCCS based GHCN stations that are closest to the SCCS point
-stationDF <- select_4_ghcn_stations(corDF, gDF, growDF)
+stationDF <- select_5_ghcn_stations(corDF, gDF, growDF)
 
 ### Obtain GHCN station list to process
-station.list <- c(stationDF$ghcn1,stationDF$ghcn2,stationDF$ghcn3,stationDF$ghcn4)
+station.list <- c(stationDF$ghcn1,stationDF$ghcn2,stationDF$ghcn3,
+                  stationDF$ghcn4,stationDF$ghcn5)
 
 ##############################################################################################################
 #### select on SCCS sites based on their information sheet
 ### Step 1: 
 ### Convert all files from .dly to .csv format, removed data quality flag
 ConvertFiles_Temp(sourceDir = "data/ghcnd_all/ghcnd_all/",
-             stations = station.list,
-             destDir = "data/ghcnd_selected_tmin")
+                  stations = station.list,
+                  destDir = "data/ghcnd_selected_tmin")
 
 ### Step 2:
 ### Restructure the files to continuous days, added leap years
