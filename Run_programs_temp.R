@@ -52,7 +52,7 @@ station.list.upd <- Missing_check(station.list,
                                   destDir = "data/ghcnd_gap_filled_tmin")
 
 ## update stationDF
-stationDF.upd <- Update_station_list_4_stations(station.list.upd, stationDF)
+stationDF.upd <- Update_station_list_5_stations(station.list.upd, stationDF)
 
 ### Step 4: 
 ### Gap filling 1. - use statistical correlation among 9 stations to gap fill all 9 stations
@@ -62,20 +62,19 @@ stationDF.upd <- Update_station_list_4_stations(station.list.upd, stationDF)
 ## problem sites: 0 (non-NA) cases: non-missing data do not overlap across all sites
 ##                 dim(X) must hvae a postive length: two sites overlapping problem
 
-stationDF2 <- stationDF.upd[-c(8,14,22,23,34,53,55,58,59,61,64,65,66,
-                               76,78,79,82,84,89,90,91,104),]
+stationDF2 <- stationDF.upd[-c(14,21,27,28,29,42,51,56,58,64,65,66,71,72,76),]
 
-Gap_Fill(stationDF2, 
-         sourceDir = "data/ghcnd_gap_filled_tmin", 
-         destDir = "data/ghcnd_gap_filled_tmin")
+Gap_Fill_5_stations(stationDF2, 
+                    sourceDir = "data/ghcnd_gap_filled_tmin", 
+                    destDir = "data/ghcnd_gap_filled_tmin")
 
 # Fill all remaining stations using data within the station
 ### Step 5:
 ### Gap filling 2. - use same period in other years to fill big chunk of missing data
 ###                - and the remaining unfilled sites
-Gap_Fill_within_station(station.list.upd, 
-                        sourceDir = "data/ghcnd_gap_filled_tmin",
-                        destDir = "data/ghcnd_gap_filled_tmin")
+Gap_Fill_within_station_5_stations(station.list.upd, 
+                                   sourceDir = "data/ghcnd_gap_filled_tmin",
+                                   destDir = "data/ghcnd_gap_filled_tmin")
 
 ### Step 6:
 ### Check year range quality - only include data with > 10 yrs of data
@@ -86,8 +85,9 @@ YrRange10(sourceDir = "data/ghcnd_gap_filled_tmin")
 ### Step 7:
 ### Update stationDF2 to remove all removed stations from this list 
 ### and add the growing season information
-final_station_DF <-Final_station_list_4(sourceDir = "data/ghcnd_gap_filled_tmin", stationDF.upd,
-                                        outname="tmin")
+final_station_DF <-Final_station_list_5_stations(sourceDir = "data/ghcnd_gap_filled_tmin", 
+                                                 stationDF.upd,
+                                                 outname="tmin")
 
 ##############################################################################################################
 #### Compute indices
@@ -99,11 +99,12 @@ ThrIndS_temp_ann(sourceDir = "data/ghcnd_gap_filled_tmin", destDir = "data/indic
 ### Step 2: 
 ### Calculate consecutive days indices
 consecutive_day_indices_tmin(final_station_DF, 
-                        sourceDir = "data/ghcnd_gap_filled_tmin", destDir = "data/indices/CSDI")
+                             sourceDir = "data/ghcnd_gap_filled_tmin", destDir = "data/indices/CSDI")
 
 ### Calculate consecutive days indices for hunter/gatherer societies, i.e. sites without any plant grow information
 consecutive_day_indices_hunter_gatherer_tmin(final_station_DF, 
-                                        sourceDir = "data/ghcnd_gap_filled_tmin", destDir = "data/indices/CSDI_hunter_gatherer")
+                                             sourceDir = "data/ghcnd_gap_filled_tmin", 
+                                             destDir = "data/indices/CSDI_hunter_gatherer")
 
 ### Calculate annual consecutive day indices, regardless of the societies
 CSDI_annual(sourceDir = "data/ghcnd_gap_filled_tmin", destDir = "data/indices/annual_consecutive_tmin")
