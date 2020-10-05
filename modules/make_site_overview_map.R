@@ -50,7 +50,7 @@ make_site_overview_map <- function(sDF) {
     guides(fill=guide_legend(nrow=5), color=guide_legend(nrow=5))
   
   
-  pdf("data/site_overview_map.pdf", width=8, height=4)
+  pdf("data/less_site_overview_map.pdf", width=8, height=4)
   plot(p1)
   dev.off()
   
