@@ -19,7 +19,7 @@ corDF <- read.csv("input/weight_dis_ht.csv")
 gDF <- read.csv("input/ghcnd-stations.csv")
 
 ### Get growing season information
-growDF <- read.csv("input/PlantSeasonality_revised.csv")
+growDF <- read.csv("input/PlantSeasonality.csv")
 
 ### Process growing season data to have single entry for each SCCS society
 growDF <- growing_season_single_entry(growDF)

@@ -74,6 +74,7 @@ vignettes/*.pdf
 /input/weight_dis_ht_revised.csv
 /input/*.xlsx
 /data/site_overview_map.pdf
+/input/PlantSeasonality_revised.csv
 
 # /data/PE_PDSI/*.txt
 
