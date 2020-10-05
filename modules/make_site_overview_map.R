@@ -18,6 +18,10 @@ make_site_overview_map <- function(sDF) {
     geom_point(data=sDF, aes(y=lat3, x=lon3), col="black", fill="grey", size=1, pch=21)+
     geom_point(data=sDF, aes(y=lat4, x=lon4), col="black", fill="grey", size=1, pch=21)+
     geom_point(data=sDF, aes(y=lat5, x=lon5), col="black", fill="grey",  size=1, pch=21)+
+    geom_point(data=sDF, aes(y=lat6, x=lon6), col="black", fill="grey",  size=1, pch=21)+
+    geom_point(data=sDF, aes(y=lat7, x=lon7), col="black", fill="grey",  size=1, pch=21)+
+    geom_point(data=sDF, aes(y=lat8, x=lon8), col="black", fill="grey",  size=1, pch=21)+
+    geom_point(data=sDF, aes(y=lat9, x=lon9), col="black", fill="grey",  size=1, pch=21)+
     geom_point(data=sDF, aes(y=lat1, x=lon1), fill="black", size=1, pch=21)+
     geom_point(data=sDF, aes(y=slat, x=slon), fill="green", size=1, pch=21)+
     scale_fill_manual(name="Rainfall (mm/yr)", 

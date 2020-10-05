@@ -25,16 +25,16 @@ growDF <- read.csv("input/PlantSeasonality.csv")
 growDF <- growing_season_single_entry(growDF)
 
 ### Obtain SCCS based GHCN stations that are closest to the SCCS point
-#stationDF <- select_9_ghcn_stations(corDF, gDF, growDF)
-stationDF <- select_5_ghcn_stations(corDF, gDF, growDF)
+stationDF <- select_9_ghcn_stations(corDF, gDF, growDF)
+#stationDF <- select_5_ghcn_stations(corDF, gDF, growDF)
 
 ### Obtain GHCN station list to process
-#station.list <- c(stationDF$ghcn1, stationDF$ghcn2, stationDF$ghcn3,
-#                  stationDF$ghcn4, stationDF$ghcn5, stationDF$ghcn6,
-#                  stationDF$ghcn7, stationDF$ghcn8, stationDF$ghcn9)
-
 station.list <- c(stationDF$ghcn1, stationDF$ghcn2, stationDF$ghcn3,
-                  stationDF$ghcn4, stationDF$ghcn5)
+                  stationDF$ghcn4, stationDF$ghcn5, stationDF$ghcn6,
+                  stationDF$ghcn7, stationDF$ghcn8, stationDF$ghcn9)
+
+#station.list <- c(stationDF$ghcn1, stationDF$ghcn2, stationDF$ghcn3,
+#                  stationDF$ghcn4, stationDF$ghcn5)
 
 ##############################################################################################################
 #### select on SCCS sites based on their information sheet
@@ -57,11 +57,11 @@ station.list.upd <- Missing_check(station.list,
                                   destDir = "data/ghcnd_gap_filled")
 
 ## update stationDF
-#stationDF.upd <- Update_station_list(station.list.input=station.list.upd, 
-#                                     sDF=stationDF)
+stationDF.upd <- Update_station_list(station.list.input=station.list.upd, 
+                                     sDF=stationDF)
 
-stationDF.upd <- Update_station_list_5_stations(station.list.input=station.list.upd, 
-                                                sDF=stationDF)
+#stationDF.upd <- Update_station_list_5_stations(station.list.input=station.list.upd, 
+#                                                sDF=stationDF)
 
 ### Step 4: 
 ### Gap filling 1. - use statistical correlation among 9 stations to gap fill all 9 stations
@@ -72,31 +72,31 @@ stationDF.upd <- Update_station_list_5_stations(station.list.input=station.list.
 ##                 dim(X) must have a postive length: two sites overlapping problem
 ##                lmCoef[j, i]: subscript out of bounds: 
 ##                error in modDF$date
-#stationDF2 <- stationDF.upd[-c(23,25,30,38,53,55,65,77,80,84,85,      # 0 (non-NA) cases
-#                               21,49,50,52,96,97,                       # dim(X) must have a positive length
-#                               24,51,62,69,70,78),]                          # lmCoef[j, i]: subscript out of bounds
+stationDF2 <- stationDF.upd[-c(23,25,30,38,53,55,65,77,80,84,85,      # 0 (non-NA) cases
+                               21,49,50,52,96,97,                       # dim(X) must have a positive length
+                               24,51,62,69,70,78),]                          # lmCoef[j, i]: subscript out of bounds
 
-#Gap_Fill(stationDF2, 
-#         sourceDir = "data/ghcnd_gap_filled", 
-#         destDir = "data/ghcnd_gap_filled")
+Gap_Fill(stationDF2, 
+         sourceDir = "data/ghcnd_gap_filled", 
+         destDir = "data/ghcnd_gap_filled")
 
 
-stationDF2 <- stationDF.upd[-c(19, 24, 32, 42, 51, 59, 60, 64, 66, 67),]
-Gap_Fill_5_stations(stationDF2, 
-                    sourceDir = "data/ghcnd_gap_filled", 
-                    destDir = "data/ghcnd_gap_filled")
+#stationDF2 <- stationDF.upd[-c(19, 24, 32, 42, 51, 59, 60, 64, 66, 67),]
+#Gap_Fill_5_stations(stationDF2, 
+#                    sourceDir = "data/ghcnd_gap_filled", 
+#                    destDir = "data/ghcnd_gap_filled")
 
 # Fill all remaining stations using data within the station
 ### Step 5:
 ### Gap filling 2. - use same period in other years to fill big chunk of missing data
 ###                - and the remaining unfilled sites
-#Gap_Fill_within_station(station.list.upd, 
-#                        sourceDir = "data/ghcnd_gap_filled",
-#                        destDir = "data/ghcnd_gap_filled")
+Gap_Fill_within_station(station.list.upd, 
+                        sourceDir = "data/ghcnd_gap_filled",
+                        destDir = "data/ghcnd_gap_filled")
 
-Gap_Fill_within_station_5_stations(station.list.input=station.list.upd, 
-                                   sourceDir = "data/ghcnd_gap_filled",
-                                   destDir = "data/ghcnd_gap_filled")
+#Gap_Fill_within_station_5_stations(station.list.input=station.list.upd, 
+#                                   sourceDir = "data/ghcnd_gap_filled",
+#                                   destDir = "data/ghcnd_gap_filled")
 
 ### Step 6:
 ### Check year range quality - only include data with > 10 yrs of data
@@ -107,11 +107,11 @@ YrRange10(sourceDir = "data/ghcnd_gap_filled")
 ### Step 7:
 ### Update stationDF2 to remove all removed stations from this list 
 ### and add the growing season information
-#final_station_DF <-Final_station_list(sourceDir = "data/ghcnd_gap_filled", stationDF.upd,
-#                                      outname="prcp")
+final_station_DF <-Final_station_list(sourceDir = "data/ghcnd_gap_filled", stationDF.upd,
+                                      outname="prcp")
 
-final_station_DF <-Final_station_list_5_stations(sourceDir = "data/ghcnd_gap_filled", sDF=stationDF.upd,
-                                                 outname="prcp")
+#final_station_DF <-Final_station_list_5_stations(sourceDir = "data/ghcnd_gap_filled", sDF=stationDF.upd,
+#                                                 outname="prcp")
 
 ### plot SCCS site and GHCN stations
 make_site_overview_map(sDF = final_station_DF)
