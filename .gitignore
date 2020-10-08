@@ -75,6 +75,7 @@ vignettes/*.pdf
 /input/*.xlsx
 /data/site_overview_map.pdf
 /input/PlantSeasonality_revised.csv
+/input/HighGodVariablesForMap.csv
 
 # /data/PE_PDSI/*.txt
 
