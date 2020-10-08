@@ -27,11 +27,11 @@ make_site_overview_map <- function(sDF) {
   
   colnames(test1) <- colnames(test2) <- colnames(test3) <- colnames(test4) <- colnames(test5) <- colnames(test6) <- colnames(test7) <- colnames(test8) <- colnames(test9) <- c("lat", "lon")
   
-  test1$lab <- "primary"
+  test1$lab <- "2_primary"
   test10 <- rbind(test2, test3, test4, test5, test6, test7, test8, test9)
-  test10$lab <- "secondary"
+  test10$lab <- "1_secondary"
   
-  ghcnDF <- rbind(test1, test10)
+  ghcnDF <- rbind(test10,test1)
   
   ### plotting
   p1 <- ggplot() + 
@@ -52,8 +52,8 @@ make_site_overview_map <- function(sDF) {
                       values=alpha(c("indianred4", "indianred1","thistle1", "skyblue", "blue"),0.2),
                       label=c("0-100", "100-500", "500-2000", "2000-4000", ">4000"))+
     scale_color_manual(name="GHCN station", 
-                       values=c("purple", "orange"),
-                       label=c("primary", "secondary"))+
+                       values=c("orange", "purple"),
+                       label=c("secondary", "primary"))+
     scale_shape_manual(name="SCCS site",
                          values=c(4,17,19),
                          labels=c("Not codable",
