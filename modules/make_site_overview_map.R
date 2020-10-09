@@ -40,8 +40,8 @@ make_site_overview_map <- function(sDF) {
     coord_quickmap(xlim=range(precDF$Lon), ylim=range(precDF$Lat))+
     borders("world", col="black", lwd=0.2) +
     geom_point(data=ghcnDF, aes(y=lat, x=lon, col=lab), size=1, pch=19)+
-    geom_point(data=plotDF, aes(y=slat, x=slon, pch=as.character(G1_AbsentOrNA_Associated)), 
-               col="black", size=1)+
+    geom_point(data=subDF, aes(y=slat, x=slon), 
+               col="black", size=1, pch=19)+
     scale_fill_manual(name="Rainfall (mm/yr)", 
                       values=alpha(c("indianred4", "indianred1","thistle1", "skyblue", "blue"),0.2),
                       label=c("0-100", "100-500", "500-2000", "2000-4000", ">4000"))+

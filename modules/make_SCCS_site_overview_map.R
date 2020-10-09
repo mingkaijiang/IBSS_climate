@@ -40,15 +40,17 @@ make_SCCS_site_overview_map <- function(sDF) {
     geom_tile(data=precDF, aes(y=Lat, x=Lon, fill=as.character(prec_cat))) +
     coord_quickmap(xlim=range(precDF$Lon), ylim=range(precDF$Lat))+
     borders("world", col="black", lwd=0.2) +
-    #geom_point(data=ghcnDF, aes(y=lat, x=lon, col=lab), size=1, pch=19)+
-    geom_point(data=plotDF, aes(y=slat, x=slon, pch=as.character(G1_AbsentOrNA_Associated)), 
-               col="black", size=1)+
+    geom_point(data=plotDF, aes(y=slat, x=slon, pch=as.character(G1_AbsentOrNA_Associated),
+                                col=as.character(G1_AbsentOrNA_Associated)), 
+              size=1)+
     scale_fill_manual(name="Rainfall (mm/yr)", 
                       values=alpha(c("indianred4", "indianred1","thistle1", "skyblue", "blue"),0.2),
                       label=c("0-100", "100-500", "500-2000", "2000-4000", ">4000"))+
-    scale_color_manual(name="GHCN station", 
-                       values=c("orange", "purple"),
-                       label=c("secondary", "primary"))+
+    scale_color_manual(name="SCCS site",
+                       values=c("black", "blue", "black"),
+                       labels=c("High God absence/Not codable",
+                                "High God presence, not associated with weather",
+                                "High God presence, associated with weather"))+
     scale_shape_manual(name="SCCS site",
                          values=c(4,3,19),
                          labels=c("High God absence/Not codable",
@@ -70,7 +72,8 @@ make_SCCS_site_overview_map <- function(sDF) {
                                            colour ="white"),
           plot.title = element_text(size=14, face="bold.italic", 
                                     hjust = 0.5))+
-    guides(fill=guide_legend(nrow=1), color=guide_legend(nrow=1), shape=guide_legend(nrow=2))
+    guides(fill=guide_legend(nrow=1), color=guide_legend(nrow=2), 
+           shape=guide_legend(nrow=2, col=c("black", "blue", "black")))
   
   
   pdf("data/Figure_1.pdf", width=8, height=5)
@@ -84,8 +87,8 @@ make_SCCS_site_overview_map <- function(sDF) {
     coord_quickmap(xlim=range(precDF$Lon), ylim=range(precDF$Lat))+
     borders("world", col="black", lwd=0.2) +
     geom_point(data=ghcnDF, aes(y=lat, x=lon, col=lab), size=1, pch=19)+
-    geom_point(data=plotDF, aes(y=slat, x=slon, pch=as.character(G1_AbsentOrNA_Associated)), 
-               col="black", size=1)+
+    geom_point(data=subDF, aes(y=slat, x=slon), 
+               col="black", size=1, pch=19)+
     scale_fill_manual(name="Rainfall (mm/yr)", 
                       values=alpha(c("indianred4", "indianred1","thistle1", "skyblue", "blue"),0.2),
                       label=c("0-100", "100-500", "500-2000", "2000-4000", ">4000"))+
@@ -116,7 +119,7 @@ make_SCCS_site_overview_map <- function(sDF) {
     guides(fill=guide_legend(nrow=1), color=guide_legend(nrow=1), shape=guide_legend(nrow=2))
   
   
-  pdf("data/Figure_1_alternative.pdf", width=8, height=5)
+  pdf("data/Figure_S2.pdf", width=8, height=5)
   plot(p1)
   dev.off()
   
