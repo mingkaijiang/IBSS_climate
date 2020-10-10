@@ -81,20 +81,24 @@ make_SCCS_site_overview_map <- function(sDF) {
   dev.off()
   
   
+  testDF <- data.frame(subDF$slat, subDF$slon, "3_SCCS_site")
+  colnames(testDF) <- c("lat", "lon", "lab")
+  pDF <- rbind(ghcnDF, testDF)
+  
   ### plotting
   p1 <- ggplot() + 
     geom_tile(data=precDF, aes(y=Lat, x=Lon, fill=as.character(prec_cat))) +
     coord_quickmap(xlim=range(precDF$Lon), ylim=range(precDF$Lat))+
     borders("world", col="black", lwd=0.2) +
-    geom_point(data=ghcnDF, aes(y=lat, x=lon, col=lab), size=1, pch=19)+
-    geom_point(data=subDF, aes(y=slat, x=slon), 
-               col="black", size=1, pch=19)+
+    geom_point(data=pDF, aes(y=lat, x=lon, col=lab), size=1, pch=19)+
+    #geom_point(data=subDF, aes(y=slat, x=slon), 
+    #           col="black", size=1, pch=19)+
     scale_fill_manual(name="Rainfall (mm/yr)", 
                       values=alpha(c("indianred4", "indianred1","thistle1", "skyblue", "blue"),0.2),
                       label=c("0-100", "100-500", "500-2000", "2000-4000", ">4000"))+
-    scale_color_manual(name="GHCN station", 
-                       values=c("orange", "purple"),
-                       label=c("secondary", "primary"))+
+    scale_color_manual(name="Point", 
+                       values=c("orange", "purple", "black"),
+                       label=c("GHCN secondary", "GHCN primary", "SCCS site"))+
     scale_shape_manual(name="SCCS site",
                        values=c(4,3,19),
                        labels=c("High God absence/Not codable",
@@ -116,7 +120,7 @@ make_SCCS_site_overview_map <- function(sDF) {
                                            colour ="white"),
           plot.title = element_text(size=14, face="bold.italic", 
                                     hjust = 0.5))+
-    guides(fill=guide_legend(nrow=1), color=guide_legend(nrow=1), shape=guide_legend(nrow=2))
+    guides(fill=guide_legend(nrow=1), color=guide_legend(nrow=2,byrow=T), shape=guide_legend(nrow=2))
   
   
   pdf("data/Figure_S2.pdf", width=8, height=5)
