@@ -52,7 +52,7 @@ make_SCCS_site_overview_map <- function(sDF) {
                                 "High God presence, not associated with weather",
                                 "High God presence, associated with weather"))+
     scale_shape_manual(name="SCCS site",
-                         values=c(4,3,19),
+                         values=c(4,19,19),
                          labels=c("High God absence/Not codable",
                                   "High God presence, not associated with weather",
                                   "High God presence, associated with weather"))+

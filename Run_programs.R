@@ -19,23 +19,23 @@ corDF <- read.csv("input/weight_dis_ht.csv")
 gDF <- read.csv("input/ghcnd-stations.csv")
 
 ### Get growing season information
-#growDF <- read.csv("input/PlantSeasonality.csv")
-growDF <- read.csv("input/PlantSeasonality_revised.csv")
+growDF <- read.csv("input/PlantSeasonality.csv")
+#growDF <- read.csv("input/PlantSeasonality_revised.csv")
 
 ### Process growing season data to have single entry for each SCCS society
 growDF <- growing_season_single_entry(growDF)
 
 ### Obtain SCCS based GHCN stations that are closest to the SCCS point
-#stationDF <- select_9_ghcn_stations(corDF, gDF, growDF)
-stationDF <- select_5_ghcn_stations(corDF, gDF, growDF)
+stationDF <- select_9_ghcn_stations(corDF, gDF, growDF)
+#stationDF <- select_5_ghcn_stations(corDF, gDF, growDF)
 
 ### Obtain GHCN station list to process
-#station.list <- c(stationDF$ghcn1, stationDF$ghcn2, stationDF$ghcn3,
-#                  stationDF$ghcn4, stationDF$ghcn5, stationDF$ghcn6,
-#                  stationDF$ghcn7, stationDF$ghcn8, stationDF$ghcn9)
-
 station.list <- c(stationDF$ghcn1, stationDF$ghcn2, stationDF$ghcn3,
-                  stationDF$ghcn4, stationDF$ghcn5)
+                  stationDF$ghcn4, stationDF$ghcn5, stationDF$ghcn6,
+                  stationDF$ghcn7, stationDF$ghcn8, stationDF$ghcn9)
+
+#station.list <- c(stationDF$ghcn1, stationDF$ghcn2, stationDF$ghcn3,
+#                  stationDF$ghcn4, stationDF$ghcn5)
 
 ##############################################################################################################
 #### select on SCCS sites based on their information sheet
@@ -58,11 +58,11 @@ station.list.upd <- Missing_check(station.list,
                                   destDir = "data/ghcnd_gap_filled")
 
 ## update stationDF
-#stationDF.upd <- Update_station_list(station.list.input=station.list.upd, 
-#                                     sDF=stationDF)
+stationDF.upd <- Update_station_list(station.list.input=station.list.upd, 
+                                     sDF=stationDF)
 
-stationDF.upd <- Update_station_list_5_stations(station.list.input=station.list.upd, 
-                                                sDF=stationDF)
+#stationDF.upd <- Update_station_list_5_stations(station.list.input=station.list.upd, 
+#                                                sDF=stationDF)
 
 ### Step 4: 
 ### Gap filling 1. - use statistical correlation among 9 stations to gap fill all 9 stations
@@ -108,11 +108,11 @@ YrRange10(sourceDir = "data/ghcnd_gap_filled")
 ### Step 7:
 ### Update stationDF2 to remove all removed stations from this list 
 ### and add the growing season information
-#final_station_DF <-Final_station_list(sourceDir = "data/ghcnd_gap_filled", stationDF.upd,
-#                                      outname="prcp")
+final_station_DF <-Final_station_list(sourceDir = "data/ghcnd_gap_filled", stationDF.upd,
+                                      outname="prcp")
 
-final_station_DF <-Final_station_list_5_stations(sourceDir = "data/ghcnd_gap_filled", sDF=stationDF.upd,
-                                                 outname="prcp")
+#final_station_DF <-Final_station_list_5_stations(sourceDir = "data/ghcnd_gap_filled", sDF=stationDF.upd,
+#                                                 outname="prcp")
 
 ### plot SCCS site and GHCN stations
 make_site_overview_map(sDF = final_station_DF)
