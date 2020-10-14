@@ -42,7 +42,7 @@ make_site_overview_map <- function(sDF) {
   p1 <- ggplot() + 
     geom_tile(data=precDF, aes(y=Lat, x=Lon, fill=as.character(prec_cat))) +
     coord_quickmap(xlim=range(precDF$Lon), ylim=range(precDF$Lat))+
-    borders("world", col="black", lwd=0.2) +
+    borders("world", col="grey", lwd=0.2) +
     geom_point(data=pDF, aes(y=lat, x=lon, col=lab), size=1, pch=19)+
     #geom_point(data=subDF, aes(y=slat, x=slon), 
     #           col="black", size=1, pch=19)+
