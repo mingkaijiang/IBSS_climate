@@ -76,7 +76,7 @@ make_SCCS_site_overview_map <- function(sDF) {
            shape=guide_legend(nrow=2, col=c("black", "blue", "black")))
   
   
-  pdf("data/Figure_1.pdf", width=8, height=5)
+  pdf("data/Figure_1b.pdf", width=8, height=5)
   plot(p1)
   dev.off()
   
@@ -97,7 +97,7 @@ make_SCCS_site_overview_map <- function(sDF) {
                       values=alpha(c("indianred4", "indianred1","thistle1", "skyblue", "blue"),0.2),
                       label=c("0-100", "100-500", "500-2000", "2000-4000", ">4000"))+
     scale_color_manual(name="Point", 
-                       values=c("orange", "purple", "black"),
+                       values=c("orange", "cyan", "black"),
                        label=c("GHCN secondary", "GHCN primary", "SCCS site"))+
     scale_shape_manual(name="SCCS site",
                        values=c(4,3,19),
@@ -123,7 +123,7 @@ make_SCCS_site_overview_map <- function(sDF) {
     guides(fill=guide_legend(nrow=1), color=guide_legend(nrow=2,byrow=T), shape=guide_legend(nrow=2))
   
   
-  pdf("data/Figure_S2.pdf", width=8, height=5)
+  pdf("data/Figure_S2b.pdf", width=8, height=5)
   plot(p1)
   dev.off()
   
